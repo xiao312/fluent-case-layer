@@ -1,0 +1,52 @@
+schema_version: "1.0"
+boundaries:
+  - id: methane-inlet
+    zones:
+      type: names
+      names: [fuel]
+      cardinality: {exactly: 1}
+    condition:
+      type: mass_flow_inlet
+      mass_flow: {value: 0.00788, unit: kg/s}
+      temperature: {value: 300, unit: K}
+      species: {basis: mass_fraction, fractions: {ch4: 1.0}}
+      turbulence: {type: none}
+  - id: oxygen-inlet
+    zones:
+      type: names
+      names: [oxy]
+      cardinality: {exactly: 1}
+    condition:
+      type: mass_flow_inlet
+      mass_flow: {value: 0.01260, unit: kg/s}
+      temperature: {value: 300, unit: K}
+      species: {basis: mass_fraction, fractions: {o2: 1.0}}
+      turbulence: {type: none}
+  - id: chamber-outlet
+    zones:
+      type: names
+      names: [outlet]
+      cardinality: {exactly: 1}
+    condition:
+      type: pressure_outlet
+      gauge_pressure: {value: 0, unit: Pa}
+      backflow_temperature: {value: 300, unit: K}
+      backflow_species: {basis: mass_fraction, fractions: {o2: 1.0}}
+  - id: torch-wall
+    zones:
+      type: names
+      names: [wall_fuel]
+      cardinality: {exactly: 1}
+    condition:
+      type: wall
+      shear: no_slip
+      thermal: {type: adiabatic}
+  - id: combustor-wall
+    zones:
+      type: names
+      names: [wall_comb]
+      cardinality: {exactly: 1}
+    condition:
+      type: wall
+      shear: no_slip
+      thermal: {type: adiabatic}

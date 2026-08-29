@@ -1,0 +1,25 @@
+schema_version: "1.0"
+case:
+  id: transient-1d-h2-air
+  title: Transient planar H2/air flame
+  readiness: illustrative
+  description: Fresh mesh, finite-rate setup, burned-half patch, and transient advance.
+  known_blockers:
+    - The typed driver does not yet run the Cantera flame-speed preprocessing step.
+    - UDF compilation and hook reconciliation are not represented by a typed stage.
+solver:
+  dimension: 2d_planar
+  formulation: pressure_based
+  time: transient
+  precision: double
+  velocity_formulation: absolute
+  energy: true
+  operating_pressure: {value: 101325, unit: Pa}
+turbulence: {type: laminar}
+species:
+  type: species_transport
+  volumetric_reactions: true
+  diffusion_energy_source: true
+  turbulence_chemistry: none
+radiation: {type: none}
+discrete_phase: {enabled: false}

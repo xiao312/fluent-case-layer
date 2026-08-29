@@ -1,0 +1,70 @@
+schema_version: "1.0"
+actions:
+  - id: standard-cold
+    type: standard
+    reference_zone:
+      type: names
+      names: [right-open]
+      cardinality: {exactly: 1}
+  - id: create-burned-half
+    type: create_register
+    name: burned-half
+    region:
+      type: box
+      minimum: {value: [0, -0.00005, -0.000001], unit: m}
+      maximum: {value: [0.00842995442595, 0.00005, 0.000001], unit: m}
+  - id: patch-burned-temperature
+    type: patch
+    target: {type: register, register: burned-half}
+    field: temperature
+    value: {type: uniform_scalar, value: {value: 2387.6369000144755, unit: K}}
+  - id: patch-burned-h2
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-h2
+    value: {type: uniform_scalar, value: {value: 0.0012094703843359856, unit: "1"}}
+  - id: patch-burned-h
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-h
+    value: {type: uniform_scalar, value: {value: 0.00007518968532887624, unit: "1"}}
+  - id: patch-burned-o
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-o
+    value: {type: uniform_scalar, value: {value: 0.0004002622489938277, unit: "1"}}
+  - id: patch-burned-o2
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-o2
+    value: {type: uniform_scalar, value: {value: 0.007393150686643479, unit: "1"}}
+  - id: patch-burned-oh
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-oh
+    value: {type: uniform_scalar, value: {value: 0.005103128536347905, unit: "1"}}
+  - id: patch-burned-h2o
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-h2o
+    value: {type: uniform_scalar, value: {value: 0.24069329630237965, unit: "1"}}
+  - id: patch-burned-ho2
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-ho2
+    value: {type: uniform_scalar, value: {value: 0.0000017090448293813704, unit: "1"}}
+  - id: patch-burned-h2o2
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-h2o2
+    value: {type: uniform_scalar, value: {value: 0.00000018760971863137027, unit: "1"}}
+  - id: patch-burned-ar
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-ar
+    value: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: patch-burned-n2
+    type: patch
+    target: {type: register, register: burned-half}
+    field: mass-fraction-n2
+    value: {type: uniform_scalar, value: {value: 0.7451236055014222, unit: "1"}}

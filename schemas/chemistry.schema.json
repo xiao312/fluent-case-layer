@@ -1,0 +1,355 @@
+{
+  "$defs": {
+    "AssetMechanism": {
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "enum": [
+            "chemkin",
+            "cantera_yaml",
+            "fluent_table"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "mechanism_asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Mechanism Asset",
+          "type": "string"
+        },
+        "thermodynamics_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Thermodynamics Asset"
+        },
+        "transport_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Transport Asset"
+        },
+        "type": {
+          "const": "asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "format",
+        "mechanism_asset"
+      ],
+      "title": "AssetMechanism",
+      "type": "object"
+    },
+    "BuiltinMechanism": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "builtin",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "title": "BuiltinMechanism",
+      "type": "object"
+    },
+    "Composition": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "mass_fraction",
+            "mole_fraction"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "fractions": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "type": "number"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Fractions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "basis",
+        "fractions"
+      ],
+      "title": "Composition",
+      "type": "object"
+    },
+    "FiniteRateChemistry": {
+      "additionalProperties": false,
+      "properties": {
+        "mechanism": {
+          "discriminator": {
+            "mapping": {
+              "asset": "#/$defs/AssetMechanism",
+              "builtin": "#/$defs/BuiltinMechanism"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/BuiltinMechanism"
+            },
+            {
+              "$ref": "#/$defs/AssetMechanism"
+            }
+          ],
+          "title": "Mechanism"
+        },
+        "stiff_chemistry_solver": {
+          "default": true,
+          "title": "Stiff Chemistry Solver",
+          "type": "boolean"
+        },
+        "turbulence_interaction": {
+          "default": "none",
+          "enum": [
+            "none",
+            "eddy_dissipation",
+            "finite_rate_eddy_dissipation",
+            "edc"
+          ],
+          "title": "Turbulence Interaction",
+          "type": "string"
+        },
+        "type": {
+          "const": "finite_rate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "mechanism"
+      ],
+      "title": "FiniteRateChemistry",
+      "type": "object"
+    },
+    "FlameletChemistry": {
+      "additionalProperties": false,
+      "properties": {
+        "mechanism": {
+          "discriminator": {
+            "mapping": {
+              "asset": "#/$defs/AssetMechanism",
+              "builtin": "#/$defs/BuiltinMechanism"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/BuiltinMechanism"
+            },
+            {
+              "$ref": "#/$defs/AssetMechanism"
+            }
+          ],
+          "title": "Mechanism"
+        },
+        "nonadiabatic": {
+          "default": true,
+          "title": "Nonadiabatic",
+          "type": "boolean"
+        },
+        "partially_premixed": {
+          "default": false,
+          "title": "Partially Premixed",
+          "type": "boolean"
+        },
+        "progress_variable": {
+          "default": true,
+          "title": "Progress Variable",
+          "type": "boolean"
+        },
+        "table_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table Asset"
+        },
+        "table_mode": {
+          "default": "read",
+          "enum": [
+            "read",
+            "calculate"
+          ],
+          "title": "Table Mode",
+          "type": "string"
+        },
+        "type": {
+          "const": "flamelet",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "mechanism"
+      ],
+      "title": "FlameletChemistry",
+      "type": "object"
+    },
+    "NoChemistry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "NoChemistry",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "StreamSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "composition": {
+          "$ref": "#/$defs/Composition"
+        },
+        "temperature": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "temperature",
+        "composition"
+      ],
+      "title": "StreamSpec",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "model": {
+      "discriminator": {
+        "mapping": {
+          "finite_rate": "#/$defs/FiniteRateChemistry",
+          "flamelet": "#/$defs/FlameletChemistry",
+          "none": "#/$defs/NoChemistry"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/NoChemistry"
+        },
+        {
+          "$ref": "#/$defs/FiniteRateChemistry"
+        },
+        {
+          "$ref": "#/$defs/FlameletChemistry"
+        }
+      ],
+      "title": "Model"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "streams": {
+      "patternProperties": {
+        "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+          "$ref": "#/$defs/StreamSpec"
+        }
+      },
+      "propertyNames": {
+        "maxLength": 96,
+        "minLength": 1
+      },
+      "title": "Streams",
+      "type": "object"
+    },
+    "tracked_species": {
+      "items": {
+        "maxLength": 96,
+        "minLength": 1,
+        "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+        "type": "string"
+      },
+      "title": "Tracked Species",
+      "type": "array"
+    }
+  },
+  "required": [
+    "model"
+  ],
+  "title": "ChemistryDocument",
+  "type": "object"
+}

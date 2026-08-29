@@ -1,0 +1,20 @@
+schema_version: "1.0"
+model:
+  type: flamelet
+  mechanism:
+    type: asset
+    format: fluent_table
+    mechanism_asset: m2-flamelet-library
+  table_asset: m2-pdf-table
+  table_mode: read
+  nonadiabatic: true
+  partially_premixed: true
+  progress_variable: true
+streams:
+  methane:
+    temperature: {value: 300, unit: K}
+    composition: {basis: mass_fraction, fractions: {ch4: 1.0}}
+  oxygen:
+    temperature: {value: 300, unit: K}
+    composition: {basis: mass_fraction, fractions: {o2: 1.0}}
+tracked_species: [ch4, o2, co2, h2o, co, h2, oh]

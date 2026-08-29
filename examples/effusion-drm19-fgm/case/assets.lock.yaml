@@ -1,0 +1,36 @@
+schema_version: "1.0"
+assets:
+  - id: tutorial-source-archive
+    kind: other
+    source: {type: remote, uri: "https://ansyshelp.ansys.com/public/Views/Secured/Doc_Assets/v261/Fluent/effusion_cooling.zip"}
+    sha256: 7cb249ed20742eee462a78a15dca432d2ce3c6e5900bd8cdc663fea5ee9f94e6
+    size_bytes: 346096
+    media_type: application/zip
+  - id: combustor-effusion-pmdb
+    kind: geometry
+    source: {type: environment, root_variable: FCL_EFFUSION_ASSET_ROOT, relative_path: combustor_effusion.dsco.pmdb}
+    sha256: 9d866bc3b95b9f7057603580aeb17ceba2e426e1e2c09bbc1534498c227bacc4
+    size_bytes: 530152
+    description: Tutorial-supplied preprocessed PMDB used by the executed SCNET meshing workflow.
+  - id: combustor-effusion-dsco
+    kind: geometry
+    source: {type: environment, root_variable: FCL_EFFUSION_ASSET_ROOT, relative_path: combustor_effusion.dsco}
+    sha256: e5e0934bcc8bd8d95710c002d8b18572f7c4375c9d9d815ea539829f377455de
+    size_bytes: 256516
+    description: Raw geometry provenance; its CAD reader was unavailable on the executed SCNET stack.
+  - id: drm19-chemkin
+    kind: chemistry
+    source: {type: environment, root_variable: FCL_EFFUSION_ASSET_ROOT, relative_path: drm19.inp}
+    sha256: e17b73d6c30b55942ca6899c7833dc27d48ad44f34eb2aa7f33d91b40e5ca925
+    size_bytes: 10576
+  - id: drm19-thermo
+    kind: chemistry
+    source: {type: environment, root_variable: FCL_EFFUSION_ASSET_ROOT, relative_path: thermo30.dat}
+    sha256: 595b544ecbd32b8e978ca2acb28c1c6779ee5da0694fe0ac00d18341946e33a7
+    size_bytes: 17568
+  - id: perforated-wall-input
+    kind: other
+    source: {type: environment, root_variable: FCL_EFFUSION_ASSET_ROOT, relative_path: input.txt}
+    sha256: 4de1eb77597cd59119b88d931bc0db84a2be7eaeb02e1f29f798ef5cd28334cb
+    size_bytes: 3676
+    description: Tutorial perforated-wall definition with 35 injection holes.

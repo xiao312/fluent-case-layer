@@ -1,0 +1,13 @@
+schema_version: "1.0"
+default_profile: continuation-second-order
+profiles:
+  continuation-second-order:
+    pressure_velocity_coupling: coupled
+    gradient: least_squares_cell_based
+    pressure: second_order
+    equations:
+      momentum: {spatial_scheme: second_order_upwind}
+      energy: {spatial_scheme: second_order_upwind}
+      mixture-fraction: {spatial_scheme: second_order_upwind}
+      mixture-fraction-variance: {spatial_scheme: second_order_upwind}
+      progress-variable: {spatial_scheme: second_order_upwind}

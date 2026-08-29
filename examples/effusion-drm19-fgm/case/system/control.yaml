@@ -1,0 +1,133 @@
+schema_version: "1.0"
+default_platform: scnet-cpu-small
+stages:
+  - id: declare-meshing-intent
+    type: reconcile
+    # A non-empty section is required by schema v1.0. The stage records solver
+    # context plus meshing inputs; it does not claim to execute Fluent Meshing.
+    sections: [physics]
+    inputs:
+      - {type: asset, name: geometry, asset: combustor-effusion-pmdb}
+      - {type: literal, name: length-unit, value: mm}
+      - {type: literal, name: local-face-labels, value: wall-liner-and-wall-liner-cold}
+      - {type: literal, name: local-target-size, value: 1.0, unit: mm}
+      - {type: literal, name: surface-min-size, value: 1.0, unit: mm}
+      - {type: literal, name: surface-max-size, value: 10.0, unit: mm}
+      - {type: literal, name: surface-growth-rate, value: 1.2}
+      - {type: literal, name: volume-fill, value: polyhedra}
+      - {type: literal, name: volume-max-cell-length, value: 10.0, unit: mm}
+      - {type: literal, name: periodic-zone, value: periodic_1}
+      - {type: literal, name: periodic-shadow-zone, value: periodic_2}
+    preconditions: [{type: asset_available, asset: combustor-effusion-pmdb}]
+    outputs:
+      - {id: meshing-intent, kind: manifest, path_template: "runs/{run_id}/meshing-intent.json"}
+  - id: build-fgm
+    type: reconcile
+    requires: [declare-meshing-intent]
+    sections: [chemistry]
+    inputs:
+      - {type: asset, name: kinetics, asset: drm19-chemkin}
+      - {type: asset, name: thermodynamics, asset: drm19-thermo}
+      - {type: literal, name: initial-flamelet-grid-points, value: 16}
+      - {type: literal, name: maximum-flamelet-grid-points, value: 64}
+      - {type: literal, name: mixture-fraction-grid-points, value: 31}
+      - {type: literal, name: progress-variable-grid-points, value: 32}
+      - {type: literal, name: initial-scalar-dissipation, value: 0.01, unit: 1/s}
+      - {type: literal, name: scalar-dissipation-multiplier, value: 10.0}
+      - {type: literal, name: scalar-dissipation-step, value: 5.0}
+    outputs:
+      - {id: fgm-case, kind: checkpoint, path_template: "runs/{run_id}/fgm.cas.h5"}
+      - {id: fgm-manifest, kind: manifest, path_template: "runs/{run_id}/fgm-manifest.json"}
+  - id: configure-flow-and-dpm
+    type: reconcile
+    requires: [build-fgm]
+    sections: [physics, materials, fields, boundary_conditions, numerics]
+    numerics_profile: tutorial-first-order
+    inputs:
+      - {type: asset, name: perforated-wall-definition, asset: perforated-wall-input}
+      - {type: literal, name: inlet-turbulence-intensity, value: 0.01}
+      - {type: literal, name: inlet-turbulent-viscosity-ratio, value: 2.0}
+      - {type: literal, name: number-of-streams, value: 300}
+      - {type: literal, name: injection-x, value: 0.015, unit: m}
+      - {type: literal, name: injection-y, value: 0.002, unit: m}
+      - {type: literal, name: injection-z, value: -0.08, unit: m}
+      - {type: literal, name: droplet-diameter, value: 0.00003, unit: m}
+      - {type: literal, name: droplet-temperature, value: 340, unit: K}
+      - {type: literal, name: injection-speed, value: 50, unit: m/s}
+      - {type: literal, name: cone-half-angle, value: 12, unit: deg}
+      - {type: literal, name: cone-outer-radius, value: 0.002, unit: m}
+      - {type: literal, name: spray-mass-flow, value: 0.003815, unit: kg/s}
+      - {type: literal, name: injection-relaxation, value: 0.1}
+      - {type: literal, name: turbulent-dispersion, value: discrete-random-walk}
+      - {type: literal, name: random-eddy-lifetime, value: true}
+      - {type: literal, name: random-walk-tries, value: 1}
+      - {type: literal, name: time-scale-constant, value: 0.15}
+      - {type: literal, name: perforated-hole-count, value: 35}
+      - {type: literal, name: evaporating-species, value: ch4}
+    outputs:
+      - {id: setup-audit, kind: report, path_template: "runs/{run_id}/tutorial-setup-validation.json"}
+  - id: initialize-cold
+    type: initialize
+    requires: [configure-flow-and-dpm]
+    actions: [hybrid-cold]
+  - id: setup-checkpoint
+    type: checkpoint
+    requires: [initialize-cold]
+    label: tutorial-setup
+    write_case: true
+    write_data: false
+    outputs:
+      - {id: case-file, kind: case, path_template: "runs/{run_id}/setup.cas.h5"}
+      - {id: checkpoint-manifest, kind: manifest, path_template: "runs/{run_id}/setup.manifest.json"}
+  - id: solve-cold
+    type: iterate
+    requires: [setup-checkpoint]
+    iterations: 300
+    report_every: 25
+    outputs: [{id: solver-log, kind: log, path_template: "runs/{run_id}/cold-300.log"}]
+  - id: sample-cold
+    type: sample
+    requires: [solve-cold]
+    monitors: [residuals, mass-closure, maximum-temperature, liner-maximum-temperature]
+    outputs: [{id: cold-metrics, kind: metrics, path_template: "runs/{run_id}/cold-300-metrics.json"}]
+  - id: patch-combustor
+    type: initialize
+    requires: [sample-cold]
+    actions: [ignite-combustor]
+    outputs: [{id: patch-audit, kind: report, path_template: "runs/{run_id}/ignition-patch-audit.json"}]
+  - id: ignited-checkpoint
+    type: checkpoint
+    requires: [patch-combustor]
+    label: combustor-patched
+    write_case: true
+    write_data: true
+    outputs:
+      - {id: case-file, kind: case, path_template: "runs/{run_id}/combustor-patched.cas.h5"}
+      - {id: data-file, kind: data, path_template: "runs/{run_id}/combustor-patched.dat.h5"}
+  - id: solve-reacting
+    type: iterate
+    requires: [ignited-checkpoint]
+    iterations: 400
+    report_every: 25
+    outputs: [{id: solver-log, kind: log, path_template: "runs/{run_id}/reacting-400.log"}]
+  - id: sample-reacting
+    type: sample
+    requires: [solve-reacting]
+    monitors: [residuals, mass-closure, maximum-temperature, liner-maximum-temperature]
+    outputs: [{id: reacting-metrics, kind: metrics, path_template: "runs/{run_id}/reacting-400-metrics.json"}]
+  - id: final-checkpoint
+    type: checkpoint
+    requires: [sample-reacting]
+    inputs:
+      - {type: stage_output, name: sampled-metrics, stage: sample-reacting, output: reacting-metrics}
+    label: cold-300-reacting-400
+    write_case: true
+    write_data: true
+    outputs:
+      - {id: case-file, kind: case, path_template: "runs/{run_id}/cold-300-reacting-400.cas.h5"}
+      - {id: data-file, kind: data, path_template: "runs/{run_id}/cold-300-reacting-400.dat.h5"}
+      - {id: checkpoint-manifest, kind: manifest, path_template: "runs/{run_id}/cold-300-reacting-400.manifest.json"}
+  - id: accept
+    type: gate
+    requires: [final-checkpoint]
+    gates: [setup-audit-written, final-data-written, reacting-metrics-written, tutorial-temperature-band, tutorial-liner-band]

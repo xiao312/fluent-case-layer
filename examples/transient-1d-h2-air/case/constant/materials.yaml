@@ -1,0 +1,12 @@
+schema_version: "1.0"
+materials:
+  - id: h2-air-mixture
+    kind: mixture
+    source: {type: chemistry_mixture, mixture: h2o2-mixture}
+zone_assignments:
+  - id: assign-reacting-fluid
+    zones:
+      type: names
+      names: [fluid]
+      cardinality: {exactly: 1}
+    material: h2-air-mixture

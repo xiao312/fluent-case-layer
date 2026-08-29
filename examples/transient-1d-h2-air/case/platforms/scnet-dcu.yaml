@@ -1,0 +1,25 @@
+schema_version: "1.0"
+platform:
+  id: scnet-dcu
+  kind: slurm
+  enabled: false
+  hardware: dcu
+  scheduler:
+    partition: "${SCNET_DCU_PARTITION}"
+    account_variable: SCNET_SLURM_ACCOUNT
+  resources:
+    nodes: 1
+    ranks: 4
+    tasks_per_node: 4
+    threads_per_rank: 1
+    memory_per_node: {value: 128, unit: GiB}
+    accelerators_per_node: 4
+    walltime: {value: 12, unit: h}
+    exclusive: true
+  environment:
+    setup_script_variable: SCNET_FLUENT_2026_ENV
+    python_environment_variable: SCNET_PYFLUENT_VENV
+  fluent: {version: 2026R1, mode: solver, graphics: none}
+  capabilities: [settings_api, tui, udf_compile, postprocess, accelerator]
+  notes:
+    - Disabled until the external chemistry accelerator adapter is represented and qualified.

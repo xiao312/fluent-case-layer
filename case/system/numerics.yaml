@@ -1,0 +1,18 @@
+schema_version: "1.0"
+default_profile: startup
+profiles:
+  startup:
+    pressure_velocity_coupling: simplec
+    gradient: least_squares_cell_based
+    pressure: standard
+    equations:
+      momentum: {enabled: true, spatial_scheme: first_order_upwind, under_relaxation: 0.5}
+      energy: {enabled: true, spatial_scheme: first_order_upwind, under_relaxation: 0.9}
+      species: {enabled: true, spatial_scheme: first_order_upwind, under_relaxation: 0.7}
+  production:
+    extends: startup
+    pressure: second_order
+    equations:
+      momentum: {enabled: true, spatial_scheme: second_order_upwind, under_relaxation: 0.7}
+      energy: {enabled: true, spatial_scheme: second_order_upwind, under_relaxation: 1.0}
+      species: {enabled: true, spatial_scheme: second_order_upwind, under_relaxation: 0.8}

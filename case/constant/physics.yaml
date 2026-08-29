@@ -1,0 +1,33 @@
+schema_version: "1.0"
+case:
+  id: illustrative-reacting-flow
+  title: Illustrative methane-air reacting flow
+  readiness: illustrative
+  description: A generic schema fixture, not a validated engineering result.
+  known_blockers:
+    - Replace the illustrative mesh lock with a real immutable asset.
+solver:
+  dimension: 3d
+  formulation: pressure_based
+  time: steady
+  precision: double
+  velocity_formulation: absolute
+  energy: true
+  operating_pressure: {value: 101325, unit: Pa}
+turbulence:
+  type: k_epsilon
+  variant: realizable
+  near_wall: enhanced_wall_treatment
+species:
+  type: species_transport
+  volumetric_reactions: true
+  diffusion_energy_source: true
+  turbulence_chemistry: eddy_dissipation
+radiation:
+  type: none
+discrete_phase:
+  enabled: false
+  interaction_with_continuous_phase: false
+  unsteady_tracking: false
+  update_every_flow_iterations: 10
+  max_tracking_steps: 50000

@@ -1,0 +1,32 @@
+schema_version: "1.0"
+case:
+  id: effusion-drm19-fgm
+  title: DRM19 FGM effusion-cooling tutorial
+  readiness: illustrative
+  description: PMDB meshing intent, generated FGM/PDF, DPM spray, cold flow, and reacting continuation.
+  known_blockers:
+    - Fluent Meshing workflow execution and meshing-to-solver session switching lack a typed stage.
+    - The removed generated reference mesh has no retained checksum and is not represented as an asset.
+    - Cone injection, perforated-wall, periodic-pair, and FGM grid controls need dedicated schemas.
+solver:
+  dimension: 3d
+  formulation: pressure_based
+  time: steady
+  precision: double
+  velocity_formulation: absolute
+  energy: true
+  operating_pressure: {value: 1519875, unit: Pa}
+turbulence:
+  type: k_omega
+  variant: sst
+species:
+  type: partially_premixed_pdf
+  nonadiabatic: true
+  progress_variable: true
+radiation: {type: none}
+discrete_phase:
+  enabled: true
+  interaction_with_continuous_phase: true
+  unsteady_tracking: false
+  update_every_flow_iterations: 50
+  max_tracking_steps: 50000

@@ -1,0 +1,78 @@
+schema_version: "1.0"
+monitors:
+  - id: residuals
+    type: residual
+    thresholds:
+      continuity: 0.001
+      x-velocity: 0.001
+      y-velocity: 0.001
+      z-velocity: 0.001
+      k: 0.001
+      omega: 0.001
+      energy: 0.000001
+    check_every: 1
+  - id: mass-closure
+    type: mass_balance
+    inlets:
+      type: names
+      names: [inlet]
+      cardinality: {exactly: 1}
+    outlets:
+      type: pattern
+      pattern: "^outlet.*$"
+      cardinality: {at_least: 1}
+    include_discrete_phase: true
+    check_every: 25
+  - id: maximum-temperature
+    type: volume_report
+    operation: maximum
+    field: temperature
+    zones:
+      type: names
+      names: [newgeom-combustor]
+      cardinality: {exactly: 1}
+    unit: K
+    check_every: 25
+  - id: liner-maximum-temperature
+    type: surface_report
+    operation: maximum
+    field: temperature
+    zones:
+      type: names
+      names: [wall-liner, wall-liner-cold]
+      cardinality: {exactly: 2}
+    unit: K
+    check_every: 25
+gates:
+  - id: setup-audit-written
+    type: artifact_exists
+    category: orchestration
+    severity: required
+    stage: configure-flow-and-dpm
+    output: setup-audit
+  - id: final-data-written
+    type: artifact_exists
+    category: orchestration
+    severity: required
+    stage: final-checkpoint
+    output: data-file
+  - id: reacting-metrics-written
+    type: artifact_exists
+    category: orchestration
+    severity: required
+    stage: sample-reacting
+    output: reacting-metrics
+  - id: tutorial-temperature-band
+    type: range
+    category: scientific
+    severity: advisory
+    monitor: maximum-temperature
+    minimum: {value: 2300, unit: K}
+    maximum: {value: 2700, unit: K}
+  - id: tutorial-liner-band
+    type: range
+    category: scientific
+    severity: advisory
+    monitor: liner-maximum-temperature
+    minimum: {value: 1800, unit: K}
+    maximum: {value: 2100, unit: K}

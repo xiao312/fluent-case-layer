@@ -1,0 +1,31 @@
+.venv/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Runtime state and licensed/large Fluent artifacts
+.fluent-case/
+runs/
+scratch/
+*.cas
+*.cas.h5
+*.dat
+*.dat.h5
+*.msh
+*.msh.h5
+*.fla
+*.fla.gz
+*.pdf.gz
+*.trn
+*.log
+slurm-*.out
+slurm-*.err
+
+# Local credentials and machine-specific overrides
+.env
+.env.*
+*.local.yaml

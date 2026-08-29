@@ -1,0 +1,42 @@
+schema_version: "1.0"
+boundaries:
+  - id: burned-side
+    zones:
+      type: names
+      names: [left-open]
+      cardinality: {exactly: 1}
+    condition:
+      type: pressure_outlet
+      gauge_pressure: {value: 0, unit: Pa}
+      backflow_temperature: {value: 2387.6369000144755, unit: K}
+      backflow_species:
+        basis: mass_fraction
+        fractions:
+          h2: 0.0012094703843359856
+          h: 0.00007518968532887624
+          o: 0.0004002622489938277
+          o2: 0.007393150686643479
+          oh: 0.005103128536347905
+          h2o: 0.24069329630237965
+          ho2: 0.0000017090448293813704
+          h2o2: 0.00000018760971863137027
+          ar: 0.0
+          n2: 0.7451236055014222
+  - id: reactant-side
+    zones:
+      type: names
+      names: [right-open]
+      cardinality: {exactly: 1}
+    condition:
+      type: pressure_outlet
+      gauge_pressure: {value: 0, unit: Pa}
+      backflow_temperature: {value: 300, unit: K}
+      backflow_species:
+        basis: mass_fraction
+        fractions: {h2: 0.028522387527567396, o2: 0.22635400697100733, n2: 0.7451236055014252}
+  - id: planar-symmetry
+    zones:
+      type: names
+      names: [symmetry-bottom, symmetry-top]
+      cardinality: {exactly: 2}
+    condition: {type: symmetry}

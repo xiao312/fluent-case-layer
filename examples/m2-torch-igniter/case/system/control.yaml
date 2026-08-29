@@ -1,0 +1,95 @@
+schema_version: "1.0"
+default_platform: scnet-cpu-small
+stages:
+  - id: restore-checkpoint
+    type: initialize
+    actions: [read-iteration-500]
+    preconditions:
+      - {type: asset_available, asset: m2-checkpoint-case}
+      - {type: asset_available, asset: m2-checkpoint-data}
+    outputs:
+      - {id: checkpoint-inventory, kind: report, path_template: "runs/{run_id}/checkpoint-inventory.json"}
+    retry: {max_attempts: 2, backoff: {value: 10, unit: s}, retry_on: [launcher_error, api_error]}
+  - id: reconcile-continuation
+    type: reconcile
+    requires: [restore-checkpoint]
+    sections: [physics, materials, chemistry, fields, boundary_conditions, numerics]
+    numerics_profile: continuation-second-order
+    outputs:
+      - {id: observed-diff, kind: report, path_template: "runs/{run_id}/observed-diff.json"}
+  - id: patch-ignition-region
+    type: initialize
+    requires: [reconcile-continuation]
+    actions: [create-full-ignition-cylinder, create-lower-clear-cylinder, patch-full-progress, clear-lower-progress]
+    outputs:
+      - {id: patch-audit, kind: report, path_template: "runs/{run_id}/patch-audit.json"}
+  - id: patched-checkpoint
+    type: checkpoint
+    requires: [patch-ignition-region]
+    label: patched-iteration-500
+    write_case: true
+    write_data: true
+    outputs:
+      - {id: case-file, kind: case, path_template: "runs/{run_id}/patched-iteration-500.cas.h5"}
+      - {id: data-file, kind: data, path_template: "runs/{run_id}/patched-iteration-500.dat.h5"}
+      - {id: checkpoint-manifest, kind: manifest, path_template: "runs/{run_id}/patched-iteration-500.manifest.json"}
+  - id: continue-window-1
+    type: iterate
+    requires: [patched-checkpoint]
+    iterations: 500
+    report_every: 25
+    outputs: [{id: solver-log, kind: log, path_template: "runs/{run_id}/window-1.log"}]
+  - id: sample-window-1
+    type: sample
+    requires: [continue-window-1]
+    monitors: [residuals, mass-closure, maximum-temperature, torch-wall-temperature, combustor-wall-temperature, torch-wall-shear, combustor-wall-shear]
+    outputs: [{id: wall-metrics, kind: metrics, path_template: "runs/{run_id}/window-1-metrics.json"}]
+  - id: continue-window-2
+    type: iterate
+    requires: [sample-window-1]
+    iterations: 500
+    report_every: 25
+    outputs: [{id: solver-log, kind: log, path_template: "runs/{run_id}/window-2.log"}]
+  - id: sample-window-2
+    type: sample
+    requires: [continue-window-2]
+    monitors: [residuals, mass-closure, maximum-temperature, torch-wall-temperature, combustor-wall-temperature, torch-wall-shear, combustor-wall-shear]
+    outputs: [{id: wall-metrics, kind: metrics, path_template: "runs/{run_id}/window-2-metrics.json"}]
+  - id: continue-window-3
+    type: iterate
+    requires: [sample-window-2]
+    iterations: 500
+    report_every: 25
+    outputs: [{id: solver-log, kind: log, path_template: "runs/{run_id}/window-3.log"}]
+  - id: sample-window-3
+    type: sample
+    requires: [continue-window-3]
+    monitors: [residuals, mass-closure, maximum-temperature, torch-wall-temperature, combustor-wall-temperature, torch-wall-shear, combustor-wall-shear]
+    outputs: [{id: wall-metrics, kind: metrics, path_template: "runs/{run_id}/window-3-metrics.json"}]
+  - id: continue-window-4
+    type: iterate
+    requires: [sample-window-3]
+    iterations: 500
+    report_every: 25
+    outputs: [{id: solver-log, kind: log, path_template: "runs/{run_id}/window-4.log"}]
+  - id: sample-window-4
+    type: sample
+    requires: [continue-window-4]
+    monitors: [residuals, mass-closure, maximum-temperature, torch-wall-temperature, combustor-wall-temperature, torch-wall-shear, combustor-wall-shear]
+    outputs: [{id: wall-metrics, kind: metrics, path_template: "runs/{run_id}/window-4-metrics.json"}]
+  - id: final-checkpoint
+    type: checkpoint
+    requires: [sample-window-4]
+    inputs:
+      - {type: stage_output, name: sampled-metrics, stage: sample-window-4, output: wall-metrics}
+    label: continuation-iteration-2500
+    write_case: true
+    write_data: true
+    outputs:
+      - {id: case-file, kind: case, path_template: "runs/{run_id}/continuation-iteration-2500.cas.h5"}
+      - {id: data-file, kind: data, path_template: "runs/{run_id}/continuation-iteration-2500.dat.h5"}
+      - {id: checkpoint-manifest, kind: manifest, path_template: "runs/{run_id}/continuation-iteration-2500.manifest.json"}
+  - id: accept
+    type: gate
+    requires: [final-checkpoint]
+    gates: [final-data-written, wall-metrics-written, credible-reacting-temperature, wall-temperature-window-stable]

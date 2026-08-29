@@ -1,0 +1,19 @@
+schema_version: "1.0"
+actions:
+  - id: hybrid-init
+    type: hybrid
+  - id: create-ignition-core
+    type: create_register
+    name: ignition-core
+    region:
+      type: cylinder
+      start: {value: [0, 0, 0], unit: m}
+      end: {value: [0.01, 0, 0], unit: m}
+      radius: {value: 0.002, unit: m}
+  - id: patch-ignition-temperature
+    type: patch
+    target: {type: register, register: ignition-core}
+    field: temperature
+    value:
+      type: uniform_scalar
+      value: {value: 1500, unit: K}

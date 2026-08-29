@@ -1,0 +1,43 @@
+schema_version: "1.0"
+monitors:
+  - id: residuals
+    type: residual
+    thresholds: {continuity: 1.0e-4, momentum: 1.0e-4, energy: 1.0e-6}
+    check_every: 1
+  - id: outlet-pressure
+    type: surface_report
+    operation: area_weighted_average
+    field: absolute-pressure
+    zones:
+      type: names
+      names: [outlet]
+      cardinality: {exactly: 1, at_least: null, at_most: null}
+    unit: Pa
+    check_every: 10
+  - id: mass-closure
+    type: mass_balance
+    inlets:
+      type: pattern
+      pattern: ".*-inlet$"
+      cardinality: {at_least: 2}
+    outlets:
+      type: names
+      names: [outlet]
+      cardinality: {exactly: 1, at_least: null, at_most: null}
+    include_discrete_phase: false
+    check_every: 10
+gates:
+  - id: mass-closure-required
+    type: threshold
+    category: numerical
+    severity: required
+    monitor: mass-closure
+    operator: le
+    limit: {value: 0.01, unit: "1"}
+  - id: outlet-pressure-band
+    type: range
+    category: scientific
+    severity: advisory
+    monitor: outlet-pressure
+    minimum: {value: 0.9, unit: bar}
+    maximum: {value: 1.1, unit: bar}

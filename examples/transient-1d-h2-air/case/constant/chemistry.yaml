@@ -1,0 +1,33 @@
+schema_version: "1.0"
+model:
+  type: finite_rate
+  mechanism:
+    type: asset
+    format: chemkin
+    mechanism_asset: h2o2-chemkin
+    thermodynamics_asset: h2o2-thermo
+    transport_asset: h2o2-transport
+  turbulence_interaction: none
+  stiff_chemistry_solver: true
+streams:
+  cold-reactants:
+    temperature: {value: 300, unit: K}
+    composition:
+      basis: mass_fraction
+      fractions: {h2: 0.028522387527567396, o2: 0.22635400697100733, n2: 0.7451236055014252}
+  burned-products:
+    temperature: {value: 2387.6369000144755, unit: K}
+    composition:
+      basis: mass_fraction
+      fractions:
+        h2: 0.0012094703843359856
+        h: 0.00007518968532887624
+        o: 0.0004002622489938277
+        o2: 0.007393150686643479
+        oh: 0.005103128536347905
+        h2o: 0.24069329630237965
+        ho2: 0.0000017090448293813704
+        h2o2: 0.00000018760971863137027
+        ar: 0.0
+        n2: 0.7451236055014222
+tracked_species: [h2, h, o, o2, oh, h2o, ho2, h2o2, ar, n2]

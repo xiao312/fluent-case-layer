@@ -1,0 +1,22 @@
+schema_version: "1"
+campaign_id: representative-fluent-cases
+description: >-
+  Compile the three provenance-backed examples together to exercise fresh
+  setup, checkpoint continuation, and mesh/FGM/DPM multi-stage planning.
+execution_semantics:
+  recording: >-
+    The recording adapter proves compilation, dependency ordering, checkpoint
+    contracts, and evidence plumbing only; it does not launch Fluent, resolve
+    assets, evaluate numerical gates, or validate science.
+  pyfluent: >-
+    Real execution additionally requires platform environment bindings,
+    matching locked assets, and resolution of every case's known blockers.
+defaults:
+  platform: scnet-cpu-small
+cases:
+  - id: transient-1d-h2-air
+    path: transient-1d-h2-air/case
+  - id: m2-torch-igniter
+    path: m2-torch-igniter/case
+  - id: effusion-drm19-fgm
+    path: effusion-drm19-fgm/case

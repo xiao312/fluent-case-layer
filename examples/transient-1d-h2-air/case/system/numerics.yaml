@@ -1,0 +1,15 @@
+schema_version: "1.0"
+default_profile: transient-second-order
+profiles:
+  transient-second-order:
+    pressure_velocity_coupling: coupled
+    gradient: least_squares_cell_based
+    pressure: second_order
+    equations:
+      momentum: {spatial_scheme: second_order_upwind}
+      energy: {spatial_scheme: second_order_upwind}
+      species: {spatial_scheme: second_order_upwind}
+    transient:
+      formulation: first_order_implicit
+      time_step: {value: 0.0000005, unit: s}
+      max_iterations_per_step: 20

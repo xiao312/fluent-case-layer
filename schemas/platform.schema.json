@@ -1,0 +1,392 @@
+{
+  "$defs": {
+    "EnvironmentSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "exports": {
+          "patternProperties": {
+            "^[A-Z][A-Z0-9_]*$": {
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 128,
+            "minLength": 2
+          },
+          "title": "Exports",
+          "type": "object"
+        },
+        "python_environment_variable": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 2,
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Python Environment Variable"
+        },
+        "setup_script_variable": {
+          "maxLength": 128,
+          "minLength": 2,
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Setup Script Variable",
+          "type": "string"
+        }
+      },
+      "required": [
+        "setup_script_variable"
+      ],
+      "title": "EnvironmentSpec",
+      "type": "object"
+    },
+    "FluentRuntime": {
+      "additionalProperties": false,
+      "properties": {
+        "graphics": {
+          "default": "none",
+          "enum": [
+            "none",
+            "null",
+            "native"
+          ],
+          "title": "Graphics",
+          "type": "string"
+        },
+        "mode": {
+          "default": "solver",
+          "enum": [
+            "solver",
+            "meshing"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version"
+      ],
+      "title": "FluentRuntime",
+      "type": "object"
+    },
+    "LocalPlatform": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "items": {
+            "enum": [
+              "settings_api",
+              "tui",
+              "udf_compile",
+              "dpm",
+              "postprocess"
+            ],
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "environment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EnvironmentSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fluent": {
+          "$ref": "#/$defs/FluentRuntime"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "local",
+          "title": "Kind",
+          "type": "string"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        },
+        "resources": {
+          "$ref": "#/$defs/ResourceSpec"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "resources",
+        "fluent"
+      ],
+      "title": "LocalPlatform",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "ResourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "accelerators_per_node": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Accelerators Per Node",
+          "type": "integer"
+        },
+        "exclusive": {
+          "default": false,
+          "title": "Exclusive",
+          "type": "boolean"
+        },
+        "memory_per_node": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "nodes": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Nodes",
+          "type": "integer"
+        },
+        "ranks": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Ranks",
+          "type": "integer"
+        },
+        "tasks_per_node": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tasks Per Node"
+        },
+        "threads_per_rank": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Threads Per Rank",
+          "type": "integer"
+        },
+        "walltime": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "memory_per_node",
+        "walltime"
+      ],
+      "title": "ResourceSpec",
+      "type": "object"
+    },
+    "SlurmPlatform": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "items": {
+            "enum": [
+              "settings_api",
+              "tui",
+              "udf_compile",
+              "dpm",
+              "postprocess",
+              "accelerator"
+            ],
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "environment": {
+          "$ref": "#/$defs/EnvironmentSpec"
+        },
+        "fluent": {
+          "$ref": "#/$defs/FluentRuntime"
+        },
+        "hardware": {
+          "default": "cpu",
+          "enum": [
+            "cpu",
+            "gpu",
+            "dcu"
+          ],
+          "title": "Hardware",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "slurm",
+          "title": "Kind",
+          "type": "string"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        },
+        "resources": {
+          "$ref": "#/$defs/ResourceSpec"
+        },
+        "scheduler": {
+          "$ref": "#/$defs/SlurmScheduler"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "scheduler",
+        "resources",
+        "environment",
+        "fluent"
+      ],
+      "title": "SlurmPlatform",
+      "type": "object"
+    },
+    "SlurmScheduler": {
+      "additionalProperties": false,
+      "properties": {
+        "account_variable": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 2,
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Account Variable"
+        },
+        "constraint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Constraint"
+        },
+        "partition": {
+          "title": "Partition",
+          "type": "string"
+        },
+        "qos": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Qos"
+        }
+      },
+      "required": [
+        "partition"
+      ],
+      "title": "SlurmScheduler",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "platform": {
+      "discriminator": {
+        "mapping": {
+          "local": "#/$defs/LocalPlatform",
+          "slurm": "#/$defs/SlurmPlatform"
+        },
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SlurmPlatform"
+        },
+        {
+          "$ref": "#/$defs/LocalPlatform"
+        }
+      ],
+      "title": "Platform"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "platform"
+  ],
+  "title": "PlatformDocument",
+  "type": "object"
+}

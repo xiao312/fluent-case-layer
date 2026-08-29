@@ -1,0 +1,42 @@
+schema_version: "1.0"
+boundaries:
+  - id: continuous-phase-inlet
+    zones:
+      type: names
+      names: [inlet]
+      cardinality: {exactly: 1}
+    condition:
+      type: mass_flow_inlet
+      mass_flow: {value: 0.1096181560833, unit: kg/s}
+      temperature: {value: 755.37222, unit: K}
+      # The source specifies intensity=0.01 and viscosity-ratio=2.0. Schema
+      # v1.0 cannot encode that pair without inventing a length, so the exact
+      # values remain stage inputs and reconciliation is a declared blocker.
+      turbulence: {type: none}
+  - id: domain-outlet
+    zones:
+      type: pattern
+      pattern: "^outlet.*$"
+      cardinality: {at_least: 1}
+    condition:
+      type: pressure_outlet
+      gauge_pressure: {value: 0, unit: Pa}
+      backflow_temperature: {value: 755.37222, unit: K}
+  - id: liner-walls
+    zones:
+      type: names
+      names: [wall-liner, wall-liner-cold]
+      cardinality: {exactly: 2}
+    condition:
+      type: wall
+      shear: no_slip
+      thermal: {type: adiabatic}
+  - id: remaining-walls
+    zones:
+      type: pattern
+      pattern: "^(wall-fuel|wall-int)$"
+      cardinality: {at_least: 1, at_most: 2}
+    condition:
+      type: wall
+      shear: no_slip
+      thermal: {type: adiabatic}

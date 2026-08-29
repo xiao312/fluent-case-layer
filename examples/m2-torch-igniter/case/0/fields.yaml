@@ -1,0 +1,26 @@
+schema_version: "1.0"
+fields:
+  - id: pressure
+    fluent_name: pressure
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: Pa}}
+  - id: temperature
+    fluent_name: temperature
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 300, unit: K}}
+  - id: velocity
+    fluent_name: velocity
+    rank: vector
+    initial: {type: uniform_vector, value: {value: [0, 0, 0], unit: m/s}}
+  - id: mixture-fraction
+    fluent_name: fmean
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: mixture-fraction-variance
+    fluent_name: fvar
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: progress-variable
+    fluent_name: premixc
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}

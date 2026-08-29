@@ -1,0 +1,195 @@
+{
+  "$defs": {
+    "EnvironmentAssetSource": {
+      "additionalProperties": false,
+      "properties": {
+        "relative_path": {
+          "minLength": 1,
+          "title": "Relative Path",
+          "type": "string"
+        },
+        "root_variable": {
+          "maxLength": 128,
+          "minLength": 2,
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Root Variable",
+          "type": "string"
+        },
+        "type": {
+          "const": "environment",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "root_variable",
+        "relative_path"
+      ],
+      "title": "EnvironmentAssetSource",
+      "type": "object"
+    },
+    "LockedAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "mesh",
+            "case",
+            "data",
+            "chemistry",
+            "profile",
+            "geometry",
+            "table",
+            "udf_source",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "media_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Media Type"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-fA-F]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size Bytes"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "environment": "#/$defs/EnvironmentAssetSource",
+              "remote": "#/$defs/RemoteAssetSource",
+              "repository": "#/$defs/RepositoryAssetSource"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RemoteAssetSource"
+            },
+            {
+              "$ref": "#/$defs/EnvironmentAssetSource"
+            },
+            {
+              "$ref": "#/$defs/RepositoryAssetSource"
+            }
+          ],
+          "title": "Source"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "source",
+        "sha256"
+      ],
+      "title": "LockedAsset",
+      "type": "object"
+    },
+    "RemoteAssetSource": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "remote",
+          "title": "Type",
+          "type": "string"
+        },
+        "uri": {
+          "minLength": 1,
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "uri"
+      ],
+      "title": "RemoteAssetSource",
+      "type": "object"
+    },
+    "RepositoryAssetSource": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "type": {
+          "const": "repository",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "path"
+      ],
+      "title": "RepositoryAssetSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assets": {
+      "items": {
+        "$ref": "#/$defs/LockedAsset"
+      },
+      "title": "Assets",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "assets"
+  ],
+  "title": "AssetsLock",
+  "type": "object"
+}

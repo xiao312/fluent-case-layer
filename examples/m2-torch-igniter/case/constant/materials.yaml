@@ -1,0 +1,12 @@
+schema_version: "1.0"
+materials:
+  - id: m2-fgm-mixture
+    kind: mixture
+    source: {type: chemistry_mixture, mixture: m2-fgm}
+zone_assignments:
+  - id: assign-checkpoint-fluid
+    zones:
+      type: zone_type
+      zone_type: fluid
+      cardinality: {at_least: 1}
+    material: m2-fgm-mixture

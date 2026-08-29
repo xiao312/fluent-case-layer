@@ -1,0 +1,29 @@
+schema_version: "1.0"
+assets:
+  - id: generated-planar-mesh
+    kind: mesh
+    source: {type: environment, root_variable: FCL_H2_AIR_ASSET_ROOT, relative_path: mesh/h2-air-1000x1.msh}
+    sha256: de928e10c3a86ae0fba56cd3893550b8082ea5281b17915ef164fe62be2bfdc8
+    size_bytes: 135672
+    description: Deterministically generated 0.0168599088519 m by 0.0001 m planar mesh.
+  - id: h2o2-chemkin
+    kind: chemistry
+    source: {type: environment, root_variable: FCL_H2_AIR_ASSET_ROOT, relative_path: chemistry/h2o2.inp}
+    sha256: 318ea593857e27def5557d7dcf4720db7a8d902227b4ae933bdd488439da96ac
+    size_bytes: 2627
+  - id: h2o2-thermo
+    kind: chemistry
+    source: {type: environment, root_variable: FCL_H2_AIR_ASSET_ROOT, relative_path: chemistry/thermo.dat}
+    sha256: 62968139ebe61252b8d849152c5550bbc55c076491e4fd5607511c6d01d501c7
+    size_bytes: 3742
+  - id: h2o2-transport
+    kind: chemistry
+    source: {type: environment, root_variable: FCL_H2_AIR_ASSET_ROOT, relative_path: chemistry/transport.dat}
+    sha256: d02536f55380537454615de067186c6acfdcf9eec80160aad1700f634579786c
+    size_bytes: 1174
+  - id: chemistry-udf
+    kind: udf_source
+    source: {type: environment, root_variable: FCL_H2_AIR_ASSET_ROOT, relative_path: udf/chemistry_udf.c}
+    sha256: 8dfb0e564045df2d03a2e422ba223b0e8bfe04a4f2684618f753d9d8265bdaa9
+    size_bytes: 7564
+    description: Source UDF retained for the future typed build-and-hook stage.

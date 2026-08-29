@@ -1,0 +1,69 @@
+schema_version: "1.0"
+default_platform: scnet-cpu-small
+stages:
+  - id: load-mesh
+    type: load_asset
+    asset: baseline-mesh
+    load_as: mesh
+    preconditions:
+      - {type: asset_available, asset: baseline-mesh}
+    outputs:
+      - id: mesh-audit
+        kind: report
+        path_template: runs/{run_id}/mesh-audit.json
+    timeout: {value: 15, unit: min}
+  - id: configure
+    type: reconcile
+    requires: [load-mesh]
+    sections: [physics, materials, chemistry, fields, boundary_conditions, numerics]
+    numerics_profile: startup
+  - id: initialize
+    type: initialize
+    requires: [configure]
+    actions: [hybrid-init, create-ignition-core, patch-ignition-temperature]
+  - id: smoke
+    type: iterate
+    requires: [initialize]
+    iterations: 25
+    report_every: 5
+    outputs:
+      - id: smoke-log
+        kind: log
+        path_template: runs/{run_id}/smoke.log
+  - id: sample
+    type: sample
+    requires: [smoke]
+    monitors: [residuals, outlet-pressure, mass-closure]
+    outputs:
+      - id: sampled-metrics
+        kind: metrics
+        path_template: runs/{run_id}/metrics.json
+  - id: accept
+    type: gate
+    requires: [sample]
+    gates: [mass-closure-required, outlet-pressure-band]
+  - id: final-checkpoint
+    type: checkpoint
+    requires: [accept]
+    inputs:
+      - type: stage_output
+        name: metrics
+        stage: sample
+        output: sampled-metrics
+    label: accepted
+    write_case: true
+    write_data: true
+    outputs:
+      - id: case-file
+        kind: case
+        path_template: runs/{run_id}/accepted.cas.h5
+      - id: data-file
+        kind: data
+        path_template: runs/{run_id}/accepted.dat.h5
+      - id: checkpoint-manifest
+        kind: manifest
+        path_template: runs/{run_id}/checkpoint-manifest.json
+    promotion:
+      type: when_gates_pass
+      gates: [mass-closure-required]
+      role: candidate

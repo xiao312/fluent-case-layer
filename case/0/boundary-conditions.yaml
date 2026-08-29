@@ -1,0 +1,56 @@
+schema_version: "1.0"
+boundaries:
+  - id: fuel-inlet
+    zones:
+      type: names
+      names: [fuel]
+      cardinality: {exactly: 1, at_least: null, at_most: null}
+    condition:
+      type: mass_flow_inlet
+      mass_flow: {value: 0.01, unit: kg/s}
+      temperature: {value: 300, unit: K}
+      species:
+        basis: mass_fraction
+        fractions: {ch4: 1.0}
+      turbulence:
+        type: intensity_hydraulic_diameter
+        intensity: 0.05
+        hydraulic_diameter: {value: 5, unit: mm}
+  - id: oxidizer-inlet
+    zones:
+      type: names
+      names: [oxidizer]
+      cardinality: {exactly: 1, at_least: null, at_most: null}
+    condition:
+      type: mass_flow_inlet
+      mass_flow: {value: 0.02, unit: kg/s}
+      temperature: {value: 300, unit: K}
+      species:
+        basis: mass_fraction
+        fractions: {o2: 0.233, n2: 0.767}
+      turbulence:
+        type: intensity_hydraulic_diameter
+        intensity: 0.05
+        hydraulic_diameter: {value: 8, unit: mm}
+  - id: outlet
+    zones:
+      type: names
+      names: [outlet]
+      cardinality: {exactly: 1, at_least: null, at_most: null}
+    condition:
+      type: pressure_outlet
+      gauge_pressure: {value: 0, unit: Pa}
+      backflow_temperature: {value: 300, unit: K}
+      backflow_species:
+        basis: mass_fraction
+        fractions: {o2: 0.233, n2: 0.767}
+      turbulence: {type: none}
+  - id: walls
+    zones:
+      type: pattern
+      pattern: "^wall.*"
+      cardinality: {at_least: 1}
+    condition:
+      type: wall
+      shear: no_slip
+      thermal: {type: adiabatic}

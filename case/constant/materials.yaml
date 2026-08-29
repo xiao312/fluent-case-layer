@@ -1,0 +1,20 @@
+schema_version: "1.0"
+materials:
+  - id: reacting-mixture
+    kind: mixture
+    source:
+      type: fluent_database
+      name: methane-air
+    properties:
+      density:
+        type: ideal_gas
+      viscosity:
+        type: constant
+        value: {value: 1.8e-5, unit: Pa*s}
+zone_assignments:
+  - id: fluid-material
+    zones:
+      type: names
+      names: [fluid]
+      cardinality: {exactly: 1, at_least: null, at_most: null}
+    material: reacting-mixture

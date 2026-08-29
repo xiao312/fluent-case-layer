@@ -1,0 +1,24 @@
+schema_version: "1.0"
+default_profile: tutorial-first-order
+profiles:
+  tutorial-first-order:
+    pressure_velocity_coupling: coupled
+    gradient: least_squares_cell_based
+    pressure: second_order
+    equations:
+      density: {spatial_scheme: second_order_upwind, under_relaxation: 0.1}
+      momentum: {spatial_scheme: first_order_upwind, under_relaxation: 0.1}
+      k: {spatial_scheme: first_order_upwind, under_relaxation: 0.1}
+      omega: {spatial_scheme: first_order_upwind, under_relaxation: 0.1}
+      enthalpy: {spatial_scheme: first_order_upwind, under_relaxation: 0.1}
+      premixc: {spatial_scheme: first_order_upwind, under_relaxation: 0.1}
+      fmean: {spatial_scheme: first_order_upwind, under_relaxation: 0.1}
+      fvar: {spatial_scheme: first_order_upwind, under_relaxation: 0.1}
+      premix-g-var: {spatial_scheme: first_order_upwind, under_relaxation: 0.1}
+    expert_controls:
+      flux_type: rhie-chow-momentum-based
+      pseudo_time_formulation: global-time-step
+      warped_face_gradient_correction: true
+      high_order_term_relaxation: false
+      pressure_relaxation: 0.1
+      dpm_relaxation: 0.5

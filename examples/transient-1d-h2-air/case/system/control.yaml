@@ -1,0 +1,80 @@
+schema_version: "1.0"
+default_platform: scnet-cpu-small
+stages:
+  - id: load-mesh
+    type: load_asset
+    asset: generated-planar-mesh
+    load_as: mesh
+    preconditions: [{type: asset_available, asset: generated-planar-mesh}]
+    outputs:
+      - {id: mesh-audit, kind: report, path_template: "runs/{run_id}/mesh-audit.json"}
+    retry: {max_attempts: 2, backoff: {value: 10, unit: s}, retry_on: [launcher_error, api_error]}
+  - id: configure
+    type: reconcile
+    requires: [load-mesh]
+    sections: [physics, materials, chemistry, fields, boundary_conditions, numerics]
+    numerics_profile: transient-second-order
+    inputs:
+      - {type: asset, name: chemistry-udf-source, asset: chemistry-udf}
+    outputs:
+      - {id: desired-state, kind: manifest, path_template: "runs/{run_id}/desired-state.json"}
+  - id: initialize-burned-half
+    type: initialize
+    requires: [configure]
+    actions:
+      - standard-cold
+      - create-burned-half
+      - patch-burned-temperature
+      - patch-burned-h2
+      - patch-burned-h
+      - patch-burned-o
+      - patch-burned-o2
+      - patch-burned-oh
+      - patch-burned-h2o
+      - patch-burned-ho2
+      - patch-burned-h2o2
+      - patch-burned-ar
+      - patch-burned-n2
+    outputs:
+      - {id: initialization-audit, kind: report, path_template: "runs/{run_id}/initialization-audit.json"}
+  - id: initial-checkpoint
+    type: checkpoint
+    requires: [initialize-burned-half]
+    label: initialized
+    write_case: true
+    write_data: true
+    outputs:
+      - {id: case-file, kind: case, path_template: "runs/{run_id}/initialized.cas.h5"}
+      - {id: data-file, kind: data, path_template: "runs/{run_id}/initialized.dat.h5"}
+      - {id: checkpoint-manifest, kind: manifest, path_template: "runs/{run_id}/initialized.manifest.json"}
+  - id: advance-transient
+    type: advance_time
+    requires: [initial-checkpoint]
+    time_steps: 5000
+    time_step: {value: 0.0000005, unit: s}
+    max_iterations_per_step: 20
+    outputs:
+      - {id: solver-log, kind: log, path_template: "runs/{run_id}/transient.log"}
+    retry: {max_attempts: 1, backoff: {value: 0, unit: s}, retry_on: [launcher_error, api_error]}
+  - id: sample-transient
+    type: sample
+    requires: [advance-transient]
+    monitors: [residuals, mass-closure, maximum-temperature]
+    outputs:
+      - {id: transient-metrics, kind: metrics, path_template: "runs/{run_id}/transient-metrics.json"}
+  - id: final-checkpoint
+    type: checkpoint
+    requires: [sample-transient]
+    inputs:
+      - {type: stage_output, name: sampled-metrics, stage: sample-transient, output: transient-metrics}
+    label: transient-complete
+    write_case: true
+    write_data: true
+    outputs:
+      - {id: case-file, kind: case, path_template: "runs/{run_id}/transient-complete.cas.h5"}
+      - {id: data-file, kind: data, path_template: "runs/{run_id}/transient-complete.dat.h5"}
+      - {id: checkpoint-manifest, kind: manifest, path_template: "runs/{run_id}/transient-complete.manifest.json"}
+  - id: accept
+    type: gate
+    requires: [final-checkpoint]
+    gates: [transient-metrics-written, final-data-written, hot-state-present]

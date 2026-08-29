@@ -1,0 +1,847 @@
+{
+  "$defs": {
+    "ArtifactGate": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "default": "orchestration",
+          "enum": [
+            "orchestration",
+            "numerical",
+            "scientific"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "output": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Output",
+          "type": "string"
+        },
+        "severity": {
+          "default": "required",
+          "enum": [
+            "advisory",
+            "required"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "stage": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Stage",
+          "type": "string"
+        },
+        "type": {
+          "const": "artifact_exists",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "stage",
+        "output"
+      ],
+      "title": "ArtifactGate",
+      "type": "object"
+    },
+    "Cardinality": {
+      "additionalProperties": false,
+      "description": "Expected number of zones resolved by a selector.",
+      "properties": {
+        "at_least": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Least"
+        },
+        "at_most": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Most"
+        },
+        "exactly": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exactly"
+        }
+      },
+      "title": "Cardinality",
+      "type": "object"
+    },
+    "ExpressionMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "expression": {
+          "title": "Expression",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "expression",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "expression",
+        "unit"
+      ],
+      "title": "ExpressionMonitor",
+      "type": "object"
+    },
+    "MassBalanceMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "include_discrete_phase": {
+          "default": false,
+          "title": "Include Discrete Phase",
+          "type": "boolean"
+        },
+        "inlets": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Inlets"
+        },
+        "outlets": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Outlets"
+        },
+        "type": {
+          "const": "mass_balance",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "inlets",
+        "outlets"
+      ],
+      "title": "MassBalanceMonitor",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "RangeGate": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "orchestration",
+            "numerical",
+            "scientific"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "severity": {
+          "default": "required",
+          "enum": [
+            "advisory",
+            "required"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "type": {
+          "const": "range",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "category",
+        "monitor"
+      ],
+      "title": "RangeGate",
+      "type": "object"
+    },
+    "ResidualMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "thresholds": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "type": "number"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Thresholds",
+          "type": "object"
+        },
+        "type": {
+          "const": "residual",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "thresholds"
+      ],
+      "title": "ResidualMonitor",
+      "type": "object"
+    },
+    "SteadyWindowGate": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "default": "numerical",
+          "enum": [
+            "orchestration",
+            "numerical",
+            "scientific"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "relative_span": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Relative Span",
+          "type": "number"
+        },
+        "samples": {
+          "minimum": 3,
+          "title": "Samples",
+          "type": "integer"
+        },
+        "severity": {
+          "default": "required",
+          "enum": [
+            "advisory",
+            "required"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "type": {
+          "const": "steady_window",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "monitor",
+        "samples",
+        "relative_span"
+      ],
+      "title": "SteadyWindowGate",
+      "type": "object"
+    },
+    "SurfaceReportMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "area_weighted_average",
+            "mass_weighted_average",
+            "integral",
+            "mass_flow_rate",
+            "minimum",
+            "maximum"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "type": {
+          "const": "surface_report",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "operation",
+        "field",
+        "zones",
+        "unit"
+      ],
+      "title": "SurfaceReportMonitor",
+      "type": "object"
+    },
+    "ThresholdGate": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "orchestration",
+            "numerical",
+            "scientific"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "limit": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "operator": {
+          "enum": [
+            "lt",
+            "le",
+            "gt",
+            "ge",
+            "eq"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "severity": {
+          "default": "required",
+          "enum": [
+            "advisory",
+            "required"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "type": {
+          "const": "threshold",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "category",
+        "monitor",
+        "operator",
+        "limit"
+      ],
+      "title": "ThresholdGate",
+      "type": "object"
+    },
+    "VolumeReportMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "volume_weighted_average",
+            "mass_weighted_average",
+            "integral",
+            "minimum",
+            "maximum"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "type": {
+          "const": "volume_report",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "operation",
+        "field",
+        "zones",
+        "unit"
+      ],
+      "title": "VolumeReportMonitor",
+      "type": "object"
+    },
+    "ZoneIdsSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "ids": {
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Ids",
+          "type": "array"
+        },
+        "type": {
+          "const": "ids",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "ids"
+      ],
+      "title": "ZoneIdsSelector",
+      "type": "object"
+    },
+    "ZoneNamesSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "names": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Names",
+          "type": "array"
+        },
+        "type": {
+          "const": "names",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "names"
+      ],
+      "title": "ZoneNamesSelector",
+      "type": "object"
+    },
+    "ZonePatternSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "pattern": {
+          "minLength": 1,
+          "title": "Pattern",
+          "type": "string"
+        },
+        "type": {
+          "const": "pattern",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "pattern"
+      ],
+      "title": "ZonePatternSelector",
+      "type": "object"
+    },
+    "ZoneTypeSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "type": {
+          "const": "zone_type",
+          "title": "Type",
+          "type": "string"
+        },
+        "zone_type": {
+          "enum": [
+            "fluid",
+            "solid",
+            "mass-flow-inlet",
+            "velocity-inlet",
+            "pressure-outlet",
+            "wall",
+            "symmetry",
+            "axis",
+            "interior"
+          ],
+          "title": "Zone Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "zone_type"
+      ],
+      "title": "ZoneTypeSelector",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "gates": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "artifact_exists": "#/$defs/ArtifactGate",
+            "range": "#/$defs/RangeGate",
+            "steady_window": "#/$defs/SteadyWindowGate",
+            "threshold": "#/$defs/ThresholdGate"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ThresholdGate"
+          },
+          {
+            "$ref": "#/$defs/RangeGate"
+          },
+          {
+            "$ref": "#/$defs/SteadyWindowGate"
+          },
+          {
+            "$ref": "#/$defs/ArtifactGate"
+          }
+        ]
+      },
+      "title": "Gates",
+      "type": "array"
+    },
+    "monitors": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "expression": "#/$defs/ExpressionMonitor",
+            "mass_balance": "#/$defs/MassBalanceMonitor",
+            "residual": "#/$defs/ResidualMonitor",
+            "surface_report": "#/$defs/SurfaceReportMonitor",
+            "volume_report": "#/$defs/VolumeReportMonitor"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ResidualMonitor"
+          },
+          {
+            "$ref": "#/$defs/SurfaceReportMonitor"
+          },
+          {
+            "$ref": "#/$defs/VolumeReportMonitor"
+          },
+          {
+            "$ref": "#/$defs/MassBalanceMonitor"
+          },
+          {
+            "$ref": "#/$defs/ExpressionMonitor"
+          }
+        ]
+      },
+      "title": "Monitors",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "monitors"
+  ],
+  "title": "MonitorsDocument",
+  "type": "object"
+}

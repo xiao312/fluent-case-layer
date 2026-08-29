@@ -1,0 +1,28 @@
+schema_version: "1.0"
+assets:
+  - id: m2-checkpoint-case
+    kind: case
+    source: {type: environment, root_variable: FCL_M2_ASSET_ROOT, relative_path: checkpoint/igniter-M2-fmean-fixed-hybrid-500-before-patch.cas.h5}
+    sha256: df43dbf1d5ae9cbbb0b444431aa00330f45f47acc08a015ec0f022ed4416943d
+    size_bytes: 138775765
+  - id: m2-checkpoint-data
+    kind: data
+    source: {type: environment, root_variable: FCL_M2_ASSET_ROOT, relative_path: checkpoint/igniter-M2-fmean-fixed-hybrid-500-before-patch.dat.h5}
+    sha256: c35bf097c67615cc2ff8c50d09f2defd078da6e1d0403429e5e1d5a7e8356185
+    size_bytes: 147605678
+  - id: m2-flamelet-library
+    kind: chemistry
+    source: {type: environment, root_variable: FCL_M2_ASSET_ROOT, relative_path: chemistry/igniter-M2-fgm-gri30-ch4-o2.fla}
+    sha256: 1df5238110721878c67e57ebe8fbfc7dc6dd2e093cd6254395cd299acab7227e
+    size_bytes: 967086
+  - id: m2-pdf-table
+    kind: table
+    source: {type: environment, root_variable: FCL_M2_ASSET_ROOT, relative_path: chemistry/igniter-M2-fgm-gri30-ch4-o2.pdf}
+    sha256: b32e065e80e13644b2ff74901497f87c377a0c4d4f29f829b45bb8b760def21c
+    size_bytes: 167737667
+  - id: m2-checkpoint-mesh
+    kind: mesh
+    source: {type: environment, root_variable: FCL_M2_ASSET_ROOT, relative_path: checkpoint/igniter-M2.msh.h5}
+    sha256: 0f1b779f102bdbdc0095b5dfe5f8ae918646e4e4e26fc0d211e7a3ab90e6980c
+    size_bytes: 143164034
+    description: Optional mesh-only provenance; the continuation reads the case/data checkpoint.

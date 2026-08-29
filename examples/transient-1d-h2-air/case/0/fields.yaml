@@ -1,0 +1,54 @@
+schema_version: "1.0"
+fields:
+  - id: pressure
+    fluent_name: pressure
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: Pa}}
+  - id: temperature
+    fluent_name: temperature
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 300, unit: K}}
+  - id: velocity
+    fluent_name: velocity
+    rank: vector
+    initial: {type: uniform_vector, value: {value: [0, 0, 0], unit: m/s}}
+  - id: h2
+    fluent_name: mass-fraction-h2
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0.028522387527567396, unit: "1"}}
+  - id: h
+    fluent_name: mass-fraction-h
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: o
+    fluent_name: mass-fraction-o
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: o2
+    fluent_name: mass-fraction-o2
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0.22635400697100733, unit: "1"}}
+  - id: oh
+    fluent_name: mass-fraction-oh
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: h2o
+    fluent_name: mass-fraction-h2o
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: ho2
+    fluent_name: mass-fraction-ho2
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: h2o2
+    fluent_name: mass-fraction-h2o2
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: ar
+    fluent_name: mass-fraction-ar
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0, unit: "1"}}
+  - id: n2
+    fluent_name: mass-fraction-n2
+    rank: scalar
+    initial: {type: uniform_scalar, value: {value: 0.7451236055014252, unit: "1"}}

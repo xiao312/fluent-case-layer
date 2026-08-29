@@ -1,0 +1,10 @@
+schema_version: "1.0"
+assets:
+  - id: baseline-mesh
+    kind: mesh
+    source:
+      type: remote
+      uri: https://example.invalid/fluent-case-layer/illustrative-reacting-flow.msh.h5
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    media_type: application/x-ansys-fluent-mesh
+    description: Illustrative lock entry; replace URI and digest before execution.

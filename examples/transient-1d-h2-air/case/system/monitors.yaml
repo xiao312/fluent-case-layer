@@ -1,0 +1,47 @@
+schema_version: "1.0"
+monitors:
+  - id: residuals
+    type: residual
+    thresholds: {continuity: 0.001, x-velocity: 0.001, energy: 0.000001, species: 0.001}
+    check_every: 1
+  - id: mass-closure
+    type: mass_balance
+    inlets:
+      type: names
+      names: [right-open]
+      cardinality: {exactly: 1}
+    outlets:
+      type: names
+      names: [left-open]
+      cardinality: {exactly: 1}
+    check_every: 20
+  - id: maximum-temperature
+    type: volume_report
+    operation: maximum
+    field: temperature
+    zones:
+      type: names
+      names: [fluid]
+      cardinality: {exactly: 1}
+    unit: K
+    check_every: 20
+gates:
+  - id: transient-metrics-written
+    type: artifact_exists
+    category: orchestration
+    severity: required
+    stage: sample-transient
+    output: transient-metrics
+  - id: final-data-written
+    type: artifact_exists
+    category: orchestration
+    severity: required
+    stage: final-checkpoint
+    output: data-file
+  - id: hot-state-present
+    type: threshold
+    category: scientific
+    severity: advisory
+    monitor: maximum-temperature
+    operator: ge
+    limit: {value: 1800, unit: K}

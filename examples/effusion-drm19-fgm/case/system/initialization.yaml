@@ -1,0 +1,14 @@
+schema_version: "1.0"
+actions:
+  - id: hybrid-cold
+    type: hybrid
+  - id: ignite-combustor
+    type: patch
+    target:
+      type: zones
+      zones:
+        type: names
+        names: [newgeom-combustor]
+        cardinality: {exactly: 1}
+    field: premixc
+    value: {type: uniform_scalar, value: {value: 1, unit: "1"}}

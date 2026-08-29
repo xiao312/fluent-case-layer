@@ -1,0 +1,20 @@
+schema_version: "1.0"
+model:
+  type: flamelet
+  mechanism:
+    type: asset
+    format: chemkin
+    mechanism_asset: drm19-chemkin
+    thermodynamics_asset: drm19-thermo
+  table_mode: calculate
+  nonadiabatic: true
+  partially_premixed: true
+  progress_variable: true
+streams:
+  fuel:
+    temperature: {value: 755.37, unit: K}
+    composition: {basis: mole_fraction, fractions: {ch4: 1.0}}
+  oxidizer:
+    temperature: {value: 422.04, unit: K}
+    composition: {basis: mole_fraction, fractions: {o2: 0.21, n2: 0.79}}
+tracked_species: [ch4, o2, n2, co2, h2o, co, h2, oh]

@@ -1,0 +1,32 @@
+schema_version: "1.0"
+actions:
+  - id: read-iteration-500
+    type: read_checkpoint
+    case_asset: m2-checkpoint-case
+    data_asset: m2-checkpoint-data
+  - id: create-full-ignition-cylinder
+    type: create_register
+    name: ignition-full
+    region:
+      type: cylinder
+      start: {value: [0, 0, 0], unit: m}
+      end: {value: [0, 0, 0.0423], unit: m}
+      radius: {value: 0.0100, unit: m}
+  - id: create-lower-clear-cylinder
+    type: create_register
+    name: ignition-lower-clear
+    region:
+      type: cylinder
+      start: {value: [0, 0, 0], unit: m}
+      end: {value: [0, 0, 0.0208], unit: m}
+      radius: {value: 0.0100, unit: m}
+  - id: patch-full-progress
+    type: patch
+    target: {type: register, register: ignition-full}
+    field: premixc
+    value: {type: uniform_scalar, value: {value: 1, unit: "1"}}
+  - id: clear-lower-progress
+    type: patch
+    target: {type: register, register: ignition-lower-clear}
+    field: premixc
+    value: {type: uniform_scalar, value: {value: 0, unit: "1"}}

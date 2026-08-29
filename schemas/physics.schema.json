@@ -1,0 +1,576 @@
+{
+  "$defs": {
+    "CaseMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "known_blockers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Known Blockers",
+          "type": "array"
+        },
+        "readiness": {
+          "default": "draft",
+          "enum": [
+            "illustrative",
+            "draft",
+            "smoke_validated",
+            "numerically_validated",
+            "scientifically_validated",
+            "blocked"
+          ],
+          "title": "Readiness",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "CaseMetadata",
+      "type": "object"
+    },
+    "DiscreteOrdinatesRadiation": {
+      "additionalProperties": false,
+      "properties": {
+        "phi_divisions": {
+          "default": 4,
+          "minimum": 1,
+          "title": "Phi Divisions",
+          "type": "integer"
+        },
+        "theta_divisions": {
+          "default": 4,
+          "minimum": 1,
+          "title": "Theta Divisions",
+          "type": "integer"
+        },
+        "type": {
+          "const": "discrete_ordinates",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "DiscreteOrdinatesRadiation",
+      "type": "object"
+    },
+    "DiscretePhaseModel": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "interaction_with_continuous_phase": {
+          "default": false,
+          "title": "Interaction With Continuous Phase",
+          "type": "boolean"
+        },
+        "max_tracking_steps": {
+          "default": 50000,
+          "minimum": 1,
+          "title": "Max Tracking Steps",
+          "type": "integer"
+        },
+        "unsteady_tracking": {
+          "default": false,
+          "title": "Unsteady Tracking",
+          "type": "boolean"
+        },
+        "update_every_flow_iterations": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Update Every Flow Iterations",
+          "type": "integer"
+        }
+      },
+      "title": "DiscretePhaseModel",
+      "type": "object"
+    },
+    "KEpsilonTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "near_wall": {
+          "default": "standard_wall_functions",
+          "enum": [
+            "standard_wall_functions",
+            "enhanced_wall_treatment",
+            "scalable_wall_functions"
+          ],
+          "title": "Near Wall",
+          "type": "string"
+        },
+        "type": {
+          "const": "k_epsilon",
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "default": "realizable",
+          "enum": [
+            "standard",
+            "realizable",
+            "rng"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "KEpsilonTurbulence",
+      "type": "object"
+    },
+    "KOmegaTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "k_omega",
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "default": "sst",
+          "enum": [
+            "standard",
+            "sst"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "KOmegaTurbulence",
+      "type": "object"
+    },
+    "LaminarTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "laminar",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "LaminarTurbulence",
+      "type": "object"
+    },
+    "LesTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "subgrid": {
+          "default": "wale",
+          "enum": [
+            "smagorinsky_lilly",
+            "wale",
+            "dynamic_smagorinsky"
+          ],
+          "title": "Subgrid",
+          "type": "string"
+        },
+        "synthetic_turbulence": {
+          "default": false,
+          "title": "Synthetic Turbulence",
+          "type": "boolean"
+        },
+        "type": {
+          "const": "les",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "LesTurbulence",
+      "type": "object"
+    },
+    "NonPremixedPdf": {
+      "additionalProperties": false,
+      "properties": {
+        "nonadiabatic": {
+          "default": true,
+          "title": "Nonadiabatic",
+          "type": "boolean"
+        },
+        "progress_variable": {
+          "default": false,
+          "title": "Progress Variable",
+          "type": "boolean"
+        },
+        "type": {
+          "const": "nonpremixed_pdf",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "NonPremixedPdf",
+      "type": "object"
+    },
+    "P1Radiation": {
+      "additionalProperties": false,
+      "properties": {
+        "absorption": {
+          "default": "wsggm",
+          "enum": [
+            "wsggm",
+            "constant"
+          ],
+          "title": "Absorption",
+          "type": "string"
+        },
+        "type": {
+          "const": "p1",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "P1Radiation",
+      "type": "object"
+    },
+    "PartiallyPremixedPdf": {
+      "additionalProperties": false,
+      "properties": {
+        "nonadiabatic": {
+          "default": true,
+          "title": "Nonadiabatic",
+          "type": "boolean"
+        },
+        "progress_variable": {
+          "default": true,
+          "title": "Progress Variable",
+          "type": "boolean"
+        },
+        "type": {
+          "const": "partially_premixed_pdf",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "PartiallyPremixedPdf",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "RadiationDisabled": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "RadiationDisabled",
+      "type": "object"
+    },
+    "ReynoldsStressTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "reynolds_stress",
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "default": "ssg",
+          "enum": [
+            "linear_pressure_strain",
+            "ssg"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "ReynoldsStressTurbulence",
+      "type": "object"
+    },
+    "SolverSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "enum": [
+            "2d_planar",
+            "2d_axisymmetric",
+            "3d"
+          ],
+          "title": "Dimension",
+          "type": "string"
+        },
+        "energy": {
+          "default": true,
+          "title": "Energy",
+          "type": "boolean"
+        },
+        "formulation": {
+          "default": "pressure_based",
+          "enum": [
+            "pressure_based",
+            "density_based"
+          ],
+          "title": "Formulation",
+          "type": "string"
+        },
+        "operating_pressure": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "precision": {
+          "default": "double",
+          "enum": [
+            "single",
+            "double"
+          ],
+          "title": "Precision",
+          "type": "string"
+        },
+        "time": {
+          "default": "steady",
+          "enum": [
+            "steady",
+            "transient"
+          ],
+          "title": "Time",
+          "type": "string"
+        },
+        "velocity_formulation": {
+          "default": "absolute",
+          "enum": [
+            "absolute",
+            "relative"
+          ],
+          "title": "Velocity Formulation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dimension",
+        "operating_pressure"
+      ],
+      "title": "SolverSpec",
+      "type": "object"
+    },
+    "SpeciesDisabled": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "SpeciesDisabled",
+      "type": "object"
+    },
+    "SpeciesTransport": {
+      "additionalProperties": false,
+      "properties": {
+        "diffusion_energy_source": {
+          "default": true,
+          "title": "Diffusion Energy Source",
+          "type": "boolean"
+        },
+        "turbulence_chemistry": {
+          "default": "none",
+          "enum": [
+            "none",
+            "eddy_dissipation",
+            "finite_rate_eddy_dissipation",
+            "edc"
+          ],
+          "title": "Turbulence Chemistry",
+          "type": "string"
+        },
+        "type": {
+          "const": "species_transport",
+          "title": "Type",
+          "type": "string"
+        },
+        "volumetric_reactions": {
+          "default": true,
+          "title": "Volumetric Reactions",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "SpeciesTransport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "case": {
+      "$ref": "#/$defs/CaseMetadata"
+    },
+    "discrete_phase": {
+      "$ref": "#/$defs/DiscretePhaseModel"
+    },
+    "radiation": {
+      "discriminator": {
+        "mapping": {
+          "discrete_ordinates": "#/$defs/DiscreteOrdinatesRadiation",
+          "none": "#/$defs/RadiationDisabled",
+          "p1": "#/$defs/P1Radiation"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/RadiationDisabled"
+        },
+        {
+          "$ref": "#/$defs/P1Radiation"
+        },
+        {
+          "$ref": "#/$defs/DiscreteOrdinatesRadiation"
+        }
+      ],
+      "title": "Radiation"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "solver": {
+      "$ref": "#/$defs/SolverSpec"
+    },
+    "species": {
+      "discriminator": {
+        "mapping": {
+          "none": "#/$defs/SpeciesDisabled",
+          "nonpremixed_pdf": "#/$defs/NonPremixedPdf",
+          "partially_premixed_pdf": "#/$defs/PartiallyPremixedPdf",
+          "species_transport": "#/$defs/SpeciesTransport"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SpeciesDisabled"
+        },
+        {
+          "$ref": "#/$defs/SpeciesTransport"
+        },
+        {
+          "$ref": "#/$defs/NonPremixedPdf"
+        },
+        {
+          "$ref": "#/$defs/PartiallyPremixedPdf"
+        }
+      ],
+      "title": "Species"
+    },
+    "turbulence": {
+      "discriminator": {
+        "mapping": {
+          "k_epsilon": "#/$defs/KEpsilonTurbulence",
+          "k_omega": "#/$defs/KOmegaTurbulence",
+          "laminar": "#/$defs/LaminarTurbulence",
+          "les": "#/$defs/LesTurbulence",
+          "reynolds_stress": "#/$defs/ReynoldsStressTurbulence"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/LaminarTurbulence"
+        },
+        {
+          "$ref": "#/$defs/KEpsilonTurbulence"
+        },
+        {
+          "$ref": "#/$defs/KOmegaTurbulence"
+        },
+        {
+          "$ref": "#/$defs/ReynoldsStressTurbulence"
+        },
+        {
+          "$ref": "#/$defs/LesTurbulence"
+        }
+      ],
+      "title": "Turbulence"
+    }
+  },
+  "required": [
+    "case",
+    "solver",
+    "turbulence"
+  ],
+  "title": "PhysicsDocument",
+  "type": "object"
+}

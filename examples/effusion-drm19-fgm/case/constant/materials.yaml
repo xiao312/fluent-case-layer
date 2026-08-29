@@ -1,0 +1,15 @@
+schema_version: "1.0"
+materials:
+  - id: effusion-fgm-mixture
+    kind: mixture
+    source: {type: chemistry_mixture, mixture: drm19-fgm}
+  - id: kerosene-liquid
+    kind: fluid
+    source: {type: fluent_database, name: kerosene-liquid}
+zone_assignments:
+  - id: assign-reacting-domain
+    zones:
+      type: zone_type
+      zone_type: fluid
+      cardinality: {at_least: 1}
+    material: effusion-fgm-mixture
