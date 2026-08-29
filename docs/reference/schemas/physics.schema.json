@@ -118,6 +118,20 @@
     "KEpsilonTurbulence": {
       "additionalProperties": false,
       "properties": {
+        "coefficients": {
+          "description": "Engineer-selected positive k-epsilon model constants keyed by a stable case-layer name; an adapter must explicitly map each key for the active Fluent release.",
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "type": "number"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Coefficients",
+          "type": "object"
+        },
         "near_wall": {
           "default": "standard_wall_functions",
           "enum": [

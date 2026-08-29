@@ -75,8 +75,39 @@ class FluentProperty(StrictModel):
     name: str
 
 
+class CubicEquationOfStateProperty(StrictModel):
+    """Fluent cubic real-gas density intent for a fluid or mixture."""
+
+    type: Literal["cubic_eos"]
+    model: Literal["soave_redlich_kwong", "peng_robinson"] = Field(
+        description="Primary cubic equation of state requested for the material density."
+    )
+    volume_translation: bool = Field(
+        default=False,
+        description="Request volume translation when the selected Fluent model exposes it.",
+    )
+    fallback_model: Literal["soave_redlich_kwong", "peng_robinson"] | None = Field(
+        default=None,
+        description=(
+            "Distinct fallback accepted only when the primary model is unavailable in "
+            "the live Fluent material state."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def distinct_fallback(self) -> CubicEquationOfStateProperty:
+        if self.fallback_model == self.model:
+            raise ValueError("cubic EOS fallback_model must differ from model")
+        return self
+
+
 PropertyModel = Annotated[
-    ConstantProperty | IdealGasProperty | PolynomialProperty | SutherlandProperty | FluentProperty,
+    ConstantProperty
+    | IdealGasProperty
+    | PolynomialProperty
+    | SutherlandProperty
+    | FluentProperty
+    | CubicEquationOfStateProperty,
     Field(discriminator="type"),
 ]
 

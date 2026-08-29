@@ -89,6 +89,55 @@
       "title": "ConstantProperty",
       "type": "object"
     },
+    "CubicEquationOfStateProperty": {
+      "additionalProperties": false,
+      "description": "Fluent cubic real-gas density intent for a fluid or mixture.",
+      "properties": {
+        "fallback_model": {
+          "anyOf": [
+            {
+              "enum": [
+                "soave_redlich_kwong",
+                "peng_robinson"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Distinct fallback accepted only when the primary model is unavailable in the live Fluent material state.",
+          "title": "Fallback Model"
+        },
+        "model": {
+          "description": "Primary cubic equation of state requested for the material density.",
+          "enum": [
+            "soave_redlich_kwong",
+            "peng_robinson"
+          ],
+          "title": "Model",
+          "type": "string"
+        },
+        "type": {
+          "const": "cubic_eos",
+          "title": "Type",
+          "type": "string"
+        },
+        "volume_translation": {
+          "default": false,
+          "description": "Request volume translation when the selected Fluent model exposes it.",
+          "title": "Volume Translation",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "model"
+      ],
+      "title": "CubicEquationOfStateProperty",
+      "type": "object"
+    },
     "ExplicitMaterialSource": {
       "additionalProperties": false,
       "properties": {
@@ -184,6 +233,7 @@
               "discriminator": {
                 "mapping": {
                   "constant": "#/$defs/ConstantProperty",
+                  "cubic_eos": "#/$defs/CubicEquationOfStateProperty",
                   "fluent_database": "#/$defs/FluentProperty",
                   "ideal_gas": "#/$defs/IdealGasProperty",
                   "polynomial": "#/$defs/PolynomialProperty",
@@ -206,6 +256,9 @@
                 },
                 {
                   "$ref": "#/$defs/FluentProperty"
+                },
+                {
+                  "$ref": "#/$defs/CubicEquationOfStateProperty"
                 }
               ]
             }

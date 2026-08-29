@@ -1246,6 +1246,55 @@
       "title": "CreateRegisterAction",
       "type": "object"
     },
+    "CubicEquationOfStateProperty": {
+      "additionalProperties": false,
+      "description": "Fluent cubic real-gas density intent for a fluid or mixture.",
+      "properties": {
+        "fallback_model": {
+          "anyOf": [
+            {
+              "enum": [
+                "soave_redlich_kwong",
+                "peng_robinson"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Distinct fallback accepted only when the primary model is unavailable in the live Fluent material state.",
+          "title": "Fallback Model"
+        },
+        "model": {
+          "description": "Primary cubic equation of state requested for the material density.",
+          "enum": [
+            "soave_redlich_kwong",
+            "peng_robinson"
+          ],
+          "title": "Model",
+          "type": "string"
+        },
+        "type": {
+          "const": "cubic_eos",
+          "title": "Type",
+          "type": "string"
+        },
+        "volume_translation": {
+          "default": false,
+          "description": "Request volume translation when the selected Fluent model exposes it.",
+          "title": "Volume Translation",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "model"
+      ],
+      "title": "CubicEquationOfStateProperty",
+      "type": "object"
+    },
     "CylinderRegion": {
       "additionalProperties": false,
       "properties": {
@@ -2944,6 +2993,20 @@
     "KEpsilonTurbulence": {
       "additionalProperties": false,
       "properties": {
+        "coefficients": {
+          "description": "Engineer-selected positive k-epsilon model constants keyed by a stable case-layer name; an adapter must explicitly map each key for the active Fluent release.",
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "type": "number"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Coefficients",
+          "type": "object"
+        },
         "near_wall": {
           "default": "standard_wall_functions",
           "enum": [
@@ -3722,6 +3785,7 @@
               "discriminator": {
                 "mapping": {
                   "constant": "#/$defs/ConstantProperty",
+                  "cubic_eos": "#/$defs/CubicEquationOfStateProperty",
                   "fluent_database": "#/$defs/FluentProperty",
                   "ideal_gas": "#/$defs/IdealGasProperty",
                   "polynomial": "#/$defs/PolynomialProperty",
@@ -3744,6 +3808,9 @@
                 },
                 {
                   "$ref": "#/$defs/FluentProperty"
+                },
+                {
+                  "$ref": "#/$defs/CubicEquationOfStateProperty"
                 }
               ]
             }

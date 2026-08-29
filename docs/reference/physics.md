@@ -4,11 +4,11 @@
 
 - Dictionary: `constant/physics.yaml`
 - Schema: [`physics.schema.json`](schemas/physics.schema.json)
-- Entries: **41**
+- Entries: **43**
 
 Solver formulation and enabled physical models.
 
-Support summary: **declaration_only** 1, **not_applicable** 5, **planned** 35.
+Support summary: **declaration_only** 1, **not_applicable** 5, **planned** 37.
 
 The status describes the repository adapter, not whether Fluent itself supports the feature.
 
@@ -52,6 +52,8 @@ The status describes the repository adapter, not whether Fluent itself supports 
 | [`/species/type`](#entry-species-type-1ca6571f) | required | `string` | `none`, `nonpremixed_pdf`, `partially_premixed_pdf`, `species_transport` | **planned** |
 | [`/species/volumetric_reactions`](#entry-species-volumetric-reactions-ea1e4b77) | optional | `boolean` | `false`, `true` | **planned** |
 | [`/turbulence`](#entry-turbulence-54d2ccd9) | required | `object` | — | **planned** |
+| [`/turbulence/coefficients`](#entry-turbulence-coefficients-78301198) | optional | `object` | — | **planned** |
+| [`/turbulence/coefficients/*`](#entry-turbulence-coefficients-36938023) | optional | `number` | — | **planned** |
 | [`/turbulence/near_wall`](#entry-turbulence-near-wall-a37321dd) | optional | `string` | `enhanced_wall_treatment`, `scalable_wall_functions`, `standard_wall_functions` | **planned** |
 | [`/turbulence/subgrid`](#entry-turbulence-subgrid-8c043a56) | optional | `string` | `dynamic_smagorinsky`, `smagorinsky_lilly`, `wale` | **planned** |
 | [`/turbulence/synthetic_turbulence`](#entry-turbulence-synthetic-turbulence-6da3c7da) | optional | `boolean` | `false`, `true` | **planned** |
@@ -1749,6 +1751,100 @@ Canonical ID: `constant/physics.yaml#/turbulence`
 | Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
 
 Broad typed physics reconciliation currently fails closed without explicit operations.
+
+<a id="entry-turbulence-coefficients-78301198"></a>
+
+## `/turbulence/coefficients`
+
+Optional engineer-owned k-epsilon model constants. Keys are deliberately extensible; every key still requires an explicit release-specific adapter mapping before execution.
+
+Canonical ID: `constant/physics.yaml#/turbulence/coefficients`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `object` |
+| Requirement | `optional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/turbulence:type=k_epsilon` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | Values must be finite and greater than zero. |
+| Example | `{"c1_epsilon": 1.4}` |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Viscous > Model Constants |
+| Activation/order | Available constants depend on the selected k-epsilon variant. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.viscous.<active-model-constant>` |
+| Operation | `set_state_or_scheme` |
+| Option source | `runtime_active_objects` |
+| Path confidence | `dynamic` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Unknown constant keys fail closed; no generic model-constant mutation is implemented.
+
+<a id="entry-turbulence-coefficients-36938023"></a>
+
+## `/turbulence/coefficients/*`
+
+One positive model constant identified by its case-layer mapping key.
+
+Canonical ID: `constant/physics.yaml#/turbulence/coefficients/*`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `number` |
+| Requirement | `optional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"keyPattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$"} |
+| Available in variants | `/turbulence:type=k_epsilon` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | The key must have an explicit adapter mapping for the active Fluent release. |
+| Example | `1.4` |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Viscous > Model Constants |
+| Activation/order | The corresponding constant must be active for the selected k-epsilon variant. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.viscous.<mapped-constant>` |
+| Operation | `set_state_or_scheme` |
+| Option source | `runtime_active_objects` |
+| Path confidence | `dynamic` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+The schema records intent but the current adapter does not map coefficient keys.
 
 <a id="entry-turbulence-near-wall-a37321dd"></a>
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
@@ -51,6 +52,21 @@ class KEpsilonTurbulence(StrictModel):
     near_wall: Literal[
         "standard_wall_functions", "enhanced_wall_treatment", "scalable_wall_functions"
     ] = "standard_wall_functions"
+    coefficients: dict[Identifier, float] = Field(
+        default_factory=dict,
+        description=(
+            "Engineer-selected positive k-epsilon model constants keyed by a stable "
+            "case-layer name; an adapter must explicitly map each key for the active "
+            "Fluent release."
+        ),
+    )
+
+    @field_validator("coefficients")
+    @classmethod
+    def finite_positive_coefficients(cls, values: dict[str, float]) -> dict[str, float]:
+        if any(not math.isfinite(value) or value <= 0 for value in values.values()):
+            raise ValueError("k-epsilon coefficients must be finite and positive")
+        return values
 
 
 class KOmegaTurbulence(StrictModel):

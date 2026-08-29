@@ -393,6 +393,85 @@ entries:
       confidence: official
     adapter:
       status: planned
+  "constant/physics.yaml#/turbulence/coefficients":
+    authoring:
+      description: >-
+        Optional engineer-owned k-epsilon model constants. Keys are deliberately extensible;
+        every key still requires an explicit release-specific adapter mapping before execution.
+      semantic_constraints: Values must be finite and greater than zero.
+      example: {c1_epsilon: 1.4}
+    fluent:
+      concept: Setup > Models > Viscous > Model Constants
+      activation: Available constants depend on the selected k-epsilon variant.
+    pyfluent:
+      path: setup.models.viscous.<active-model-constant>
+      operation: set_state_or_scheme
+      option_source: runtime_active_objects
+      confidence: dynamic
+    adapter:
+      status: planned
+      note: Unknown constant keys fail closed; no generic model-constant mutation is implemented.
+  "constant/physics.yaml#/turbulence/coefficients/*":
+    authoring:
+      description: One positive model constant identified by its case-layer mapping key.
+      semantic_constraints: The key must have an explicit adapter mapping for the active Fluent release.
+      example: 1.4
+    fluent:
+      concept: Setup > Models > Viscous > Model Constants
+      activation: The corresponding constant must be active for the selected k-epsilon variant.
+    pyfluent:
+      path: setup.models.viscous.<mapped-constant>
+      operation: set_state_or_scheme
+      option_source: runtime_active_objects
+      confidence: dynamic
+    adapter:
+      status: planned
+      note: The schema records intent but the current adapter does not map coefficient keys.
+  "constant/materials.yaml#/materials/*/properties/*/model":
+    authoring:
+      description: Select the primary cubic real-gas equation of state for density.
+    fluent:
+      concept: Setup > Materials > Density > Real Gas Cubic EOS
+      activation: Requires a compatible fluid or mixture and species/energy model state.
+    pyfluent:
+      path: setup.materials.<kind>[<name>].density.option
+      operation: set_state
+      option_source: runtime_allowed_values
+      confidence: dynamic
+    adapter:
+      status: planned
+      note: The current material reconciler does not yet activate cubic EOS models.
+  "constant/materials.yaml#/materials/*/properties/*/fallback_model":
+    authoring:
+      description: >-
+        Record a distinct alternate cubic EOS that an execution adapter may try only when
+        the primary option is unavailable.
+      semantic_constraints: When present, it must differ from model.
+    fluent:
+      concept: Setup > Materials > Density > Real Gas Cubic EOS
+      activation: Evaluated only after the primary model cannot be selected.
+    pyfluent:
+      path: setup.materials.<kind>[<name>].density.option
+      operation: set_state
+      option_source: runtime_allowed_values
+      confidence: dynamic
+    adapter:
+      status: planned
+      note: Fallback policy is declared but not automatically executed by the current adapter.
+  "constant/materials.yaml#/materials/*/properties/*/volume_translation":
+    authoring:
+      description: Request volume translation if that option is active for the chosen EOS.
+    fluent:
+      concept: Setup > Materials > Density > Real Gas Cubic EOS
+      activation: Availability depends on the selected EOS and Fluent release.
+    pyfluent:
+      path: setup.materials.<kind>[<name>].density.<volume-translation-option>
+      operation: set_state
+      option_source: runtime_active_objects
+      confidence: dynamic
+    adapter:
+      status: planned
+      note: Volume translation is retained as typed intent and currently fails closed at apply time.
   "constant/physics.yaml#/species/type":
     authoring:
       description: Choose whether and how Fluent transports reacting species or PDF variables.

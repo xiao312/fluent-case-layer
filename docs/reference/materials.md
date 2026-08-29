@@ -4,11 +4,11 @@
 
 - Dictionary: `constant/materials.yaml`
 - Schema: [`materials.schema.json`](schemas/materials.schema.json)
-- Entries: **41**
+- Entries: **44**
 
 Material definitions, properties, and cell-zone assignments.
 
-Support summary: **declaration_only** 2, **not_applicable** 1, **planned** 38.
+Support summary: **declaration_only** 2, **not_applicable** 1, **planned** 41.
 
 The status describes the repository adapter, not whether Fluent itself supports the feature.
 
@@ -22,7 +22,9 @@ The status describes the repository adapter, not whether Fluent itself supports 
 | [`/materials/*/properties`](#entry-materials-properties-ae3ca9d9) | optional | `object` | — | **planned** |
 | [`/materials/*/properties/*`](#entry-materials-properties-3fd9da50) | optional | `object` | — | **planned** |
 | [`/materials/*/properties/*/coefficients`](#entry-materials-properties-coefficients-d0cc065a) | conditional | `array` | — | **planned** |
+| [`/materials/*/properties/*/fallback_model`](#entry-materials-properties-fallback-model-f7132137) | optional | `null`, `string` | `peng_robinson`, `soave_redlich_kwong` | **planned** |
 | [`/materials/*/properties/*/independent_unit`](#entry-materials-properties-independent-unit-5f97d8c6) | conditional | `string` | — | **planned** |
+| [`/materials/*/properties/*/model`](#entry-materials-properties-model-aeb686bc) | conditional | `string` | `peng_robinson`, `soave_redlich_kwong` | **planned** |
 | [`/materials/*/properties/*/name`](#entry-materials-properties-name-30aac0a6) | conditional | `string` | — | **planned** |
 | [`/materials/*/properties/*/output_unit`](#entry-materials-properties-output-unit-83322080) | conditional | `string` | — | **planned** |
 | [`/materials/*/properties/*/reference_temperature`](#entry-materials-properties-reference-temperature-b7ad56ea) | conditional | `object` | — | **planned** |
@@ -34,11 +36,12 @@ The status describes the repository adapter, not whether Fluent itself supports 
 | [`/materials/*/properties/*/sutherland_temperature`](#entry-materials-properties-sutherland-temperature-d866f8b2) | conditional | `object` | — | **planned** |
 | [`/materials/*/properties/*/sutherland_temperature/unit`](#entry-materials-properties-sutherland-temperature-unit-d7fc8b31) | conditional | `string` | — | **planned** |
 | [`/materials/*/properties/*/sutherland_temperature/value`](#entry-materials-properties-sutherland-temperature-value-e8f682c2) | conditional | `number` | — | **planned** |
-| [`/materials/*/properties/*/type`](#entry-materials-properties-type-83ee888b) | required | `string` | `constant`, `fluent_database`, `ideal_gas`, `polynomial`, `sutherland` | **planned** |
+| [`/materials/*/properties/*/type`](#entry-materials-properties-type-83ee888b) | required | `string` | `constant`, `cubic_eos`, `fluent_database`, `ideal_gas`, `polynomial`, `sutherland` | **planned** |
 | [`/materials/*/properties/*/valid_range`](#entry-materials-properties-valid-range-dbae6c89) | optional | `array`, `null` | — | **planned** |
 | [`/materials/*/properties/*/value`](#entry-materials-properties-value-76144f49) | conditional | `object` | — | **planned** |
 | [`/materials/*/properties/*/value/unit`](#entry-materials-properties-value-unit-65c38e36) | conditional | `string` | — | **planned** |
 | [`/materials/*/properties/*/value/value`](#entry-materials-properties-value-value-f6638179) | conditional | `number` | — | **planned** |
+| [`/materials/*/properties/*/volume_translation`](#entry-materials-properties-volume-translation-7317eee5) | optional | `boolean` | `false`, `true` | **planned** |
 | [`/materials/*/source`](#entry-materials-source-a2ef9a55) | required | `object` | — | **planned** |
 | [`/materials/*/source/mixture`](#entry-materials-source-mixture-fd617a92) | conditional | `string` | — | **planned** |
 | [`/materials/*/source/name`](#entry-materials-source-name-42a57f8a) | conditional | `string` | — | **planned** |
@@ -250,7 +253,7 @@ Material creation and zone assignment need a typed reconciler.
 
 ## `/materials/*/properties/*`
 
-Authored key `*`.
+Fluent cubic real-gas density intent for a fluid or mixture.
 
 Canonical ID: `constant/materials.yaml#/materials/*/properties/*`
 
@@ -340,6 +343,53 @@ Canonical ID: `constant/materials.yaml#/materials/*/properties/*/coefficients`
 
 Material creation and zone assignment need a typed reconciler.
 
+<a id="entry-materials-properties-fallback-model-f7132137"></a>
+
+## `/materials/*/properties/*/fallback_model`
+
+Record a distinct alternate cubic EOS that an execution adapter may try only when the primary option is unavailable.
+
+Canonical ID: `constant/materials.yaml#/materials/*/properties/*/fallback_model`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `null`, `string` |
+| Requirement | `optional` |
+| Default | — |
+| Choices | `peng_robinson`, `soave_redlich_kwong` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/materials/*/properties/*:type=cubic_eos` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | When present, it must differ from model. |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Materials > Density > Real Gas Cubic EOS |
+| Activation/order | Evaluated only after the primary model cannot be selected. |
+| PyFluent interface | `settings_named_objects` |
+| PyFluent path | `setup.materials.<kind>[<name>].density.option` |
+| Operation | `set_state` |
+| Option source | `runtime_allowed_values` |
+| Path confidence | `dynamic` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Fallback policy is declared but not automatically executed by the current adapter.
+
 <a id="entry-materials-properties-independent-unit-5f97d8c6"></a>
 
 ## `/materials/*/properties/*/independent_unit`
@@ -386,6 +436,53 @@ Canonical ID: `constant/materials.yaml#/materials/*/properties/*/independent_uni
 | Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
 
 Material creation and zone assignment need a typed reconciler.
+
+<a id="entry-materials-properties-model-aeb686bc"></a>
+
+## `/materials/*/properties/*/model`
+
+Select the primary cubic real-gas equation of state for density.
+
+Canonical ID: `constant/materials.yaml#/materials/*/properties/*/model`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `peng_robinson`, `soave_redlich_kwong` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/materials/*/properties/*:type=cubic_eos` |
+| Required in variants | `/materials/*/properties/*:type=cubic_eos` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Materials > Density > Real Gas Cubic EOS |
+| Activation/order | Requires a compatible fluid or mixture and species/energy model state. |
+| PyFluent interface | `settings_named_objects` |
+| PyFluent path | `setup.materials.<kind>[<name>].density.option` |
+| Operation | `set_state` |
+| Option source | `runtime_allowed_values` |
+| Path confidence | `dynamic` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+The current material reconciler does not yet activate cubic EOS models.
 
 <a id="entry-materials-properties-name-30aac0a6"></a>
 
@@ -928,11 +1025,11 @@ Canonical ID: `constant/materials.yaml#/materials/*/properties/*/type`
 | Type | `string` |
 | Requirement | `required` |
 | Default | — |
-| Choices | `constant`, `fluent_database`, `ideal_gas`, `polynomial`, `sutherland` |
+| Choices | `constant`, `cubic_eos`, `fluent_database`, `ideal_gas`, `polynomial`, `sutherland` |
 | List-item choices | — |
 | Constraints | {} |
-| Available in variants | `/materials/*/properties/*:type=constant`, `/materials/*/properties/*:type=fluent_database`, `/materials/*/properties/*:type=ideal_gas`, `/materials/*/properties/*:type=polynomial`, `/materials/*/properties/*:type=sutherland` |
-| Required in variants | `/materials/*/properties/*:type=constant`, `/materials/*/properties/*:type=fluent_database`, `/materials/*/properties/*:type=ideal_gas`, `/materials/*/properties/*:type=polynomial`, `/materials/*/properties/*:type=sutherland` |
+| Available in variants | `/materials/*/properties/*:type=constant`, `/materials/*/properties/*:type=cubic_eos`, `/materials/*/properties/*:type=fluent_database`, `/materials/*/properties/*:type=ideal_gas`, `/materials/*/properties/*:type=polynomial`, `/materials/*/properties/*:type=sutherland` |
+| Required in variants | `/materials/*/properties/*:type=constant`, `/materials/*/properties/*:type=cubic_eos`, `/materials/*/properties/*:type=fluent_database`, `/materials/*/properties/*:type=ideal_gas`, `/materials/*/properties/*:type=polynomial`, `/materials/*/properties/*:type=sutherland` |
 | Allowed units | — |
 | Semantic constraints | — |
 | Example | — |
@@ -1150,6 +1247,53 @@ Canonical ID: `constant/materials.yaml#/materials/*/properties/*/value/value`
 | Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
 
 Material creation and zone assignment need a typed reconciler.
+
+<a id="entry-materials-properties-volume-translation-7317eee5"></a>
+
+## `/materials/*/properties/*/volume_translation`
+
+Request volume translation if that option is active for the chosen EOS.
+
+Canonical ID: `constant/materials.yaml#/materials/*/properties/*/volume_translation`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `boolean` |
+| Requirement | `optional` |
+| Default | `false` |
+| Choices | `false`, `true` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/materials/*/properties/*:type=cubic_eos` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Materials > Density > Real Gas Cubic EOS |
+| Activation/order | Availability depends on the selected EOS and Fluent release. |
+| PyFluent interface | `settings_named_objects` |
+| PyFluent path | `setup.materials.<kind>[<name>].density.<volume-translation-option>` |
+| Operation | `set_state` |
+| Option source | `runtime_active_objects` |
+| Path confidence | `dynamic` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Volume translation is retained as typed intent and currently fails closed at apply time.
 
 <a id="entry-materials-source-a2ef9a55"></a>
 
