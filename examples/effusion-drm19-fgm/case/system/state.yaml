@@ -1,0 +1,49 @@
+schema_version: "1.0"
+mode: full_definition
+declared_paths:
+  - path: geometry.source
+    source: {type: case_document, document: system/control.yaml, pointer: /stages/0/inputs/0/asset}
+    rationale: Own the immutable tutorial PMDB selection and its provenance.
+  - path: mesh.controls
+    source: {type: case_document, document: system/control.yaml, pointer: /stages/0/inputs}
+    rationale: >-
+      Own meshing intent even though the initial adapter reports this workflow
+      as an unsupported execution mapping rather than silently skipping it.
+  - path: setup.solver
+    source: {type: case_document, document: constant/physics.yaml, pointer: /solver}
+  - path: setup.models.turbulence
+    source: {type: case_document, document: constant/physics.yaml, pointer: /turbulence}
+  - path: setup.models.species
+    source: {type: case_document, document: constant/physics.yaml, pointer: /species}
+  - path: setup.models.radiation
+    source: {type: case_document, document: constant/physics.yaml, pointer: /radiation}
+  - path: setup.models.discrete_phase
+    source: {type: case_document, document: constant/physics.yaml, pointer: /discrete_phase}
+  - path: setup.materials
+    source: {type: case_document, document: constant/materials.yaml, pointer: /materials}
+  - path: setup.zone_assignments
+    source: {type: case_document, document: constant/materials.yaml, pointer: /zone_assignments}
+  - path: setup.chemistry.model
+    source: {type: case_document, document: constant/chemistry.yaml, pointer: /model}
+  - path: setup.chemistry.streams
+    source: {type: case_document, document: constant/chemistry.yaml, pointer: /streams}
+  - path: setup.chemistry.tracked_species
+    source: {type: case_document, document: constant/chemistry.yaml, pointer: /tracked_species}
+  - path: solution.fields
+    source: {type: case_document, document: 0/fields.yaml, pointer: /fields}
+  - path: setup.boundary_conditions
+    source: {type: case_document, document: 0/boundary-conditions.yaml, pointer: /boundaries}
+  - path: solution.methods
+    source: {type: case_document, document: system/numerics.yaml, pointer: /profiles}
+  - path: solution.initialization
+    source: {type: case_document, document: system/initialization.yaml, pointer: /actions}
+observed_paths:
+  - {path: geometry.provenance, capture: digest, purpose: provenance, required: true}
+  - {path: mesh.summary, capture: summary, purpose: provenance, required: true}
+  - {path: setup.models, capture: exact, purpose: verification, required: true}
+  - {path: setup.boundary_conditions, capture: exact, purpose: verification, required: true}
+  - {path: solution.methods, capture: exact, purpose: verification, required: true}
+  - {path: solution.initialization, capture: summary, purpose: provenance, required: true}
+  - {path: solution.discrete_phase, capture: summary, purpose: diagnostic, required: true}
+  - {path: solution.fields, capture: summary, purpose: diagnostic, required: true}
+  - {path: solution.residuals, capture: summary, purpose: diagnostic, required: false}

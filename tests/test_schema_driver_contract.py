@@ -24,3 +24,8 @@ def test_typed_case_compiles_to_dependency_ordered_driver_plan() -> None:
     ]
     assert plan.actions[-1].depends_on == ("accept",)
     assert len(plan.plan_hash) == 64
+    assert plan.metadata["objectives"]["enforcement"] == "none"
+    assert plan.metadata["objectives"]["revision"]["id"] == "initial-objectives"
+    assert len(plan.metadata["objectives"]["content_digest"]) == 64
+    assert plan.metadata["state_ownership"]["policy"]["mode"] == "full_definition"
+    assert len(plan.metadata["state_ownership"]["content_digest"]) == 64

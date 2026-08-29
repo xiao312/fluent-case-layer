@@ -58,5 +58,6 @@ the same.
 
 Resource allocation, process exit, numerical health, and scientific validity
 are separate claims. A successful Slurm/PyFluent invocation establishes only
-execution evidence. Convergence, conservation, stationarity, and comparison to
-reference data require explicit monitors and gates in the case.
+execution evidence. A case may declare monitors, references, and gates when
+they help answer its engineer-defined objective, but no universal numerical or
+scientific gate is required; absent judgments remain `not_evaluated`.

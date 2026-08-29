@@ -62,17 +62,3 @@ gates:
     severity: required
     stage: sample-reacting
     output: reacting-metrics
-  - id: tutorial-temperature-band
-    type: range
-    category: scientific
-    severity: advisory
-    monitor: maximum-temperature
-    minimum: {value: 2300, unit: K}
-    maximum: {value: 2700, unit: K}
-  - id: tutorial-liner-band
-    type: range
-    category: scientific
-    severity: advisory
-    monitor: liner-maximum-temperature
-    minimum: {value: 1800, unit: K}
-    maximum: {value: 2100, unit: K}

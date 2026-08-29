@@ -10,16 +10,9 @@ stages:
     outputs:
       - {id: checkpoint-inventory, kind: report, path_template: "runs/{run_id}/checkpoint-inventory.json"}
     retry: {max_attempts: 2, backoff: {value: 10, unit: s}, retry_on: [launcher_error, api_error]}
-  - id: reconcile-continuation
-    type: reconcile
-    requires: [restore-checkpoint]
-    sections: [physics, materials, chemistry, fields, boundary_conditions, numerics]
-    numerics_profile: continuation-second-order
-    outputs:
-      - {id: observed-diff, kind: report, path_template: "runs/{run_id}/observed-diff.json"}
   - id: patch-ignition-region
     type: initialize
-    requires: [reconcile-continuation]
+    requires: [restore-checkpoint]
     actions: [create-full-ignition-cylinder, create-lower-clear-cylinder, patch-full-progress, clear-lower-progress]
     outputs:
       - {id: patch-audit, kind: report, path_template: "runs/{run_id}/patch-audit.json"}

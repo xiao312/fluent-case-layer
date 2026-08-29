@@ -4,12 +4,21 @@ This illustrative case captures the executed Fluent 2026 R1 effusion-cooling
 tutorial as a multi-stage intent: PMDB meshing, DRM19 flamelet/PDF generation,
 continuous-phase and DPM reconciliation, 300 cold-flow iterations, a
 `premixc=1` combustor patch, 400 reacting iterations, and evidence/checkpoints.
+`system/state.yaml` uses `full_definition` and declares geometry, meshing,
+models, materials, chemistry, fields, boundaries, methods, and initialization
+as owned fresh-case intent.
 
 The legacy four-rank workflow passed 42 setup assertions and produced all
 requested images.  Its fixed-iteration field reached 2458.78 K on the
 mid-plane, while final continuity and energy residuals remained above their
 configured criteria.  That is executed tutorial evidence, not scientific
 validation of this translation.
+
+The versioned engineering objective uses a cleaned, hash-locked copy of those
+field ranges as a simulation reference for liner maximum temperature. It is
+guidance for comparison, not an experimental claim or an acceptance threshold;
+the mandatory gates cover only materialized setup, metrics, and checkpoint
+artifacts.
 
 Set `FCL_EFFUSION_ASSET_ROOT` to the extracted source directory represented by
 `case/assets.lock.yaml`.  No generated mesh or licensed asset is committed.
@@ -25,3 +34,11 @@ Two current schema/driver gaps are deliberate and visible:
   inputs until dedicated injection and perforated-wall schemas exist.
 
 See `docs/example-migration-notes.md` for the promotion path.
+
+Agent investigations may retain and compare modified candidates, including
+failed and rejected attempts, and may promote a candidate with an attributable
+reason and recoverable predecessor. Geometry, meshing controls, and topology
+are within eventual mutation authority; the current meshing adapter remains
+honest by refusing the unsupported workflow instead of claiming it ran. A rich
+human-collaboration UI is deferred; consequential physical, geometry, or
+resource choices still require an engineer interruption.

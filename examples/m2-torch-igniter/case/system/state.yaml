@@ -1,0 +1,34 @@
+schema_version: "1.0"
+mode: checkpoint_overlay
+baseline:
+  label: iteration-500-before-progress-patch
+  case:
+    asset: m2-checkpoint-case
+    sha256: df43dbf1d5ae9cbbb0b444431aa00330f45f47acc08a015ec0f022ed4416943d
+  data:
+    asset: m2-checkpoint-data
+    sha256: c35bf097c67615cc2ff8c50d09f2defd078da6e1d0403429e5e1d5a7e8356185
+declared_paths:
+  - path: solution.initialization.registers.ignition_full
+    source: {type: case_document, document: system/initialization.yaml, pointer: /actions/1}
+    rationale: The patch stage creates this register after restoring the locked baseline.
+  - path: solution.initialization.registers.ignition_lower_clear
+    source: {type: case_document, document: system/initialization.yaml, pointer: /actions/2}
+    rationale: The patch stage creates this register after restoring the locked baseline.
+  - path: solution.initialization.patches.full_progress
+    source: {type: case_document, document: system/initialization.yaml, pointer: /actions/3}
+    rationale: The patch stage explicitly mutates premixc inside ignition-full.
+  - path: solution.initialization.patches.lower_progress
+    source: {type: case_document, document: system/initialization.yaml, pointer: /actions/4}
+    rationale: The patch stage explicitly clears premixc inside ignition-lower-clear.
+observed_paths:
+  - {path: mesh.summary, capture: summary, purpose: provenance, required: true}
+  - {path: setup.solver, capture: exact, purpose: verification, required: true}
+  - {path: setup.models, capture: exact, purpose: verification, required: true}
+  - {path: setup.materials, capture: digest, purpose: verification, required: true}
+  - {path: setup.chemistry, capture: digest, purpose: verification, required: true}
+  - {path: setup.boundary_conditions, capture: exact, purpose: verification, required: true}
+  - {path: solution.methods, capture: exact, purpose: verification, required: true}
+  - {path: solution.fields, capture: summary, purpose: diagnostic, required: true}
+  - {path: solution.initialization, capture: summary, purpose: provenance, required: true}
+  - {path: solution.pdf_table_state, capture: summary, purpose: diagnostic, required: false}

@@ -7,11 +7,11 @@ did. The filesystem idea is the inspiration; this is a Fluent-only product and
 does not plan to support OpenFOAM.
 
 This is the first development baseline. Schema validation, planning,
-recording-adapter execution, evidence capture, and multi-case campaign
-expansion work without Fluent. The real PyFluent adapter supports a narrow set
-of explicit operations and fails closed when a semantic mapping is missing;
-the three provenance-backed examples have not yet been replayed through this
-new layer on SCNET.
+recording-adapter execution, objective-driven candidate attempts, evidence
+capture, and multi-case campaign expansion work without Fluent. The real
+PyFluent adapter supports a narrow set of explicit operations and fails closed
+when a semantic mapping is missing; the three provenance-backed examples have
+not yet been replayed through this new layer on SCNET.
 
 ## Why this layer exists
 
@@ -36,8 +36,17 @@ remain outside Git and are referenced by immutable SHA-256 locks.
 The target authoring model also supports partial mutation layers over locked
 Fluent case/data checkpoints. Such a layer declares what it owns or changes and
 labels the rest as inherited or merely observed; it does not need to reconstruct
-or allowlist every setting already stored in Fluent. The current strict schema
-baseline is the first implementation step toward that model.
+or allowlist every setting already stored in Fluent. The schema implements both
+full definitions and checkpoint overlays, validates source pointers, and refuses
+a whole-section reconciliation unless the overlay explicitly owns that whole
+document. Finer path-scoped adapter reconciliation remains future work.
+
+Each agent investigation is driven by a versioned, engineer-defined objective,
+which may include matching selected aspects of experiment data. Candidate
+overlays, failed/rejected attempts, promotion decisions, and their evidence are
+retained. Agents may promote candidates and may eventually change geometry and
+mesh topology as well as solver state; consequential ambiguity is returned to
+the engineer. The richer collaboration interface is intentionally deferred.
 
 ## Case layout
 
@@ -54,6 +63,8 @@ case/
 │   ├── numerics.yaml
 │   ├── initialization.yaml
 │   ├── monitors.yaml
+│   ├── objectives.yaml
+│   ├── state.yaml
 │   └── control.yaml
 ├── platforms/
 │   ├── scnet-cpu-small.yaml
@@ -65,7 +76,7 @@ case/
 The checked-in [`case/`](case/) directory is a complete illustrative template.
 Every document uses strict Pydantic models; unknown fields, invalid units,
 unresolved assets, impossible zone/cardinality contracts, bad stage edges, and
-cross-file reference errors fail before a solver license is requested. Twelve
+cross-file reference errors fail before a solver license is requested. Fourteen
 generated JSON Schemas are available in [`schemas/`](schemas/).
 
 ## Quick start
@@ -93,10 +104,12 @@ unknown evidence.
 
 | Component | Current capability |
 | --- | --- |
-| Schema | strict split YAML, units, selectors, assets, physics, chemistry, boundaries, initialization actions, monitors/gates, stage DAG, platforms |
+| Schema | strict split YAML, units, selectors, assets, physics, chemistry, boundaries, initialization actions, optional monitors/gates, stage DAG, platforms |
+| Objectives and state | versioned non-enforcing engineer objectives; full-definition or hash-locked checkpoint-overlay ownership with declared/observed paths |
 | Compiler | stable dependency order, canonical JSON projection, case/plan hashes, typed campaign-overlay revalidation |
 | Executor | retries, adapter-approved resume, immutable plan lock, safe run-root outputs, before/after/failure snapshots, independent status axes |
 | Evidence | append-only hash-chained events, artifact/checkpoint manifests, snapshot diff |
+| Candidate attempts | exact overlay + rationale, objective/state digests, retained success/failure, append-only promote/reject decisions, recoverable named refs |
 | Recording adapter | deterministic license-free state transitions for tests and agent evaluation |
 | PyFluent adapter | lazy launch/attach, locked local-asset verification, explicit settings operations, simple hybrid initialization, solve/time advance, checkpoints, audited TUI |
 | Campaigns | multiple cases, variants/matrices, portable campaign hashes, bounded concurrency, failure isolation |
@@ -107,6 +120,9 @@ The CLI surface is:
 fluent-case validate <case>
 fluent-case plan <case>
 fluent-case apply <case> [--adapter recording|pyfluent]
+fluent-case candidate plan <case> --overlay <overlay.yaml> --rationale <text>
+fluent-case candidate apply <case> --overlay <overlay.yaml> --rationale <text>
+fluent-case attempt list|show|decide|rebuild-refs ...
 fluent-case snapshot <case>
 fluent-case diff <before.json> <after.json>
 fluent-case campaign <campaign.yaml> [--mode validate|plan|apply]
@@ -119,7 +135,7 @@ Repository-checkout wrappers are also provided in [`scripts/`](scripts/).
 | Example | Historical source evidence | Status in this repository |
 | --- | --- | --- |
 | [`transient-1d-h2-air`](examples/transient-1d-h2-air/) | native routes completed 5,000 transient steps | typed migration; SCNET replay pending |
-| [`m2-torch-igniter`](examples/m2-torch-igniter/) | checkpoint continued from iteration 500 to 2,500 | typed migration; science gates still pending |
+| [`m2-torch-igniter`](examples/m2-torch-igniter/) | checkpoint continued from iteration 500 to 2,500 | typed checkpoint overlay; deeper engineering review pending |
 | [`effusion-drm19-fgm`](examples/effusion-drm19-fgm/) | tutorial workflow ran 300 cold-flow + 400 reacting iterations | typed intent; meshing/FGM/DPM mappings pending |
 
 [`examples/campaign.yaml`](examples/campaign.yaml) compiles the three together.
@@ -154,9 +170,12 @@ disabled DCU profile.
 
 Each apply run writes an immutable plan lock, run identity/summary,
 hash-chained `events.jsonl`, per-stage snapshots, and artifact/checkpoint
-manifests. Orchestration facts, evolving case-local judgments, and human review
-remain separate: a Fluent process exiting normally is neither a scientific
-pass nor a failure by itself, and absent judgments stay `not_evaluated`.
+manifests. Candidate execution additionally retains the exact overlay,
+rationale, objective/state digests, success or failure record, and hash-chained
+promotion/rejection decisions. Orchestration facts, evolving case-local
+judgments, and human review remain separate: a Fluent process exiting normally
+is neither a scientific pass nor a failure by itself, and absent judgments stay
+`not_evaluated`.
 
 See [architecture](docs/architecture.md), [contributing](CONTRIBUTING.md), and
 the [design interview](docs/design-interview.md). Project progress and weekly

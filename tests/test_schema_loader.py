@@ -44,6 +44,8 @@ def test_schema_export_is_machine_readable(tmp_path: Path) -> None:
     aggregate = json.loads((tmp_path / "schemas" / "case-spec.schema.json").read_text())
     assert aggregate["title"] == "CaseSpec"
     assert "control" in aggregate["properties"]
+    assert (tmp_path / "schemas" / "objectives.schema.json").is_file()
+    assert (tmp_path / "schemas" / "state.schema.json").is_file()
 
 
 def test_bad_sha256_is_rejected_with_path(tmp_path: Path) -> None:

@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "provenance": {
+    "source": "DFODE_PLUGS_ROOT/.work/runs/260722_fluent_effusion_fgm_tutorial_exact5/tutorial-field-validation.json",
+    "solver": "ANSYS Fluent 2026 R1",
+    "interpretation": "Fixed-iteration tutorial simulation evidence; not experimental validation"
+  },
+  "artifacts": {
+    "tutorial-mid-plane-mean-mixture-fraction": {
+      "field": "fmean",
+      "range": [
+        0.0,
+        0.10965864360332489
+      ],
+      "surfaces": [
+        "mid-plane"
+      ]
+    },
+    "tutorial-mid-plane-temperature": {
+      "field": "temperature",
+      "range": [
+        635.3336181640625,
+        2458.781982421875
+      ],
+      "surfaces": [
+        "mid-plane"
+      ]
+    },
+    "tutorial-wall-temperature": {
+      "field": "temperature",
+      "range": [
+        748.7040405273438,
+        1965.444580078125
+      ],
+      "surfaces": [
+        "wall-liner",
+        "wall-liner-cold"
+      ]
+    }
+  },
+  "errors": []
+}

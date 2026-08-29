@@ -130,4 +130,4 @@ stages:
   - id: accept
     type: gate
     requires: [final-checkpoint]
-    gates: [setup-audit-written, final-data-written, reacting-metrics-written, tutorial-temperature-band, tutorial-liner-band]
+    gates: [setup-audit-written, final-data-written, reacting-metrics-written]

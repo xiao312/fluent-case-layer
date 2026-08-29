@@ -1,0 +1,48 @@
+schema_version: "1.0"
+revision:
+  id: initial-search-objective
+  sequence: 1
+  recorded_at: "2026-08-29T14:18:07+08:00"
+  recorded_by: case migration working session
+  change_summary: Initial illustrative objective linked to retained tutorial evidence.
+provenance:
+  type: engineer_statement
+  author: illustrative CFD case owner
+  role: CFD engineer
+  context: >-
+    Example search intent for the typed tutorial migration; the retained source
+    result is a simulation reference and not an experiment.
+statement: >-
+  Reproduce the staged effusion-cooling setup, study coupled FGM/DPM behavior,
+  and compare liner thermal response with the retained Fluent tutorial result
+  without turning that historical simulation into an acceptance threshold.
+enforcement: none
+aspects:
+  - id: staged-run-health
+    type: observe
+    description: Track residual behavior, continuous-plus-discrete mass closure, and thermal response.
+    monitors: [residuals, mass-closure, maximum-temperature]
+    priority: primary
+  - id: tutorial-liner-reference
+    type: match_reference
+    description: Compare the combined liner-wall maximum with the retained tutorial result.
+    monitor: liner-maximum-temperature
+    reference:
+      type: reference_asset
+      asset: tutorial-field-reference
+      role: simulation
+      locator: /artifacts/tutorial-wall-temperature/range/1
+      observable: maximum temperature over wall-liner and wall-liner-cold
+    comparison:
+      method: absolute_difference
+      alignment: Same tutorial geometry, setup, and fixed 300-cold plus 400-reacting iteration schedule.
+      notes: Search guidance only; no tolerance or scientific pass is implied.
+    priority: secondary
+  - id: cooling-interaction-investigation
+    type: investigate
+    description: Diagnose how the reacting field and discrete phase influence liner protection.
+    questions:
+      - Does the staged ignition preserve the expected effusion-cooling pattern?
+      - Are thermal changes distinguishable from residual drift and incomplete DPM source convergence?
+    monitors: [maximum-temperature, liner-maximum-temperature, mass-closure, residuals]
+    priority: exploratory

@@ -8,3 +8,11 @@ assets:
     sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
     media_type: application/x-ansys-fluent-mesh
     description: Illustrative lock entry; replace URI and digest before execution.
+  - id: outlet-pressure-reference
+    kind: reference_data
+    source:
+      type: remote
+      uri: https://example.invalid/fluent-case-layer/outlet-pressure-reference.csv
+    sha256: ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb
+    media_type: text/csv
+    description: Illustrative experimental reference; replace before engineering use.

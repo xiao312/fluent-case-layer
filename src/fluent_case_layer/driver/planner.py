@@ -10,6 +10,15 @@ from .errors import CaseValidationError
 from .types import ActionKind, CompiledPlan, SemanticAction
 from .util import deep_merge, dotted_get, stable_hash, to_jsonable
 
+_RECONCILE_DOCUMENTS = {
+    "physics": "constant/physics.yaml",
+    "materials": "constant/materials.yaml",
+    "chemistry": "constant/chemistry.yaml",
+    "fields": "0/fields.yaml",
+    "boundary_conditions": "0/boundary-conditions.yaml",
+    "numerics": "system/numerics.yaml",
+}
+
 
 @dataclass(frozen=True, slots=True)
 class ValidationIssue:
@@ -126,6 +135,52 @@ def _referenced_asset_ids(value: Any, known_ids: set[str]) -> set[str]:
     return referenced
 
 
+def _reconcile_state_scope(
+    case: Mapping[str, Any], stage_id: str, sections: Sequence[Any]
+) -> dict[str, Any]:
+    state = case.get("state", {})
+    if not isinstance(state, Mapping):
+        return {}
+    mode = str(state.get("mode", ""))
+    declared = state.get("declared_paths", ())
+    authorized_documents = {
+        str(source["document"])
+        for item in declared
+        if isinstance(item, Mapping)
+        and isinstance((source := item.get("source")), Mapping)
+        and source.get("type") == "case_document"
+        and source.get("pointer") == ""
+        and source.get("document")
+    }
+    requested = tuple(str(section) for section in sections)
+    if mode == "checkpoint_overlay":
+        unknown = sorted(set(requested) - set(_RECONCILE_DOCUMENTS))
+        if unknown:
+            raise CaseValidationError(
+                f"checkpoint_overlay reconcile stage {stage_id!r} has unknown sections: "
+                + ", ".join(unknown)
+            )
+        unauthorized = [
+            section
+            for section in requested
+            if _RECONCILE_DOCUMENTS[section] not in authorized_documents
+        ]
+        if unauthorized:
+            details = ", ".join(
+                f"{section} ({_RECONCILE_DOCUMENTS[section]})" for section in unauthorized
+            )
+            raise CaseValidationError(
+                f"checkpoint_overlay reconcile stage {stage_id!r} is not authorized for "
+                f"whole-section mutation: {details}; declare the corresponding case_document "
+                "with pointer='' or use a future path-scoped reconcile operation"
+            )
+    return {
+        "mode": mode,
+        "requested_sections": list(requested),
+        "whole_document_authorizations": sorted(authorized_documents),
+    }
+
+
 def _enrich_explicit_action(raw: Mapping[str, Any], case: Mapping[str, Any]) -> SemanticAction:
     """Resolve schema references while preserving the semantic authored stage."""
 
@@ -143,6 +198,7 @@ def _enrich_explicit_action(raw: Mapping[str, Any], case: Mapping[str, Any]) -> 
             parameters["data_asset_spec"] = dict(assets[str(data_id)])
     elif raw_type == "reconcile":
         sections = parameters.get("sections", ())
+        parameters["state_scope"] = _reconcile_state_scope(case, action.id, sections)
         parameters["desired"] = {str(section): case.get(str(section), {}) for section in sections}
     elif raw_type == "initialize":
         action_index = _indexed(case.get("initialization", {}))
@@ -455,6 +511,20 @@ def compile_plan(
         "compiler": "fluent-case-layer",
         "explicit_stages": explicit is not None,
     }
+    objectives = case_mapping.get("objectives")
+    if isinstance(objectives, Mapping):
+        metadata["objectives"] = {
+            "revision": to_jsonable(objectives.get("revision", {})),
+            "content_digest": stable_hash(objectives),
+            "enforcement": objectives.get("enforcement", "none"),
+            "document": to_jsonable(objectives),
+        }
+    state_ownership = case_mapping.get("state")
+    if isinstance(state_ownership, Mapping):
+        metadata["state_ownership"] = {
+            "policy": to_jsonable(state_ownership),
+            "content_digest": stable_hash(state_ownership),
+        }
     title = _first(case_mapping, ("title", "case.title", "metadata.title"))
     if title:
         metadata["title"] = str(title)

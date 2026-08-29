@@ -1,0 +1,48 @@
+schema_version: "1.0"
+revision:
+  id: initial-search-objective
+  sequence: 1
+  recorded_at: "2026-08-29T14:18:07+08:00"
+  recorded_by: case migration working session
+  change_summary: Initial illustrative objective for the typed case fixture.
+provenance:
+  type: engineer_statement
+  author: illustrative CFD case owner
+  role: CFD engineer
+  context: >-
+    Example search intent for this migration; replace with a new attributed
+    revision when the responsible engineer changes the investigation.
+statement: >-
+  Establish a reproducible transient H2/air flame baseline, compare its thermal
+  state with the locked Cantera FreeFlame calculation, and diagnose propagation
+  behavior without treating the model-to-model comparison as a pass/fail gate.
+enforcement: none
+aspects:
+  - id: transient-numerical-health
+    type: observe
+    description: Track equation behavior and continuous-phase mass closure.
+    monitors: [residuals, mass-closure]
+    priority: primary
+  - id: cantera-thermal-reference
+    type: match_reference
+    description: Compare the final Fluent peak temperature with the locked FreeFlame profile.
+    monitor: maximum-temperature
+    reference:
+      type: reference_asset
+      asset: cantera-freeflame-reference
+      role: simulation
+      locator: "column=temperature_k"
+      observable: maximum temperature in the steady Cantera FreeFlame profile
+    comparison:
+      method: relative_difference
+      alignment: Same nominal H2/air composition and pressure; compare thermal maxima only.
+      notes: Model-reference evidence for investigation, never an automatic acceptance rule.
+    priority: secondary
+  - id: propagation-investigation
+    type: investigate
+    description: Examine whether the initialized front evolves into a persistent physical flame.
+    questions:
+      - Does the hot region propagate rather than merely diffuse or extinguish?
+      - Are temperature evolution and mass closure stable across the requested time window?
+    monitors: [maximum-temperature, mass-closure]
+    priority: exploratory

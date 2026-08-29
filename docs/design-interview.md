@@ -87,3 +87,18 @@ The next interview should resolve only the remaining operational choices:
 5. whether broad mutation authority includes geometry and mesh topology; and
 6. how inherited, observed, and declared checkpoint state should appear in the
    UI and evidence record.
+
+### 2026-08-29 — Round 2 operating decisions
+
+| ID | Decision | Architectural consequence |
+| --- | --- | --- |
+| D-007 | The **engineer defines the investigation objective**. An objective may be narrative or may ask the simulation to match selected aspects of experiment data. | Store a versioned engineer-authored objective separately from acceptance gates. It may reference monitors and immutable experiment assets, and it may evolve between attempts. |
+| D-008 | The **agent may promote a candidate**. | Promotion is an auditable, reversible decision with an actor and reason; it does not require a universal gate or a separate human approval step. Promotion must not silently destroy the prior canonical reference. |
+| D-009 | The agent should **interrupt the engineer** when a choice materially changes physical interpretation, geometry/mesh intent, or resource commitment. | Do not silently resolve consequential ambiguity. The detailed interaction policy and UI are deferred, but the run/attempt model must leave room for a pending engineer decision. |
+| D-010 | Failed and rejected attempts are **first-class retained evidence**. | Preserve the candidate overlay, objective revision, rationale, plan, diagnosis, outcome, and evidence links. Large raw fields may follow storage-retention policy; the compact attempt record remains durable. |
+| D-011 | Broad mutation authority **includes geometry and mesh topology**. | Geometry provenance, units, coordinates, named regions, meshing parameters, and mesh checks belong in the same staged audit graph, even though their real Fluent Meshing adapters can arrive incrementally. |
+| D-012 | The richer **agent/human collaboration interface is future work**. | Implement durable objectives, attempts, decisions, and evidence now; defer conversational UI, review presentation, and interaction ergonomics without inventing a premature contract. |
+
+Round 1 and Round 2 together are sufficient to begin implementation. The first
+vertical slice is the objective/state/attempt contract; the first real-solver
+slice remains a small Fluent replay before scaling on SCNET.

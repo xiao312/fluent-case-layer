@@ -4,6 +4,8 @@ from pathlib import Path
 
 from .case import CaseSpec
 from .loader import CaseLoadError, load_case, load_document
+from .objectives import EngineeringObjectiveDocument
+from .state import StateOwnershipDocument
 
 
 def export_json_schemas(output_directory: str | Path) -> list[Path]:
@@ -17,6 +19,8 @@ def export_json_schemas(output_directory: str | Path) -> list[Path]:
 __all__ = [
     "CaseLoadError",
     "CaseSpec",
+    "EngineeringObjectiveDocument",
+    "StateOwnershipDocument",
     "export_json_schemas",
     "load_case",
     "load_document",

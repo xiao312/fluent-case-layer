@@ -1,0 +1,39 @@
+schema_version: "1.0"
+revision:
+  id: initial-search-objective
+  sequence: 1
+  recorded_at: "2026-08-29T14:18:07+08:00"
+  recorded_by: case migration working session
+  change_summary: Initial investigative objective for the checkpoint overlay.
+provenance:
+  type: engineer_statement
+  author: illustrative CFD case owner
+  role: CFD engineer
+  context: >-
+    Example search intent for the M2 continuation; it deliberately avoids a
+    wall-risk ranking because the historical branches do not establish one.
+statement: >-
+  Determine whether the locked M2 checkpoint can support a numerically credible
+  reacting continuation and investigate persistent relative thermal and shear
+  risk on the torch and combustor walls without presuming which wall is limiting.
+enforcement: none
+aspects:
+  - id: continuation-health
+    type: observe
+    description: Track residual behavior, mass closure, and reacting temperature.
+    monitors: [residuals, mass-closure, maximum-temperature]
+    priority: primary
+  - id: wall-risk-investigation
+    type: investigate
+    description: Use co-located thermal and shear evidence to compare the two wall regions.
+    questions:
+      - Does either wall maintain a higher thermal maximum across all continuation windows?
+      - Do wall-temperature and wall-shear rankings agree or indicate different risk mechanisms?
+      - Are any apparent rankings robust to PDF-table warnings and incomplete convergence?
+    monitors:
+      - torch-wall-temperature
+      - combustor-wall-temperature
+      - torch-wall-shear
+      - combustor-wall-shear
+      - residuals
+    priority: primary

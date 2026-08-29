@@ -150,6 +150,8 @@ class AutoCaseLoader:
         "system/initialization.yaml",
         "system/monitors.yaml",
         "system/control.yaml",
+        "system/objectives.yaml",
+        "system/state.yaml",
         "assets.lock.yaml",
     )
 

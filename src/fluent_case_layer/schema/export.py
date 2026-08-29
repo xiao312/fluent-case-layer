@@ -16,8 +16,10 @@ from .initialization import InitializationDocument
 from .materials import MaterialsDocument
 from .monitors import MonitorsDocument
 from .numerics import NumericsDocument
+from .objectives import EngineeringObjectiveDocument
 from .physics import PhysicsDocument
 from .platform import PlatformDocument
+from .state import StateOwnershipDocument
 
 SCHEMA_MODELS: dict[str, type[BaseModel]] = {
     "case-spec.schema.json": CaseSpec,
@@ -30,6 +32,8 @@ SCHEMA_MODELS: dict[str, type[BaseModel]] = {
     "initialization.schema.json": InitializationDocument,
     "monitors.schema.json": MonitorsDocument,
     "control.schema.json": ControlDocument,
+    "objectives.schema.json": EngineeringObjectiveDocument,
+    "state.schema.json": StateOwnershipDocument,
     "platform.schema.json": PlatformDocument,
     "assets-lock.schema.json": AssetsLock,
 }

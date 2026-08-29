@@ -15,8 +15,10 @@ field, personal account path, or credential is stored here.
 | named-zone boundary intent | `0/boundary-conditions.yaml` |
 | schemes, coupling and relaxation | `system/numerics.yaml` |
 | ordered initialize/register/patch actions | `system/initialization.yaml` |
-| residuals, QoIs and independent acceptance gates | `system/monitors.yaml` |
-| typed stage DAG, retries, checkpoints and promotion | `system/control.yaml` |
+| residuals, QoIs and optional case-local judgments | `system/monitors.yaml` |
+| versioned, attributed, non-enforcing investigation aim | `system/objectives.yaml` |
+| explicitly owned, inherited and observed Fluent state | `system/state.yaml` |
+| typed stage DAG, retries and checkpoints | `system/control.yaml` |
 | Slurm/runtime choices | `platforms/*.yaml` |
 | immutable external binaries and provenance | `assets.lock.yaml` |
 
@@ -24,25 +26,51 @@ The split is semantic. A compiler may merge the files into one immutable run
 plan, but it must retain file/field provenance so a plan diff points back to a
 user-authored value.
 
+`full_definition` means the layer owns the listed fresh-case paths and leaves
+undeclared values at Fluent defaults. `checkpoint_overlay` means all undeclared
+state is inherited from an exact hash-locked case/data baseline; only a path
+with a real staged mutation is declared as owned. Broader observations may
+surround a narrow mutation for compatibility evidence. The current driver
+cannot authorize a narrow overlay through a whole-document reconcile, so it
+fails closed rather than silently expanding mutation authority.
+
+Objectives remain separate from gates. An objective may name qualitative
+questions or reference immutable experimental, analytical, or simulation data,
+but `enforcement: none` prevents it from becoming an automatic acceptance
+decision. A case-local gate is a separately authored judgment. Neither an
+objective match nor a solver completion alone establishes scientific validity.
+
+Agent exploration retains successful, failed, and rejected candidates as
+compact attributable records. An agent may promote a candidate with a reason
+and a recoverable predecessor; a universal pass gate is not required. Geometry,
+meshing controls, and topology are within eventual mutation authority, although
+the initial adapters must expose unsupported geometry/meshing operations as
+mapping gaps. Detailed human-collaboration UI is deferred; consequential
+physics, geometry, or resource decisions still interrupt the engineer.
+
 ## Transient 1D H2/air
 
 Source: `DFODE_PLUGS_ROOT/recipes/transient-1d-laminar-flame/`.
 
 Features retained:
 
+- a `full_definition` state policy over the fresh mesh and authored solver
+  setup;
 - 1,000-cell quasi-1D mesh intent and H2/O2/N2 mixture;
 - 101325 Pa, 300 K unburned state and adiabatic energy;
 - H2/O2 mechanism with 10 species and 29 reactions;
 - piecewise equilibrium/reactant initialization;
 - `5e-7 s` timestep, 5,000 steps and 20 outer iterations per step;
+- a hash-locked Cantera FreeFlame simulation profile used by a non-enforcing
+  model-reference objective;
 - four-rank small platform and an explicit final evidence/checkpoint contract.
 
 Migration gaps:
 
 - the deterministic generated mesh is a locked input asset; regenerating and
   attesting it still needs a typed preprocessing action;
-- Cantera equilibrium/FreeFlame preprocessing needs a typed preprocessing
-  action or a separately versioned generated-profile asset;
+- regenerating the locked Cantera equilibrium/FreeFlame reference still needs
+  a typed preprocessing action and provenance attestation;
 - the source's 50-step profile cadence needs a typed periodic-sampling policy;
 - backend overlays (native stiff, CHEMKIN, CVODE and DFODE) should use the
   landed campaign matrix rather than edits to the base case;
@@ -54,13 +82,16 @@ Source: `CFD_AGENT_BENCH_ROOT/tasks/fluent-torch-igniter-m2/`.
 
 Features retained:
 
-- immutable iteration-500 case/data plus FGM/PDF table assets;
-- 2 MPa nominal point, pure CH4 and O2 streams at 300 K;
+- immutable iteration-500 case/data plus FGM/PDF table assets as a
+  `checkpoint_overlay` baseline;
+- observed compatibility expectations for the inherited 2 MPa nominal point,
+  pure CH4/O2 streams, models, tables, fields, and numerical methods;
 - restart audit before mutation;
 - two ordered cylindrical registers, `premixc` patching, and an intermediate
   patched checkpoint;
 - 2,000-iteration continuation and persistence sampling;
-- independent operational, numerical-health and wall-risk gates.
+- an open, non-enforcing wall-risk investigation with no assumed wall ranking;
+- separate operational, reacting-state and numerical-health checks.
 
 Migration gaps:
 
@@ -68,6 +99,9 @@ Migration gaps:
   smoke branch (89,725 and 47,542 selected cells); production execution must
   still compare resolved cell counts and hold on drift;
 - the driver needs cell-count evidence after each register and patch;
+- path-scoped settings reconciliation is required before pressure, boundary,
+  or numerical-method differences can become declared overlay mutations; the
+  current example only observes them and must hold on drift;
 - Fluent PDF-table range warnings need typed counters rather than transcript
   text matching alone;
 - wall percentile statistics and localization currently require a field-data
@@ -81,13 +115,16 @@ Source: `DFODE_PLUGS_ROOT/recipes/fluent-effusion-drm19/`.
 
 Features retained:
 
+- a `full_definition` state policy including geometry and meshing intent;
 - public tutorial PMDB referenced by its real SHA-256;
 - meshing and periodic-zone intent;
 - nonadiabatic partially premixed FGM at 1,519,875 Pa;
 - 300-stream hollow-cone DPM injection and 50-iteration source cadence;
 - explicit `mesh -> FGM -> reconcile -> cold -> ignite -> reacting -> evidence`
   DAG with durable checkpoints;
-- tutorial setup assertions and reactivity/field evidence.
+- tutorial setup assertions and reactivity/field evidence;
+- cleaned, locked tutorial simulation ranges used by a non-enforcing liner
+  temperature comparison objective rather than duplicated scientific gates.
 
 Migration gaps:
 

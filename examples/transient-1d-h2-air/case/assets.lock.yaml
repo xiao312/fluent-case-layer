@@ -27,3 +27,12 @@ assets:
     sha256: 8dfb0e564045df2d03a2e422ba223b0e8bfe04a4f2684618f753d9d8265bdaa9
     size_bytes: 7564
     description: Source UDF retained for the future typed build-and-hook stage.
+  - id: cantera-freeflame-reference
+    kind: reference_data
+    source: {type: environment, root_variable: FCL_H2_AIR_ASSET_ROOT, relative_path: reference/cantera-freeflame.csv}
+    sha256: 6cf9b62f43495c033f41a90378ec58427d7421c8e14f37b12339f33b1219dde6
+    size_bytes: 46720
+    media_type: text/csv
+    description: >-
+      Cantera FreeFlame simulation profile retained by the source workflow;
+      useful as a model-reference objective, not experimental validation.

@@ -9,8 +9,9 @@ scientifically validated. It deliberately records three independent states:
   run;
 - **execution**: whether retained evidence shows that Fluent or the reference
   solver actually ran;
-- **science**: whether the result passed case-specific physical and numerical
-  acceptance gates.
+- **science**: the current case-specific engineering judgment supported by
+  retained physical and numerical evidence; that judgment may include optional
+  gates, reference comparisons, and human review.
 
 The provenance paths below use two logical source roots so this repository does
 not encode a developer's home directory or an SCNET account path:
@@ -25,15 +26,24 @@ assets. This repository copies only typed intent and immutable hashes.
 
 ## Implemented repository examples
 
-| Example | Repository path | Translation state | Historical evidence state |
-| --- | --- | --- | --- |
-| transient 1D H2/air | `examples/transient-1d-h2-air/case/` | schema-valid, plan-compilable, not executed through this layer | source workflow executed 5,000 steps |
-| M2 torch igniter | `examples/m2-torch-igniter/case/` | schema-valid, plan-compilable, not executed through this layer | source checkpoint continuation executed to iteration 2,500; science pending |
-| effusion DRM19 FGM | `examples/effusion-drm19-fgm/case/` | schema-valid declaration plan; real apply blocked on typed meshing and detailed FGM/DPM adapters | source tutorial executed 300 cold plus 400 reacting iterations and passed 42 setup assertions |
+| Example | Repository path | State policy | Engineer objective | Translation state | Historical evidence state |
+| --- | --- | --- | --- | --- | --- |
+| transient 1D H2/air | `examples/transient-1d-h2-air/case/` | `full_definition` | numerical health, flame propagation, and non-enforcing comparison with a locked Cantera simulation profile | schema-valid, plan-compilable, not executed through this layer | source workflow executed 5,000 steps |
+| M2 torch igniter | `examples/m2-torch-igniter/case/` | `checkpoint_overlay`; only two registers and two `premixc` patches are owned | investigate persistent wall thermal/shear risk without assuming a ranking | schema-valid, plan-compilable, not executed through this layer; broader checkpoint state is inherited and observed | source checkpoint continuation executed to iteration 2,500; science pending |
+| effusion DRM19 FGM | `examples/effusion-drm19-fgm/case/` | `full_definition` | staged FGM/DPM behavior and non-enforcing comparison with retained tutorial simulation evidence | schema-valid declaration plan; real apply blocked on typed meshing and detailed FGM/DPM adapters | source tutorial executed 300 cold plus 400 reacting iterations and passed 42 setup assertions |
 
 `examples/campaign.yaml` compiles the three together. Compilation or use of the
 recording adapter validates plan shape and evidence plumbing only; it does not
 resolve assets, launch Fluent, pass numerical gates, or validate science.
+
+Each objective is an attributed, versioned engineering search aim with
+`enforcement: none`; it is neither a retroactive validation claim nor an
+implicit gate. Agent exploration may promote a candidate with a recorded
+reason and recoverable predecessor, but failed and rejected attempts remain
+first-class compact evidence. The initial backend defers the rich human-
+collaboration UI while still requiring an engineer interruption for choices
+that materially alter physical interpretation, geometry/mesh intent, or
+resource commitment.
 
 ## Status vocabulary
 
@@ -47,6 +57,11 @@ resolve assets, launch Fluent, pass numerical gates, or validate science.
 convergence or physical validity. `Qualified baseline` means a narrower
 reproducibility or numerical contract passed; it is not automatically an
 experimental validation.
+
+Geometry, meshing controls, and mesh topology are in the eventual agent
+mutation scope for Fluent cases. Current adapters must nevertheless fail or
+report a mapping gap whenever they cannot preserve and attest geometry source,
+units, coordinates, named regions, mesh checks, and downstream compatibility.
 
 ## Fluent cases selected for the implementation corpus
 
@@ -105,7 +120,7 @@ an OpenFOAM adapter and solver-neutral case model are explicitly out of scope.
 These definitions are useful because a typed layer must be able to reject or
 hold a campaign before consuming solver licenses.
 
-| Case | Definition | Missing gate or input | Provenance |
+| Case | Definition | Blocking evidence, judgment, or input | Provenance |
 | --- | --- | --- | --- |
 | MASCOTTE C60 | blocked | no complete reproducible mesh/operating-condition package in the current catalog | `DFODE_PLUGS_ROOT/recipes/fluent-rocket-validation/cases/mascotte/mascotte_c60.json` |
 | DLR BKN LOX/H2 | blocked | nozzle/inlet geometry and boundary details are incomplete | `DFODE_PLUGS_ROOT/recipes/fluent-rocket-validation/cases/dlr-bkn/dlr_bkn_lox_h2.json` |

@@ -30,6 +30,18 @@ simulation team.
 - Agents may explore changes across in-scope Fluent settings. Record every
   mutation, rationale, observation, and artifact so an engineer can inspect and
   continue the evolving investigation.
+- The engineer defines the current, versioned investigation objective. It may
+  be qualitative or reference selected experimental evidence; do not silently
+  turn it into a universal acceptance gate.
+- Agent mutation authority includes geometry, meshing controls, and mesh
+  topology. Preserve geometry/mesh provenance, units, coordinates, named
+  regions, checks, and downstream compatibility evidence.
+- Retain failed and rejected candidate attempts as first-class compact records.
+  Agents may promote candidates with an attributable reason and recoverable
+  predecessor; promotion does not require a universal gate.
+- Interrupt the engineer when a choice materially changes physical
+  interpretation, geometry/mesh intent, or resource commitment. The detailed
+  collaboration UI is future work; do not invent it in the initial backend.
 - Tests must run without Fluent by using a recording/fake adapter.
 - Keep examples honest about readiness and known blockers.
 

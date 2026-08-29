@@ -68,6 +68,7 @@ class LockedAsset(StrictModel):
         "data",
         "chemistry",
         "profile",
+        "reference_data",
         "geometry",
         "table",
         "udf_source",

@@ -34,3 +34,12 @@ assets:
     sha256: 4de1eb77597cd59119b88d931bc0db84a2be7eaeb02e1f29f798ef5cd28334cb
     size_bytes: 3676
     description: Tutorial perforated-wall definition with 35 injection holes.
+  - id: tutorial-field-reference
+    kind: reference_data
+    source: {type: repository, path: examples/effusion-drm19-fgm/reference/tutorial-field-validation.json}
+    sha256: 0bcf3d1498a303fb1e9a5012ddf0840527c1442dd632e43ae0ce96f53995b018
+    size_bytes: 972
+    media_type: application/json
+    description: >-
+      Cleaned fixed-iteration field ranges from the executed tutorial run;
+      simulation evidence only, with machine-local artifact paths removed.

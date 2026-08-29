@@ -17,8 +17,10 @@ from .initialization import InitializationDocument
 from .materials import MaterialsDocument
 from .monitors import MonitorsDocument
 from .numerics import NumericsDocument
+from .objectives import EngineeringObjectiveDocument
 from .physics import PhysicsDocument
 from .platform import PlatformDocument
+from .state import StateOwnershipDocument
 
 DocumentT = TypeVar("DocumentT", bound=BaseModel)
 
@@ -37,6 +39,8 @@ DOCUMENTS: dict[str, type[BaseModel]] = {
     "system/initialization.yaml": InitializationDocument,
     "system/monitors.yaml": MonitorsDocument,
     "system/control.yaml": ControlDocument,
+    "system/objectives.yaml": EngineeringObjectiveDocument,
+    "system/state.yaml": StateOwnershipDocument,
     "assets.lock.yaml": AssetsLock,
 }
 
@@ -64,7 +68,7 @@ def load_document(path: str | Path, model: type[DocumentT]) -> DocumentT:
 
 
 def load_case(case_directory: str | Path) -> CaseSpec:
-    """Load and cross-validate a canonical OpenFOAM-like case directory.
+    """Load and cross-validate a canonical split Fluent case directory.
 
     This function imports no Fluent modules and performs no environment-variable
     expansion or I/O against locked assets.
@@ -108,6 +112,8 @@ def load_case(case_directory: str | Path) -> CaseSpec:
             initialization=parsed["system/initialization.yaml"],
             monitors=parsed["system/monitors.yaml"],
             control=parsed["system/control.yaml"],
+            objectives=parsed["system/objectives.yaml"],
+            state=parsed["system/state.yaml"],
             platforms=platforms,
             assets=parsed["assets.lock.yaml"],
         )

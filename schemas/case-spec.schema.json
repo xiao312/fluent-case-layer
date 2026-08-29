@@ -595,6 +595,43 @@
       "title": "Cardinality",
       "type": "object"
     },
+    "CaseDocumentStateSource": {
+      "additionalProperties": false,
+      "properties": {
+        "document": {
+          "enum": [
+            "constant/physics.yaml",
+            "constant/materials.yaml",
+            "constant/chemistry.yaml",
+            "0/fields.yaml",
+            "0/boundary-conditions.yaml",
+            "system/numerics.yaml",
+            "system/initialization.yaml",
+            "system/monitors.yaml",
+            "system/control.yaml"
+          ],
+          "title": "Document",
+          "type": "string"
+        },
+        "pointer": {
+          "maxLength": 512,
+          "title": "Pointer",
+          "type": "string"
+        },
+        "type": {
+          "const": "case_document",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "document",
+        "pointer"
+      ],
+      "title": "CaseDocumentStateSource",
+      "type": "object"
+    },
     "CaseMetadata": {
       "additionalProperties": false,
       "properties": {
@@ -647,6 +684,54 @@
         "title"
       ],
       "title": "CaseMetadata",
+      "type": "object"
+    },
+    "CheckpointBaseline": {
+      "additionalProperties": false,
+      "properties": {
+        "case": {
+          "$ref": "#/$defs/LockedAssetReference"
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LockedAssetReference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fluent_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fluent Version"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        }
+      },
+      "required": [
+        "case"
+      ],
+      "title": "CheckpointBaseline",
       "type": "object"
     },
     "CheckpointStage": {
@@ -913,6 +998,52 @@
       "title": "ChemistryMixtureMaterialSource",
       "type": "object"
     },
+    "ComparisonIntent": {
+      "additionalProperties": false,
+      "description": "A non-enforcing hint for how an engineer intends to inspect agreement.",
+      "properties": {
+        "alignment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignment"
+        },
+        "method": {
+          "enum": [
+            "absolute_difference",
+            "relative_difference",
+            "normalized_rmse",
+            "profile_shape",
+            "qualitative"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "title": "ComparisonIntent",
+      "type": "object"
+    },
     "Composition": {
       "additionalProperties": false,
       "properties": {
@@ -1142,6 +1273,113 @@
       "title": "CylinderRegion",
       "type": "object"
     },
+    "DeclaredStatePath": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*$",
+          "title": "Path",
+          "type": "string"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "case_document": "#/$defs/CaseDocumentStateSource",
+              "inline": "#/$defs/InlineStateSource"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/CaseDocumentStateSource"
+            },
+            {
+              "$ref": "#/$defs/InlineStateSource"
+            }
+          ],
+          "title": "Source"
+        }
+      },
+      "required": [
+        "path",
+        "source"
+      ],
+      "title": "DeclaredStatePath",
+      "type": "object"
+    },
+    "DirectionalAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "minimize",
+            "maximize",
+            "increase",
+            "decrease",
+            "hold"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "priority": {
+          "default": "secondary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "type": {
+          "const": "directional",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitor",
+        "direction"
+      ],
+      "title": "DirectionalAspect",
+      "type": "object"
+    },
     "DiscreteOrdinatesRadiation": {
       "additionalProperties": false,
       "properties": {
@@ -1201,6 +1439,143 @@
         }
       },
       "title": "DiscretePhaseModel",
+      "type": "object"
+    },
+    "EngineerStatementProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "minLength": 1,
+          "title": "Author",
+          "type": "string"
+        },
+        "context": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context"
+        },
+        "organization": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization"
+        },
+        "role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Role"
+        },
+        "type": {
+          "const": "engineer_statement",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "author"
+      ],
+      "title": "EngineerStatementProvenance",
+      "type": "object"
+    },
+    "EngineeringObjectiveDocument": {
+      "additionalProperties": false,
+      "description": "Human intent kept independent from optional case-local gates.",
+      "properties": {
+        "aspects": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "directional": "#/$defs/DirectionalAspect",
+                "investigate": "#/$defs/InvestigateAspect",
+                "match_reference": "#/$defs/MatchReferenceAspect",
+                "observe": "#/$defs/ObserveAspect"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ObserveAspect"
+              },
+              {
+                "$ref": "#/$defs/DirectionalAspect"
+              },
+              {
+                "$ref": "#/$defs/MatchReferenceAspect"
+              },
+              {
+                "$ref": "#/$defs/InvestigateAspect"
+              }
+            ]
+          },
+          "title": "Aspects",
+          "type": "array"
+        },
+        "enforcement": {
+          "const": "none",
+          "default": "none",
+          "title": "Enforcement",
+          "type": "string"
+        },
+        "provenance": {
+          "discriminator": {
+            "mapping": {
+              "engineer_statement": "#/$defs/EngineerStatementProvenance",
+              "source_asset": "#/$defs/SourceAssetProvenance"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/EngineerStatementProvenance"
+            },
+            {
+              "$ref": "#/$defs/SourceAssetProvenance"
+            }
+          ],
+          "title": "Provenance"
+        },
+        "revision": {
+          "$ref": "#/$defs/ObjectiveRevision"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revision",
+        "provenance",
+        "statement"
+      ],
+      "title": "EngineeringObjectiveDocument",
       "type": "object"
     },
     "EnvironmentAssetSource": {
@@ -1321,6 +1696,54 @@
         }
       },
       "title": "EquationNumerics",
+      "type": "object"
+    },
+    "ExperimentalValueReference": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "source_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Note"
+        },
+        "type": {
+          "const": "experimental_value",
+          "title": "Type",
+          "type": "string"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "value": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "type",
+        "label",
+        "value"
+      ],
+      "title": "ExperimentalValueReference",
       "type": "object"
     },
     "ExplicitMaterialSource": {
@@ -2187,6 +2610,48 @@
       "title": "InitializeStage",
       "type": "object"
     },
+    "InlineStateSource": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "inline",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "$ref": "#/$defs/VectorQuantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "InlineStateSource",
+      "type": "object"
+    },
     "IntensityHydraulicDiameter": {
       "additionalProperties": false,
       "properties": {
@@ -2237,6 +2702,64 @@
         "length_scale"
       ],
       "title": "IntensityLengthScale",
+      "type": "object"
+    },
+    "InvestigateAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitors": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Monitors",
+          "type": "array"
+        },
+        "priority": {
+          "default": "exploratory",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "questions": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Questions",
+          "type": "array"
+        },
+        "type": {
+          "const": "investigate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "questions"
+      ],
+      "title": "InvestigateAspect",
       "type": "object"
     },
     "IterateStage": {
@@ -2854,6 +3377,7 @@
             "data",
             "chemistry",
             "profile",
+            "reference_data",
             "geometry",
             "table",
             "udf_source",
@@ -2922,6 +3446,30 @@
         "sha256"
       ],
       "title": "LockedAsset",
+      "type": "object"
+    },
+    "LockedAssetReference": {
+      "additionalProperties": false,
+      "description": "An asset id plus the exact digest expected by this state policy.",
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-fA-F]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset",
+        "sha256"
+      ],
+      "title": "LockedAssetReference",
       "type": "object"
     },
     "MassBalanceMonitor": {
@@ -3070,6 +3618,83 @@
         "temperature"
       ],
       "title": "MassFlowInlet",
+      "type": "object"
+    },
+    "MatchReferenceAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ComparisonIntent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "priority": {
+          "default": "primary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "reference": {
+          "discriminator": {
+            "mapping": {
+              "experimental_value": "#/$defs/ExperimentalValueReference",
+              "reference_asset": "#/$defs/ReferenceAsset"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ExperimentalValueReference"
+            },
+            {
+              "$ref": "#/$defs/ReferenceAsset"
+            }
+          ],
+          "title": "Reference"
+        },
+        "type": {
+          "const": "match_reference",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitor",
+        "reference"
+      ],
+      "title": "MatchReferenceAspect",
       "type": "object"
     },
     "MaterialSpec": {
@@ -3534,6 +4159,162 @@
         }
       },
       "title": "NumericsProfile",
+      "type": "object"
+    },
+    "ObjectiveRevision": {
+      "additionalProperties": false,
+      "description": "Identity and authorship of one objective-document revision.",
+      "properties": {
+        "change_summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Change Summary"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "recorded_by": {
+          "minLength": 1,
+          "title": "Recorded By",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        }
+      },
+      "required": [
+        "id",
+        "sequence",
+        "recorded_at",
+        "recorded_by"
+      ],
+      "title": "ObjectiveRevision",
+      "type": "object"
+    },
+    "ObserveAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitors": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Monitors",
+          "type": "array"
+        },
+        "priority": {
+          "default": "secondary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "type": {
+          "const": "observe",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitors"
+      ],
+      "title": "ObserveAspect",
+      "type": "object"
+    },
+    "ObservedStatePath": {
+      "additionalProperties": false,
+      "properties": {
+        "capture": {
+          "default": "exact",
+          "enum": [
+            "exact",
+            "summary",
+            "digest"
+          ],
+          "title": "Capture",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*$",
+          "title": "Path",
+          "type": "string"
+        },
+        "purpose": {
+          "default": "verification",
+          "enum": [
+            "verification",
+            "diagnostic",
+            "provenance"
+          ],
+          "title": "Purpose",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "ObservedStatePath",
       "type": "object"
     },
     "P1Radiation": {
@@ -4252,6 +5033,63 @@
       "title": "ReconcileStage",
       "type": "object"
     },
+    "ReferenceAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        },
+        "observable": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observable"
+        },
+        "role": {
+          "enum": [
+            "experiment",
+            "simulation",
+            "analytical"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "type": {
+          "const": "reference_asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset",
+        "role"
+      ],
+      "title": "ReferenceAsset",
+      "type": "object"
+    },
     "RegisterPatchTarget": {
       "additionalProperties": false,
       "properties": {
@@ -4822,6 +5660,65 @@
       "title": "SolverSpec",
       "type": "object"
     },
+    "SourceAssetProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "interpretation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interpretation"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        },
+        "recorded_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recorded By"
+        },
+        "type": {
+          "const": "source_asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset"
+      ],
+      "title": "SourceAssetProvenance",
+      "type": "object"
+    },
     "SpeciesDisabled": {
       "additionalProperties": false,
       "properties": {
@@ -5068,6 +5965,56 @@
         "path"
       ],
       "title": "StateCondition",
+      "type": "object"
+    },
+    "StateOwnershipDocument": {
+      "additionalProperties": false,
+      "description": "Declares only state this layer owns and state it intentionally records.\n\nIn ``checkpoint_overlay`` mode, every undeclared path remains inherited\nfrom the hash-locked baseline.  In ``full_definition`` mode, undeclared\npaths retain fresh-case or Fluent defaults.  Neither mode uses an exhaustive\nallowlist.",
+      "properties": {
+        "baseline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CheckpointBaseline"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "declared_paths": {
+          "items": {
+            "$ref": "#/$defs/DeclaredStatePath"
+          },
+          "title": "Declared Paths",
+          "type": "array"
+        },
+        "mode": {
+          "enum": [
+            "full_definition",
+            "checkpoint_overlay"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "observed_paths": {
+          "items": {
+            "$ref": "#/$defs/ObservedStatePath"
+          },
+          "title": "Observed Paths",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "title": "StateOwnershipDocument",
       "type": "object"
     },
     "SteadyWindowGate": {
@@ -6142,6 +7089,9 @@
     "numerics": {
       "$ref": "#/$defs/NumericsDocument"
     },
+    "objectives": {
+      "$ref": "#/$defs/EngineeringObjectiveDocument"
+    },
     "physics": {
       "$ref": "#/$defs/PhysicsDocument"
     },
@@ -6171,6 +7121,9 @@
       },
       "title": "Platforms",
       "type": "object"
+    },
+    "state": {
+      "$ref": "#/$defs/StateOwnershipDocument"
     }
   },
   "required": [
@@ -6183,6 +7136,8 @@
     "initialization",
     "monitors",
     "control",
+    "objectives",
+    "state",
     "platforms",
     "assets"
   ],

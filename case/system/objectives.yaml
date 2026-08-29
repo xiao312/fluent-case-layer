@@ -1,0 +1,37 @@
+schema_version: "1.0"
+revision:
+  id: initial-objectives
+  sequence: 1
+  recorded_at: "2026-08-29T12:00:00+08:00"
+  recorded_by: CFD engineer
+  change_summary: Initial illustrative engineering objective.
+provenance:
+  type: engineer_statement
+  author: CFD engineer
+  role: case owner
+  context: Illustrative schema fixture; replace with the real engineering question.
+statement: >-
+  Establish a reproducible reacting-flow baseline, understand its numerical
+  health, and compare outlet pressure with the supplied experimental reference
+  without treating that comparison as an automatic acceptance decision.
+enforcement: none
+aspects:
+  - id: numerical-health
+    type: observe
+    description: Track residual behavior and continuous-phase mass closure.
+    monitors: [residuals, mass-closure]
+    priority: primary
+  - id: outlet-pressure-comparison
+    type: match_reference
+    description: Compare simulated outlet pressure with the experimental table.
+    monitor: outlet-pressure
+    reference:
+      type: reference_asset
+      asset: outlet-pressure-reference
+      role: experiment
+      locator: "column=pressure; row=nominal-condition"
+      observable: area-weighted absolute outlet pressure
+    comparison:
+      method: relative_difference
+      notes: Engineering guidance only; no pass/fail tolerance is implied.
+    priority: secondary
