@@ -79,6 +79,12 @@ unresolved assets, impossible zone/cardinality contracts, bad stage edges, and
 cross-file reference errors fail before a solver license is requested. Fourteen
 generated JSON Schemas are available in [`schemas/`](schemas/).
 
+The generated [dictionary manual](docs/reference/index.md) covers every split
+document entry. It lists types, defaults, static choices, conditional variants,
+curated unit/semantic constraints, the corresponding Fluent concept, intended
+PyFluent path and confidence, and the adapter's actual support boundary. The
+same complete reference is packaged as a deterministic JSON catalog for agents.
+
 ## Quick start
 
 Python 3.11 or newer is required. Using `uv`:
@@ -92,6 +98,8 @@ uv run fluent-case apply case --platform scnet-cpu-small \
   --adapter recording --run-dir .fluent-case/example-run
 uv run fluent-case campaign examples/campaign.yaml --mode validate
 uv run fluent-case campaign examples/campaign.yaml --mode plan
+uv run fluent-case reference show 'constant/physics.yaml#/solver/time'
+uv run mkdocs serve
 ```
 
 Or install into an existing environment with
@@ -126,6 +134,7 @@ fluent-case attempt list|show|decide|rebuild-refs ...
 fluent-case snapshot <case>
 fluent-case diff <before.json> <after.json>
 fluent-case campaign <campaign.yaml> [--mode validate|plan|apply]
+fluent-case reference list|search|show ...
 ```
 
 Repository-checkout wrappers are also provided in [`scripts/`](scripts/).
@@ -178,6 +187,8 @@ is neither a scientific pass nor a failure by itself, and absent judgments stay
 `not_evaluated`.
 
 See [architecture](docs/architecture.md), [contributing](CONTRIBUTING.md), and
-the [design interview](docs/design-interview.md). Project progress and weekly
+the [documentation system](docs/manual/documentation-system.md). The
+[human manual](docs/index.md) and [agent guide](docs/manual/agent-guide.md) use
+the same generated catalog. Project progress and weekly
 logs are maintained in the private Lark document
 [CFD Agent｜Fluent 算例层与调试智能化](https://qcnwovvb1xop.feishu.cn/docx/NBNJdruXgolpXUxS1qoczNmKnBH).

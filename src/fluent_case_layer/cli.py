@@ -29,6 +29,7 @@ from .driver.evidence import diff_values, read_json_document, write_plan_lock
 from .driver.loading import load_data
 from .driver.types import CompiledPlan
 from .driver.util import atomic_write_json, canonical_json
+from .reference import find_entries, get_entry, load_catalog
 
 
 def _print(value: Any, *, stream: Any = None) -> None:
@@ -184,6 +185,47 @@ def _command_campaign(args: argparse.Namespace) -> int:
     return 0 if result["status"] == "succeeded" else 1
 
 
+def _reference_summary(entry: Mapping[str, Any]) -> dict[str, Any]:
+    """Return a compact search/list projection while keeping canonical identifiers."""
+
+    return {
+        "id": entry.get("id"),
+        "title": entry.get("title"),
+        "description": entry.get("description"),
+        "schema": entry.get("schema"),
+        "adapter_status": entry.get("coupling", {}).get("adapter", {}).get("status"),
+        "pyfluent_path": entry.get("coupling", {}).get("pyfluent", {}).get("path"),
+        "reference": entry.get("reference"),
+    }
+
+
+def _command_reference(args: argparse.Namespace) -> int:
+    catalog = load_catalog()
+    if args.reference_mode == "show":
+        try:
+            entry = get_entry(args.entry_id, catalog)
+        except KeyError as exc:
+            raise ValueError(str(exc)) from exc
+        _print(entry)
+        return 0
+    query = args.query if args.reference_mode == "search" else ""
+    entries = find_entries(
+        query,
+        document=args.document,
+        status=args.status,
+        limit=args.limit,
+        catalog=catalog,
+    )
+    _print(
+        {
+            "catalog_version": catalog["catalog_version"],
+            "count": len(entries),
+            "entries": [entry if args.full else _reference_summary(entry) for entry in entries],
+        }
+    )
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="fluent-case",
@@ -284,6 +326,26 @@ def build_parser() -> argparse.ArgumentParser:
     campaign.add_argument("--max-workers", type=int, default=1)
     campaign.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)
     campaign.set_defaults(handler=_command_campaign)
+
+    reference = subparsers.add_parser(
+        "reference", help="query dictionary options and Fluent/PyFluent coupling"
+    )
+    reference_modes = reference.add_subparsers(dest="reference_mode", required=True)
+    reference_list = reference_modes.add_parser("list", help="list dictionary entries")
+    reference_search = reference_modes.add_parser("search", help="search dictionary entries")
+    reference_search.add_argument("query")
+    for command in (reference_list, reference_search):
+        command.add_argument("--document")
+        command.add_argument(
+            "--status",
+            choices=("implemented", "partial", "planned", "declaration_only", "not_applicable"),
+        )
+        command.add_argument("--limit", type=int, default=50)
+        command.add_argument("--full", action="store_true")
+        command.set_defaults(handler=_command_reference)
+    reference_show = reference_modes.add_parser("show", help="show one canonical entry")
+    reference_show.add_argument("entry_id")
+    reference_show.set_defaults(handler=_command_reference)
     return parser
 
 

@@ -1,0 +1,1984 @@
+{
+  "$defs": {
+    "AdvanceTimeStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "max_iterations_per_step": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Iterations Per Step"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "time_step": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "time_steps": {
+          "minimum": 1,
+          "title": "Time Steps",
+          "type": "integer"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "advance_time",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "time_steps"
+      ],
+      "title": "AdvanceTimeStage",
+      "type": "object"
+    },
+    "AssetAvailableCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "type": {
+          "const": "asset_available",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset"
+      ],
+      "title": "AssetAvailableCondition",
+      "type": "object"
+    },
+    "AssetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "asset"
+      ],
+      "title": "AssetInput",
+      "type": "object"
+    },
+    "CheckpointStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "label": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Label",
+          "type": "string"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "promotion": {
+          "discriminator": {
+            "mapping": {
+              "none": "#/$defs/NoPromotion",
+              "when_gates_pass": "#/$defs/GatePromotion"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoPromotion"
+            },
+            {
+              "$ref": "#/$defs/GatePromotion"
+            }
+          ],
+          "title": "Promotion"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "checkpoint",
+          "title": "Type",
+          "type": "string"
+        },
+        "write_case": {
+          "default": true,
+          "title": "Write Case",
+          "type": "boolean"
+        },
+        "write_data": {
+          "default": true,
+          "title": "Write Data",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "label"
+      ],
+      "title": "CheckpointStage",
+      "type": "object"
+    },
+    "GatePromotion": {
+      "additionalProperties": false,
+      "properties": {
+        "gates": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Gates",
+          "type": "array"
+        },
+        "role": {
+          "enum": [
+            "candidate",
+            "trusted",
+            "production_restart"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "type": {
+          "const": "when_gates_pass",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "gates",
+        "role"
+      ],
+      "title": "GatePromotion",
+      "type": "object"
+    },
+    "GateStage": {
+      "additionalProperties": false,
+      "properties": {
+        "gates": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Gates",
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "gate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "gates"
+      ],
+      "title": "GateStage",
+      "type": "object"
+    },
+    "InitializeStage": {
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Actions",
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "initialize",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "actions"
+      ],
+      "title": "InitializeStage",
+      "type": "object"
+    },
+    "IterateStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "iterations": {
+          "minimum": 1,
+          "title": "Iterations",
+          "type": "integer"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "report_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Report Every",
+          "type": "integer"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "iterate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "iterations"
+      ],
+      "title": "IterateStage",
+      "type": "object"
+    },
+    "LiteralInput": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "literal",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "value"
+      ],
+      "title": "LiteralInput",
+      "type": "object"
+    },
+    "LoadAssetStage": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "data_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Asset"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "load_as": {
+          "enum": [
+            "mesh",
+            "case",
+            "case_data",
+            "chemistry_table",
+            "profile"
+          ],
+          "title": "Load As",
+          "type": "string"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "load_asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "asset",
+        "load_as"
+      ],
+      "title": "LoadAssetStage",
+      "type": "object"
+    },
+    "MetricCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "operator": {
+          "enum": [
+            "lt",
+            "le",
+            "gt",
+            "ge",
+            "eq"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "type": {
+          "const": "metric",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "monitor",
+        "operator",
+        "limit"
+      ],
+      "title": "MetricCondition",
+      "type": "object"
+    },
+    "NoPromotion": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "NoPromotion",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "ReconcileStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "numerics_profile": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Numerics Profile"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "sections": {
+          "items": {
+            "enum": [
+              "physics",
+              "materials",
+              "chemistry",
+              "fields",
+              "boundary_conditions",
+              "numerics"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Sections",
+          "type": "array"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "reconcile",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "sections"
+      ],
+      "title": "ReconcileStage",
+      "type": "object"
+    },
+    "RetryPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "backoff": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "max_attempts": {
+          "default": 1,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Max Attempts",
+          "type": "integer"
+        },
+        "retry_on": {
+          "items": {
+            "enum": [
+              "launcher_error",
+              "api_error",
+              "precondition",
+              "numerical_health"
+            ],
+            "type": "string"
+          },
+          "title": "Retry On",
+          "type": "array"
+        }
+      },
+      "title": "RetryPolicy",
+      "type": "object"
+    },
+    "SampleStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "monitors": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Monitors",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "sample",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "monitors"
+      ],
+      "title": "SampleStage",
+      "type": "object"
+    },
+    "StageOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "case",
+            "data",
+            "checkpoint",
+            "report",
+            "metrics",
+            "log",
+            "field_data",
+            "image",
+            "manifest"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "path_template": {
+          "minLength": 1,
+          "title": "Path Template",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "sha256": {
+          "default": true,
+          "title": "Sha256",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "path_template"
+      ],
+      "title": "StageOutput",
+      "type": "object"
+    },
+    "StageOutputInput": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "output": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Output",
+          "type": "string"
+        },
+        "stage": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Stage",
+          "type": "string"
+        },
+        "type": {
+          "const": "stage_output",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "stage",
+        "output"
+      ],
+      "title": "StageOutputInput",
+      "type": "object"
+    },
+    "StateCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "expected": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "equals",
+            "not_equals"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "type": {
+          "const": "state",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "path"
+      ],
+      "title": "StateCondition",
+      "type": "object"
+    },
+    "TuiEscape": {
+      "additionalProperties": false,
+      "description": "An explicit, reviewable escape from the PyFluent settings API.",
+      "properties": {
+        "command": {
+          "minLength": 1,
+          "title": "Command",
+          "type": "string"
+        },
+        "expected_postcondition": {
+          "minLength": 8,
+          "title": "Expected Postcondition",
+          "type": "string"
+        },
+        "fluent_version": {
+          "minLength": 1,
+          "title": "Fluent Version",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 12,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "fluent_version",
+        "command",
+        "expected_postcondition"
+      ],
+      "title": "TuiEscape",
+      "type": "object"
+    },
+    "TuiStage": {
+      "additionalProperties": false,
+      "properties": {
+        "escape": {
+          "$ref": "#/$defs/TuiEscape"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "tui",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "escape"
+      ],
+      "title": "TuiStage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "default_platform": {
+      "maxLength": 96,
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+      "title": "Default Platform",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stages": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "advance_time": "#/$defs/AdvanceTimeStage",
+            "checkpoint": "#/$defs/CheckpointStage",
+            "gate": "#/$defs/GateStage",
+            "initialize": "#/$defs/InitializeStage",
+            "iterate": "#/$defs/IterateStage",
+            "load_asset": "#/$defs/LoadAssetStage",
+            "reconcile": "#/$defs/ReconcileStage",
+            "sample": "#/$defs/SampleStage",
+            "tui": "#/$defs/TuiStage"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/LoadAssetStage"
+          },
+          {
+            "$ref": "#/$defs/ReconcileStage"
+          },
+          {
+            "$ref": "#/$defs/InitializeStage"
+          },
+          {
+            "$ref": "#/$defs/IterateStage"
+          },
+          {
+            "$ref": "#/$defs/AdvanceTimeStage"
+          },
+          {
+            "$ref": "#/$defs/SampleStage"
+          },
+          {
+            "$ref": "#/$defs/GateStage"
+          },
+          {
+            "$ref": "#/$defs/CheckpointStage"
+          },
+          {
+            "$ref": "#/$defs/TuiStage"
+          }
+        ]
+      },
+      "minItems": 1,
+      "title": "Stages",
+      "type": "array"
+    }
+  },
+  "required": [
+    "default_platform",
+    "stages"
+  ],
+  "title": "ControlDocument",
+  "type": "object"
+}

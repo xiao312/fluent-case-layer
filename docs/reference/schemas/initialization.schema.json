@@ -1,0 +1,842 @@
+{
+  "$defs": {
+    "BoxRegion": {
+      "additionalProperties": false,
+      "properties": {
+        "maximum": {
+          "$ref": "#/$defs/VectorQuantity"
+        },
+        "minimum": {
+          "$ref": "#/$defs/VectorQuantity"
+        },
+        "type": {
+          "const": "box",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "minimum",
+        "maximum"
+      ],
+      "title": "BoxRegion",
+      "type": "object"
+    },
+    "Cardinality": {
+      "additionalProperties": false,
+      "description": "Expected number of zones resolved by a selector.",
+      "properties": {
+        "at_least": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Least"
+        },
+        "at_most": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Most"
+        },
+        "exactly": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exactly"
+        }
+      },
+      "title": "Cardinality",
+      "type": "object"
+    },
+    "CreateRegisterAction": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "region": {
+          "discriminator": {
+            "mapping": {
+              "box": "#/$defs/BoxRegion",
+              "cylinder": "#/$defs/CylinderRegion",
+              "zones": "#/$defs/ZoneRegion"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/CylinderRegion"
+            },
+            {
+              "$ref": "#/$defs/BoxRegion"
+            },
+            {
+              "$ref": "#/$defs/ZoneRegion"
+            }
+          ],
+          "title": "Region"
+        },
+        "type": {
+          "const": "create_register",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "name",
+        "region"
+      ],
+      "title": "CreateRegisterAction",
+      "type": "object"
+    },
+    "CylinderRegion": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "$ref": "#/$defs/VectorQuantity"
+        },
+        "radius": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "start": {
+          "$ref": "#/$defs/VectorQuantity"
+        },
+        "type": {
+          "const": "cylinder",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "start",
+        "end",
+        "radius"
+      ],
+      "title": "CylinderRegion",
+      "type": "object"
+    },
+    "ExpressionValue": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "type": {
+          "const": "expression",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "expression",
+        "unit"
+      ],
+      "title": "ExpressionValue",
+      "type": "object"
+    },
+    "HybridInitializationAction": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "hybrid",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "title": "HybridInitializationAction",
+      "type": "object"
+    },
+    "PatchAction": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "target": {
+          "discriminator": {
+            "mapping": {
+              "register": "#/$defs/RegisterPatchTarget",
+              "zones": "#/$defs/ZonePatchTarget"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RegisterPatchTarget"
+            },
+            {
+              "$ref": "#/$defs/ZonePatchTarget"
+            }
+          ],
+          "title": "Target"
+        },
+        "type": {
+          "const": "patch",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "discriminator": {
+            "mapping": {
+              "expression": "#/$defs/ExpressionValue",
+              "profile": "#/$defs/ProfileValue",
+              "uniform_scalar": "#/$defs/UniformScalarValue",
+              "uniform_vector": "#/$defs/UniformVectorValue"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/UniformScalarValue"
+            },
+            {
+              "$ref": "#/$defs/UniformVectorValue"
+            },
+            {
+              "$ref": "#/$defs/ProfileValue"
+            },
+            {
+              "$ref": "#/$defs/ExpressionValue"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "target",
+        "field",
+        "value"
+      ],
+      "title": "PatchAction",
+      "type": "object"
+    },
+    "ProfileValue": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "field": {
+          "minLength": 1,
+          "title": "Field",
+          "type": "string"
+        },
+        "scale": {
+          "default": 1.0,
+          "title": "Scale",
+          "type": "number"
+        },
+        "type": {
+          "const": "profile",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset",
+        "field"
+      ],
+      "title": "ProfileValue",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "ReadCheckpointAction": {
+      "additionalProperties": false,
+      "properties": {
+        "case_asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Case Asset",
+          "type": "string"
+        },
+        "data_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Asset"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "read_checkpoint",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "case_asset"
+      ],
+      "title": "ReadCheckpointAction",
+      "type": "object"
+    },
+    "RegisterPatchTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "register": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Register",
+          "type": "string"
+        },
+        "type": {
+          "const": "register",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "register"
+      ],
+      "title": "RegisterPatchTarget",
+      "type": "object"
+    },
+    "StandardInitializationAction": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "reference_zone": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "ids": "#/$defs/ZoneIdsSelector",
+                  "names": "#/$defs/ZoneNamesSelector",
+                  "pattern": "#/$defs/ZonePatternSelector",
+                  "zone_type": "#/$defs/ZoneTypeSelector"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/ZoneNamesSelector"
+                },
+                {
+                  "$ref": "#/$defs/ZonePatternSelector"
+                },
+                {
+                  "$ref": "#/$defs/ZoneTypeSelector"
+                },
+                {
+                  "$ref": "#/$defs/ZoneIdsSelector"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Zone"
+        },
+        "type": {
+          "const": "standard",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "title": "StandardInitializationAction",
+      "type": "object"
+    },
+    "TuiEscape": {
+      "additionalProperties": false,
+      "description": "An explicit, reviewable escape from the PyFluent settings API.",
+      "properties": {
+        "command": {
+          "minLength": 1,
+          "title": "Command",
+          "type": "string"
+        },
+        "expected_postcondition": {
+          "minLength": 8,
+          "title": "Expected Postcondition",
+          "type": "string"
+        },
+        "fluent_version": {
+          "minLength": 1,
+          "title": "Fluent Version",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 12,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "fluent_version",
+        "command",
+        "expected_postcondition"
+      ],
+      "title": "TuiEscape",
+      "type": "object"
+    },
+    "TuiInitializationAction": {
+      "additionalProperties": false,
+      "properties": {
+        "escape": {
+          "$ref": "#/$defs/TuiEscape"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "tui",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "escape"
+      ],
+      "title": "TuiInitializationAction",
+      "type": "object"
+    },
+    "UniformScalarValue": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "uniform_scalar",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "UniformScalarValue",
+      "type": "object"
+    },
+    "UniformVectorValue": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "uniform_vector",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/VectorQuantity"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "UniformVectorValue",
+      "type": "object"
+    },
+    "VectorQuantity": {
+      "additionalProperties": false,
+      "description": "A three-component finite vector with one shared unit.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "VectorQuantity",
+      "type": "object"
+    },
+    "ZoneIdsSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "ids": {
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Ids",
+          "type": "array"
+        },
+        "type": {
+          "const": "ids",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "ids"
+      ],
+      "title": "ZoneIdsSelector",
+      "type": "object"
+    },
+    "ZoneNamesSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "names": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Names",
+          "type": "array"
+        },
+        "type": {
+          "const": "names",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "names"
+      ],
+      "title": "ZoneNamesSelector",
+      "type": "object"
+    },
+    "ZonePatchTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "zones",
+          "title": "Type",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "type",
+        "zones"
+      ],
+      "title": "ZonePatchTarget",
+      "type": "object"
+    },
+    "ZonePatternSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "pattern": {
+          "minLength": 1,
+          "title": "Pattern",
+          "type": "string"
+        },
+        "type": {
+          "const": "pattern",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "pattern"
+      ],
+      "title": "ZonePatternSelector",
+      "type": "object"
+    },
+    "ZoneRegion": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "zones",
+          "title": "Type",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "type",
+        "zones"
+      ],
+      "title": "ZoneRegion",
+      "type": "object"
+    },
+    "ZoneTypeSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "type": {
+          "const": "zone_type",
+          "title": "Type",
+          "type": "string"
+        },
+        "zone_type": {
+          "enum": [
+            "fluid",
+            "solid",
+            "mass-flow-inlet",
+            "velocity-inlet",
+            "pressure-outlet",
+            "wall",
+            "symmetry",
+            "axis",
+            "interior"
+          ],
+          "title": "Zone Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "zone_type"
+      ],
+      "title": "ZoneTypeSelector",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "create_register": "#/$defs/CreateRegisterAction",
+            "hybrid": "#/$defs/HybridInitializationAction",
+            "patch": "#/$defs/PatchAction",
+            "read_checkpoint": "#/$defs/ReadCheckpointAction",
+            "standard": "#/$defs/StandardInitializationAction",
+            "tui": "#/$defs/TuiInitializationAction"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ReadCheckpointAction"
+          },
+          {
+            "$ref": "#/$defs/HybridInitializationAction"
+          },
+          {
+            "$ref": "#/$defs/StandardInitializationAction"
+          },
+          {
+            "$ref": "#/$defs/CreateRegisterAction"
+          },
+          {
+            "$ref": "#/$defs/PatchAction"
+          },
+          {
+            "$ref": "#/$defs/TuiInitializationAction"
+          }
+        ]
+      },
+      "title": "Actions",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "actions"
+  ],
+  "title": "InitializationDocument",
+  "type": "object"
+}

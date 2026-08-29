@@ -1,0 +1,550 @@
+{
+  "$defs": {
+    "Cardinality": {
+      "additionalProperties": false,
+      "description": "Expected number of zones resolved by a selector.",
+      "properties": {
+        "at_least": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Least"
+        },
+        "at_most": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Most"
+        },
+        "exactly": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exactly"
+        }
+      },
+      "title": "Cardinality",
+      "type": "object"
+    },
+    "ChemistryMixtureMaterialSource": {
+      "additionalProperties": false,
+      "properties": {
+        "mixture": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Mixture",
+          "type": "string"
+        },
+        "type": {
+          "const": "chemistry_mixture",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "mixture"
+      ],
+      "title": "ChemistryMixtureMaterialSource",
+      "type": "object"
+    },
+    "ConstantProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "constant",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "ConstantProperty",
+      "type": "object"
+    },
+    "ExplicitMaterialSource": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "explicit",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "ExplicitMaterialSource",
+      "type": "object"
+    },
+    "FluentDatabaseMaterialSource": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "fluent_database",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "title": "FluentDatabaseMaterialSource",
+      "type": "object"
+    },
+    "FluentProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "fluent_database",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "title": "FluentProperty",
+      "type": "object"
+    },
+    "IdealGasProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ideal_gas",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "IdealGasProperty",
+      "type": "object"
+    },
+    "MaterialSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "fluid",
+            "solid",
+            "mixture"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "properties": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "discriminator": {
+                "mapping": {
+                  "constant": "#/$defs/ConstantProperty",
+                  "fluent_database": "#/$defs/FluentProperty",
+                  "ideal_gas": "#/$defs/IdealGasProperty",
+                  "polynomial": "#/$defs/PolynomialProperty",
+                  "sutherland": "#/$defs/SutherlandProperty"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/ConstantProperty"
+                },
+                {
+                  "$ref": "#/$defs/IdealGasProperty"
+                },
+                {
+                  "$ref": "#/$defs/PolynomialProperty"
+                },
+                {
+                  "$ref": "#/$defs/SutherlandProperty"
+                },
+                {
+                  "$ref": "#/$defs/FluentProperty"
+                }
+              ]
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Properties",
+          "type": "object"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "chemistry_mixture": "#/$defs/ChemistryMixtureMaterialSource",
+              "explicit": "#/$defs/ExplicitMaterialSource",
+              "fluent_database": "#/$defs/FluentDatabaseMaterialSource"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/FluentDatabaseMaterialSource"
+            },
+            {
+              "$ref": "#/$defs/ExplicitMaterialSource"
+            },
+            {
+              "$ref": "#/$defs/ChemistryMixtureMaterialSource"
+            }
+          ],
+          "title": "Source"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "source"
+      ],
+      "title": "MaterialSpec",
+      "type": "object"
+    },
+    "PolynomialProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "coefficients": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Coefficients",
+          "type": "array"
+        },
+        "independent_unit": {
+          "title": "Independent Unit",
+          "type": "string"
+        },
+        "output_unit": {
+          "title": "Output Unit",
+          "type": "string"
+        },
+        "type": {
+          "const": "polynomial",
+          "title": "Type",
+          "type": "string"
+        },
+        "valid_range": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "$ref": "#/$defs/Quantity"
+                },
+                {
+                  "$ref": "#/$defs/Quantity"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid Range"
+        }
+      },
+      "required": [
+        "type",
+        "coefficients",
+        "independent_unit",
+        "output_unit"
+      ],
+      "title": "PolynomialProperty",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "SutherlandProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "reference_temperature": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "reference_value": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "sutherland_temperature": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "type": {
+          "const": "sutherland",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "reference_value",
+        "reference_temperature",
+        "sutherland_temperature"
+      ],
+      "title": "SutherlandProperty",
+      "type": "object"
+    },
+    "ZoneIdsSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "ids": {
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Ids",
+          "type": "array"
+        },
+        "type": {
+          "const": "ids",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "ids"
+      ],
+      "title": "ZoneIdsSelector",
+      "type": "object"
+    },
+    "ZoneMaterialAssignment": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "material": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Material",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "id",
+        "zones",
+        "material"
+      ],
+      "title": "ZoneMaterialAssignment",
+      "type": "object"
+    },
+    "ZoneNamesSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "names": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Names",
+          "type": "array"
+        },
+        "type": {
+          "const": "names",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "names"
+      ],
+      "title": "ZoneNamesSelector",
+      "type": "object"
+    },
+    "ZonePatternSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "pattern": {
+          "minLength": 1,
+          "title": "Pattern",
+          "type": "string"
+        },
+        "type": {
+          "const": "pattern",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "pattern"
+      ],
+      "title": "ZonePatternSelector",
+      "type": "object"
+    },
+    "ZoneTypeSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "type": {
+          "const": "zone_type",
+          "title": "Type",
+          "type": "string"
+        },
+        "zone_type": {
+          "enum": [
+            "fluid",
+            "solid",
+            "mass-flow-inlet",
+            "velocity-inlet",
+            "pressure-outlet",
+            "wall",
+            "symmetry",
+            "axis",
+            "interior"
+          ],
+          "title": "Zone Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "zone_type"
+      ],
+      "title": "ZoneTypeSelector",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "materials": {
+      "items": {
+        "$ref": "#/$defs/MaterialSpec"
+      },
+      "minItems": 1,
+      "title": "Materials",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "zone_assignments": {
+      "items": {
+        "$ref": "#/$defs/ZoneMaterialAssignment"
+      },
+      "title": "Zone Assignments",
+      "type": "array"
+    }
+  },
+  "required": [
+    "materials"
+  ],
+  "title": "MaterialsDocument",
+  "type": "object"
+}

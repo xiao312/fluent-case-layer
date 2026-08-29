@@ -1,0 +1,679 @@
+{
+  "$defs": {
+    "ComparisonIntent": {
+      "additionalProperties": false,
+      "description": "A non-enforcing hint for how an engineer intends to inspect agreement.",
+      "properties": {
+        "alignment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignment"
+        },
+        "method": {
+          "enum": [
+            "absolute_difference",
+            "relative_difference",
+            "normalized_rmse",
+            "profile_shape",
+            "qualitative"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "title": "ComparisonIntent",
+      "type": "object"
+    },
+    "DirectionalAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "minimize",
+            "maximize",
+            "increase",
+            "decrease",
+            "hold"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "priority": {
+          "default": "secondary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "type": {
+          "const": "directional",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitor",
+        "direction"
+      ],
+      "title": "DirectionalAspect",
+      "type": "object"
+    },
+    "EngineerStatementProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "minLength": 1,
+          "title": "Author",
+          "type": "string"
+        },
+        "context": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context"
+        },
+        "organization": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization"
+        },
+        "role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Role"
+        },
+        "type": {
+          "const": "engineer_statement",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "author"
+      ],
+      "title": "EngineerStatementProvenance",
+      "type": "object"
+    },
+    "ExperimentalValueReference": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "source_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Note"
+        },
+        "type": {
+          "const": "experimental_value",
+          "title": "Type",
+          "type": "string"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "value": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "type",
+        "label",
+        "value"
+      ],
+      "title": "ExperimentalValueReference",
+      "type": "object"
+    },
+    "InvestigateAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitors": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Monitors",
+          "type": "array"
+        },
+        "priority": {
+          "default": "exploratory",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "questions": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Questions",
+          "type": "array"
+        },
+        "type": {
+          "const": "investigate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "questions"
+      ],
+      "title": "InvestigateAspect",
+      "type": "object"
+    },
+    "MatchReferenceAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ComparisonIntent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "priority": {
+          "default": "primary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "reference": {
+          "discriminator": {
+            "mapping": {
+              "experimental_value": "#/$defs/ExperimentalValueReference",
+              "reference_asset": "#/$defs/ReferenceAsset"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ExperimentalValueReference"
+            },
+            {
+              "$ref": "#/$defs/ReferenceAsset"
+            }
+          ],
+          "title": "Reference"
+        },
+        "type": {
+          "const": "match_reference",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitor",
+        "reference"
+      ],
+      "title": "MatchReferenceAspect",
+      "type": "object"
+    },
+    "ObjectiveRevision": {
+      "additionalProperties": false,
+      "description": "Identity and authorship of one objective-document revision.",
+      "properties": {
+        "change_summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Change Summary"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "recorded_by": {
+          "minLength": 1,
+          "title": "Recorded By",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        }
+      },
+      "required": [
+        "id",
+        "sequence",
+        "recorded_at",
+        "recorded_by"
+      ],
+      "title": "ObjectiveRevision",
+      "type": "object"
+    },
+    "ObserveAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitors": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Monitors",
+          "type": "array"
+        },
+        "priority": {
+          "default": "secondary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "type": {
+          "const": "observe",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitors"
+      ],
+      "title": "ObserveAspect",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "ReferenceAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        },
+        "observable": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observable"
+        },
+        "role": {
+          "enum": [
+            "experiment",
+            "simulation",
+            "analytical"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "type": {
+          "const": "reference_asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset",
+        "role"
+      ],
+      "title": "ReferenceAsset",
+      "type": "object"
+    },
+    "SourceAssetProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "interpretation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interpretation"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        },
+        "recorded_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recorded By"
+        },
+        "type": {
+          "const": "source_asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset"
+      ],
+      "title": "SourceAssetProvenance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Human intent kept independent from optional case-local gates.",
+  "properties": {
+    "aspects": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "directional": "#/$defs/DirectionalAspect",
+            "investigate": "#/$defs/InvestigateAspect",
+            "match_reference": "#/$defs/MatchReferenceAspect",
+            "observe": "#/$defs/ObserveAspect"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ObserveAspect"
+          },
+          {
+            "$ref": "#/$defs/DirectionalAspect"
+          },
+          {
+            "$ref": "#/$defs/MatchReferenceAspect"
+          },
+          {
+            "$ref": "#/$defs/InvestigateAspect"
+          }
+        ]
+      },
+      "title": "Aspects",
+      "type": "array"
+    },
+    "enforcement": {
+      "const": "none",
+      "default": "none",
+      "title": "Enforcement",
+      "type": "string"
+    },
+    "provenance": {
+      "discriminator": {
+        "mapping": {
+          "engineer_statement": "#/$defs/EngineerStatementProvenance",
+          "source_asset": "#/$defs/SourceAssetProvenance"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/EngineerStatementProvenance"
+        },
+        {
+          "$ref": "#/$defs/SourceAssetProvenance"
+        }
+      ],
+      "title": "Provenance"
+    },
+    "revision": {
+      "$ref": "#/$defs/ObjectiveRevision"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "statement": {
+      "minLength": 1,
+      "title": "Statement",
+      "type": "string"
+    }
+  },
+  "required": [
+    "revision",
+    "provenance",
+    "statement"
+  ],
+  "title": "EngineeringObjectiveDocument",
+  "type": "object"
+}

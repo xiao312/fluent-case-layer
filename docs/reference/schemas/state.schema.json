@@ -1,0 +1,350 @@
+{
+  "$defs": {
+    "CaseDocumentStateSource": {
+      "additionalProperties": false,
+      "properties": {
+        "document": {
+          "enum": [
+            "constant/physics.yaml",
+            "constant/materials.yaml",
+            "constant/chemistry.yaml",
+            "0/fields.yaml",
+            "0/boundary-conditions.yaml",
+            "system/numerics.yaml",
+            "system/initialization.yaml",
+            "system/monitors.yaml",
+            "system/control.yaml"
+          ],
+          "title": "Document",
+          "type": "string"
+        },
+        "pointer": {
+          "maxLength": 512,
+          "title": "Pointer",
+          "type": "string"
+        },
+        "type": {
+          "const": "case_document",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "document",
+        "pointer"
+      ],
+      "title": "CaseDocumentStateSource",
+      "type": "object"
+    },
+    "CheckpointBaseline": {
+      "additionalProperties": false,
+      "properties": {
+        "case": {
+          "$ref": "#/$defs/LockedAssetReference"
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LockedAssetReference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fluent_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fluent Version"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        }
+      },
+      "required": [
+        "case"
+      ],
+      "title": "CheckpointBaseline",
+      "type": "object"
+    },
+    "DeclaredStatePath": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*$",
+          "title": "Path",
+          "type": "string"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "case_document": "#/$defs/CaseDocumentStateSource",
+              "inline": "#/$defs/InlineStateSource"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/CaseDocumentStateSource"
+            },
+            {
+              "$ref": "#/$defs/InlineStateSource"
+            }
+          ],
+          "title": "Source"
+        }
+      },
+      "required": [
+        "path",
+        "source"
+      ],
+      "title": "DeclaredStatePath",
+      "type": "object"
+    },
+    "InlineStateSource": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "inline",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "$ref": "#/$defs/VectorQuantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "InlineStateSource",
+      "type": "object"
+    },
+    "LockedAssetReference": {
+      "additionalProperties": false,
+      "description": "An asset id plus the exact digest expected by this state policy.",
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-fA-F]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset",
+        "sha256"
+      ],
+      "title": "LockedAssetReference",
+      "type": "object"
+    },
+    "ObservedStatePath": {
+      "additionalProperties": false,
+      "properties": {
+        "capture": {
+          "default": "exact",
+          "enum": [
+            "exact",
+            "summary",
+            "digest"
+          ],
+          "title": "Capture",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*$",
+          "title": "Path",
+          "type": "string"
+        },
+        "purpose": {
+          "default": "verification",
+          "enum": [
+            "verification",
+            "diagnostic",
+            "provenance"
+          ],
+          "title": "Purpose",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "ObservedStatePath",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "VectorQuantity": {
+      "additionalProperties": false,
+      "description": "A three-component finite vector with one shared unit.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "VectorQuantity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Declares only state this layer owns and state it intentionally records.\n\nIn ``checkpoint_overlay`` mode, every undeclared path remains inherited\nfrom the hash-locked baseline.  In ``full_definition`` mode, undeclared\npaths retain fresh-case or Fluent defaults.  Neither mode uses an exhaustive\nallowlist.",
+  "properties": {
+    "baseline": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CheckpointBaseline"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "declared_paths": {
+      "items": {
+        "$ref": "#/$defs/DeclaredStatePath"
+      },
+      "title": "Declared Paths",
+      "type": "array"
+    },
+    "mode": {
+      "enum": [
+        "full_definition",
+        "checkpoint_overlay"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "observed_paths": {
+      "items": {
+        "$ref": "#/$defs/ObservedStatePath"
+      },
+      "title": "Observed Paths",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mode"
+  ],
+  "title": "StateOwnershipDocument",
+  "type": "object"
+}

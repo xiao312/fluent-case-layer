@@ -1,0 +1,41 @@
+site_name: Fluent Case Layer
+site_description: Human and agent documentation for typed PyFluent case orchestration
+repo_url: https://github.com/xiao312/fluent-case-layer
+repo_name: xiao312/fluent-case-layer
+strict: true
+
+theme:
+  name: readthedocs
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - User manual:
+      - Authoring cases: manual/authoring.md
+      - Agent guide: manual/agent-guide.md
+      - Documentation system: manual/documentation-system.md
+      - Runtime discovery: manual/runtime-discovery.md
+  - Dictionary reference:
+      - Overview: reference/index.md
+      - Coupling coverage: reference/coverage.md
+      - Physics: reference/physics.md
+      - Materials: reference/materials.md
+      - Chemistry: reference/chemistry.md
+      - Initial fields: reference/fields.md
+      - Boundary conditions: reference/boundary-conditions.md
+      - Numerics: reference/numerics.md
+      - Initialization: reference/initialization.md
+      - Monitors and gates: reference/monitors.md
+      - Engineering objectives: reference/objectives.md
+      - State ownership: reference/state.md
+      - Stage control: reference/control.md
+      - Platforms: reference/platform.md
+      - Asset lock: reference/assets-lock.md
+  - Design and operations:
+      - Architecture: architecture.md
+      - SCNET platform: scnet-platform.md
+      - Case catalog: case-catalog.md
+      - Migration notes: example-migration-notes.md
+      - Design interview: design-interview.md

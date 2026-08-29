@@ -1,0 +1,7146 @@
+{
+  "$defs": {
+    "AdiabaticWall": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "adiabatic",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "AdiabaticWall",
+      "type": "object"
+    },
+    "AdvanceTimeStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "max_iterations_per_step": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Iterations Per Step"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "time_step": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "time_steps": {
+          "minimum": 1,
+          "title": "Time Steps",
+          "type": "integer"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "advance_time",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "time_steps"
+      ],
+      "title": "AdvanceTimeStage",
+      "type": "object"
+    },
+    "ArtifactGate": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "default": "orchestration",
+          "enum": [
+            "orchestration",
+            "numerical",
+            "scientific"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "output": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Output",
+          "type": "string"
+        },
+        "severity": {
+          "default": "required",
+          "enum": [
+            "advisory",
+            "required"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "stage": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Stage",
+          "type": "string"
+        },
+        "type": {
+          "const": "artifact_exists",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "stage",
+        "output"
+      ],
+      "title": "ArtifactGate",
+      "type": "object"
+    },
+    "AssetAvailableCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "type": {
+          "const": "asset_available",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset"
+      ],
+      "title": "AssetAvailableCondition",
+      "type": "object"
+    },
+    "AssetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "asset"
+      ],
+      "title": "AssetInput",
+      "type": "object"
+    },
+    "AssetMechanism": {
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "enum": [
+            "chemkin",
+            "cantera_yaml",
+            "fluent_table"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "mechanism_asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Mechanism Asset",
+          "type": "string"
+        },
+        "thermodynamics_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Thermodynamics Asset"
+        },
+        "transport_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Transport Asset"
+        },
+        "type": {
+          "const": "asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "format",
+        "mechanism_asset"
+      ],
+      "title": "AssetMechanism",
+      "type": "object"
+    },
+    "AssetsLock": {
+      "additionalProperties": false,
+      "properties": {
+        "assets": {
+          "items": {
+            "$ref": "#/$defs/LockedAsset"
+          },
+          "title": "Assets",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "assets"
+      ],
+      "title": "AssetsLock",
+      "type": "object"
+    },
+    "AxisBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "axis",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "AxisBoundary",
+      "type": "object"
+    },
+    "BoundaryConditionsDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "boundaries": {
+          "items": {
+            "$ref": "#/$defs/BoundarySpec"
+          },
+          "minItems": 1,
+          "title": "Boundaries",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "boundaries"
+      ],
+      "title": "BoundaryConditionsDocument",
+      "type": "object"
+    },
+    "BoundarySpec": {
+      "additionalProperties": false,
+      "properties": {
+        "condition": {
+          "discriminator": {
+            "mapping": {
+              "axis": "#/$defs/AxisBoundary",
+              "mass_flow_inlet": "#/$defs/MassFlowInlet",
+              "pressure_outlet": "#/$defs/PressureOutlet",
+              "symmetry": "#/$defs/SymmetryBoundary",
+              "velocity_inlet": "#/$defs/VelocityInlet",
+              "wall": "#/$defs/WallBoundary"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/MassFlowInlet"
+            },
+            {
+              "$ref": "#/$defs/VelocityInlet"
+            },
+            {
+              "$ref": "#/$defs/PressureOutlet"
+            },
+            {
+              "$ref": "#/$defs/WallBoundary"
+            },
+            {
+              "$ref": "#/$defs/SymmetryBoundary"
+            },
+            {
+              "$ref": "#/$defs/AxisBoundary"
+            }
+          ],
+          "title": "Condition"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "id",
+        "zones",
+        "condition"
+      ],
+      "title": "BoundarySpec",
+      "type": "object"
+    },
+    "BoxRegion": {
+      "additionalProperties": false,
+      "properties": {
+        "maximum": {
+          "$ref": "#/$defs/VectorQuantity"
+        },
+        "minimum": {
+          "$ref": "#/$defs/VectorQuantity"
+        },
+        "type": {
+          "const": "box",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "minimum",
+        "maximum"
+      ],
+      "title": "BoxRegion",
+      "type": "object"
+    },
+    "BuiltinMechanism": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "builtin",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "title": "BuiltinMechanism",
+      "type": "object"
+    },
+    "Cardinality": {
+      "additionalProperties": false,
+      "description": "Expected number of zones resolved by a selector.",
+      "properties": {
+        "at_least": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Least"
+        },
+        "at_most": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Most"
+        },
+        "exactly": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exactly"
+        }
+      },
+      "title": "Cardinality",
+      "type": "object"
+    },
+    "CaseDocumentStateSource": {
+      "additionalProperties": false,
+      "properties": {
+        "document": {
+          "enum": [
+            "constant/physics.yaml",
+            "constant/materials.yaml",
+            "constant/chemistry.yaml",
+            "0/fields.yaml",
+            "0/boundary-conditions.yaml",
+            "system/numerics.yaml",
+            "system/initialization.yaml",
+            "system/monitors.yaml",
+            "system/control.yaml"
+          ],
+          "title": "Document",
+          "type": "string"
+        },
+        "pointer": {
+          "maxLength": 512,
+          "title": "Pointer",
+          "type": "string"
+        },
+        "type": {
+          "const": "case_document",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "document",
+        "pointer"
+      ],
+      "title": "CaseDocumentStateSource",
+      "type": "object"
+    },
+    "CaseMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "known_blockers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Known Blockers",
+          "type": "array"
+        },
+        "readiness": {
+          "default": "draft",
+          "enum": [
+            "illustrative",
+            "draft",
+            "smoke_validated",
+            "numerically_validated",
+            "scientifically_validated",
+            "blocked"
+          ],
+          "title": "Readiness",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "CaseMetadata",
+      "type": "object"
+    },
+    "CheckpointBaseline": {
+      "additionalProperties": false,
+      "properties": {
+        "case": {
+          "$ref": "#/$defs/LockedAssetReference"
+        },
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LockedAssetReference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fluent_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fluent Version"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        }
+      },
+      "required": [
+        "case"
+      ],
+      "title": "CheckpointBaseline",
+      "type": "object"
+    },
+    "CheckpointStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "label": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Label",
+          "type": "string"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "promotion": {
+          "discriminator": {
+            "mapping": {
+              "none": "#/$defs/NoPromotion",
+              "when_gates_pass": "#/$defs/GatePromotion"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoPromotion"
+            },
+            {
+              "$ref": "#/$defs/GatePromotion"
+            }
+          ],
+          "title": "Promotion"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "checkpoint",
+          "title": "Type",
+          "type": "string"
+        },
+        "write_case": {
+          "default": true,
+          "title": "Write Case",
+          "type": "boolean"
+        },
+        "write_data": {
+          "default": true,
+          "title": "Write Data",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "label"
+      ],
+      "title": "CheckpointStage",
+      "type": "object"
+    },
+    "ChemistryDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "discriminator": {
+            "mapping": {
+              "finite_rate": "#/$defs/FiniteRateChemistry",
+              "flamelet": "#/$defs/FlameletChemistry",
+              "none": "#/$defs/NoChemistry"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoChemistry"
+            },
+            {
+              "$ref": "#/$defs/FiniteRateChemistry"
+            },
+            {
+              "$ref": "#/$defs/FlameletChemistry"
+            }
+          ],
+          "title": "Model"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "streams": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "$ref": "#/$defs/StreamSpec"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Streams",
+          "type": "object"
+        },
+        "tracked_species": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Tracked Species",
+          "type": "array"
+        }
+      },
+      "required": [
+        "model"
+      ],
+      "title": "ChemistryDocument",
+      "type": "object"
+    },
+    "ChemistryMixtureMaterialSource": {
+      "additionalProperties": false,
+      "properties": {
+        "mixture": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Mixture",
+          "type": "string"
+        },
+        "type": {
+          "const": "chemistry_mixture",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "mixture"
+      ],
+      "title": "ChemistryMixtureMaterialSource",
+      "type": "object"
+    },
+    "ComparisonIntent": {
+      "additionalProperties": false,
+      "description": "A non-enforcing hint for how an engineer intends to inspect agreement.",
+      "properties": {
+        "alignment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignment"
+        },
+        "method": {
+          "enum": [
+            "absolute_difference",
+            "relative_difference",
+            "normalized_rmse",
+            "profile_shape",
+            "qualitative"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "title": "ComparisonIntent",
+      "type": "object"
+    },
+    "Composition": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "mass_fraction",
+            "mole_fraction"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "fractions": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "type": "number"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Fractions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "basis",
+        "fractions"
+      ],
+      "title": "Composition",
+      "type": "object"
+    },
+    "ConstantProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "constant",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "ConstantProperty",
+      "type": "object"
+    },
+    "ControlDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "default_platform": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Default Platform",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "stages": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "advance_time": "#/$defs/AdvanceTimeStage",
+                "checkpoint": "#/$defs/CheckpointStage",
+                "gate": "#/$defs/GateStage",
+                "initialize": "#/$defs/InitializeStage",
+                "iterate": "#/$defs/IterateStage",
+                "load_asset": "#/$defs/LoadAssetStage",
+                "reconcile": "#/$defs/ReconcileStage",
+                "sample": "#/$defs/SampleStage",
+                "tui": "#/$defs/TuiStage"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/LoadAssetStage"
+              },
+              {
+                "$ref": "#/$defs/ReconcileStage"
+              },
+              {
+                "$ref": "#/$defs/InitializeStage"
+              },
+              {
+                "$ref": "#/$defs/IterateStage"
+              },
+              {
+                "$ref": "#/$defs/AdvanceTimeStage"
+              },
+              {
+                "$ref": "#/$defs/SampleStage"
+              },
+              {
+                "$ref": "#/$defs/GateStage"
+              },
+              {
+                "$ref": "#/$defs/CheckpointStage"
+              },
+              {
+                "$ref": "#/$defs/TuiStage"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Stages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "default_platform",
+        "stages"
+      ],
+      "title": "ControlDocument",
+      "type": "object"
+    },
+    "ConvectionWall": {
+      "additionalProperties": false,
+      "properties": {
+        "external_temperature": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "heat_transfer_coefficient": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "type": {
+          "const": "convection",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "heat_transfer_coefficient",
+        "external_temperature"
+      ],
+      "title": "ConvectionWall",
+      "type": "object"
+    },
+    "CreateRegisterAction": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "region": {
+          "discriminator": {
+            "mapping": {
+              "box": "#/$defs/BoxRegion",
+              "cylinder": "#/$defs/CylinderRegion",
+              "zones": "#/$defs/ZoneRegion"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/CylinderRegion"
+            },
+            {
+              "$ref": "#/$defs/BoxRegion"
+            },
+            {
+              "$ref": "#/$defs/ZoneRegion"
+            }
+          ],
+          "title": "Region"
+        },
+        "type": {
+          "const": "create_register",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "name",
+        "region"
+      ],
+      "title": "CreateRegisterAction",
+      "type": "object"
+    },
+    "CylinderRegion": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "$ref": "#/$defs/VectorQuantity"
+        },
+        "radius": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "start": {
+          "$ref": "#/$defs/VectorQuantity"
+        },
+        "type": {
+          "const": "cylinder",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "start",
+        "end",
+        "radius"
+      ],
+      "title": "CylinderRegion",
+      "type": "object"
+    },
+    "DeclaredStatePath": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*$",
+          "title": "Path",
+          "type": "string"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "case_document": "#/$defs/CaseDocumentStateSource",
+              "inline": "#/$defs/InlineStateSource"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/CaseDocumentStateSource"
+            },
+            {
+              "$ref": "#/$defs/InlineStateSource"
+            }
+          ],
+          "title": "Source"
+        }
+      },
+      "required": [
+        "path",
+        "source"
+      ],
+      "title": "DeclaredStatePath",
+      "type": "object"
+    },
+    "DirectionalAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "minimize",
+            "maximize",
+            "increase",
+            "decrease",
+            "hold"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "priority": {
+          "default": "secondary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "type": {
+          "const": "directional",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitor",
+        "direction"
+      ],
+      "title": "DirectionalAspect",
+      "type": "object"
+    },
+    "DiscreteOrdinatesRadiation": {
+      "additionalProperties": false,
+      "properties": {
+        "phi_divisions": {
+          "default": 4,
+          "minimum": 1,
+          "title": "Phi Divisions",
+          "type": "integer"
+        },
+        "theta_divisions": {
+          "default": 4,
+          "minimum": 1,
+          "title": "Theta Divisions",
+          "type": "integer"
+        },
+        "type": {
+          "const": "discrete_ordinates",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "DiscreteOrdinatesRadiation",
+      "type": "object"
+    },
+    "DiscretePhaseModel": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "interaction_with_continuous_phase": {
+          "default": false,
+          "title": "Interaction With Continuous Phase",
+          "type": "boolean"
+        },
+        "max_tracking_steps": {
+          "default": 50000,
+          "minimum": 1,
+          "title": "Max Tracking Steps",
+          "type": "integer"
+        },
+        "unsteady_tracking": {
+          "default": false,
+          "title": "Unsteady Tracking",
+          "type": "boolean"
+        },
+        "update_every_flow_iterations": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Update Every Flow Iterations",
+          "type": "integer"
+        }
+      },
+      "title": "DiscretePhaseModel",
+      "type": "object"
+    },
+    "EngineerStatementProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "minLength": 1,
+          "title": "Author",
+          "type": "string"
+        },
+        "context": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Context"
+        },
+        "organization": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization"
+        },
+        "role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Role"
+        },
+        "type": {
+          "const": "engineer_statement",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "author"
+      ],
+      "title": "EngineerStatementProvenance",
+      "type": "object"
+    },
+    "EngineeringObjectiveDocument": {
+      "additionalProperties": false,
+      "description": "Human intent kept independent from optional case-local gates.",
+      "properties": {
+        "aspects": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "directional": "#/$defs/DirectionalAspect",
+                "investigate": "#/$defs/InvestigateAspect",
+                "match_reference": "#/$defs/MatchReferenceAspect",
+                "observe": "#/$defs/ObserveAspect"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ObserveAspect"
+              },
+              {
+                "$ref": "#/$defs/DirectionalAspect"
+              },
+              {
+                "$ref": "#/$defs/MatchReferenceAspect"
+              },
+              {
+                "$ref": "#/$defs/InvestigateAspect"
+              }
+            ]
+          },
+          "title": "Aspects",
+          "type": "array"
+        },
+        "enforcement": {
+          "const": "none",
+          "default": "none",
+          "title": "Enforcement",
+          "type": "string"
+        },
+        "provenance": {
+          "discriminator": {
+            "mapping": {
+              "engineer_statement": "#/$defs/EngineerStatementProvenance",
+              "source_asset": "#/$defs/SourceAssetProvenance"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/EngineerStatementProvenance"
+            },
+            {
+              "$ref": "#/$defs/SourceAssetProvenance"
+            }
+          ],
+          "title": "Provenance"
+        },
+        "revision": {
+          "$ref": "#/$defs/ObjectiveRevision"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revision",
+        "provenance",
+        "statement"
+      ],
+      "title": "EngineeringObjectiveDocument",
+      "type": "object"
+    },
+    "EnvironmentAssetSource": {
+      "additionalProperties": false,
+      "properties": {
+        "relative_path": {
+          "minLength": 1,
+          "title": "Relative Path",
+          "type": "string"
+        },
+        "root_variable": {
+          "maxLength": 128,
+          "minLength": 2,
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Root Variable",
+          "type": "string"
+        },
+        "type": {
+          "const": "environment",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "root_variable",
+        "relative_path"
+      ],
+      "title": "EnvironmentAssetSource",
+      "type": "object"
+    },
+    "EnvironmentSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "exports": {
+          "patternProperties": {
+            "^[A-Z][A-Z0-9_]*$": {
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 128,
+            "minLength": 2
+          },
+          "title": "Exports",
+          "type": "object"
+        },
+        "python_environment_variable": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 2,
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Python Environment Variable"
+        },
+        "setup_script_variable": {
+          "maxLength": 128,
+          "minLength": 2,
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Setup Script Variable",
+          "type": "string"
+        }
+      },
+      "required": [
+        "setup_script_variable"
+      ],
+      "title": "EnvironmentSpec",
+      "type": "object"
+    },
+    "EquationNumerics": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "spatial_scheme": {
+          "anyOf": [
+            {
+              "enum": [
+                "first_order_upwind",
+                "second_order_upwind",
+                "power_law",
+                "quick",
+                "bounded_central_differencing",
+                "central_differencing"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spatial Scheme"
+        },
+        "under_relaxation": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 1,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Under Relaxation"
+        }
+      },
+      "title": "EquationNumerics",
+      "type": "object"
+    },
+    "ExperimentalValueReference": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "source_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Note"
+        },
+        "type": {
+          "const": "experimental_value",
+          "title": "Type",
+          "type": "string"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "value": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "type",
+        "label",
+        "value"
+      ],
+      "title": "ExperimentalValueReference",
+      "type": "object"
+    },
+    "ExplicitMaterialSource": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "explicit",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "ExplicitMaterialSource",
+      "type": "object"
+    },
+    "ExpressionMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "expression": {
+          "title": "Expression",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "expression",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "expression",
+        "unit"
+      ],
+      "title": "ExpressionMonitor",
+      "type": "object"
+    },
+    "ExpressionValue": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "type": {
+          "const": "expression",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "expression",
+        "unit"
+      ],
+      "title": "ExpressionValue",
+      "type": "object"
+    },
+    "FieldSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "fluent_name": {
+          "title": "Fluent Name",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "initial": {
+          "discriminator": {
+            "mapping": {
+              "expression": "#/$defs/ExpressionValue",
+              "profile": "#/$defs/ProfileValue",
+              "uniform_scalar": "#/$defs/UniformScalarValue",
+              "uniform_vector": "#/$defs/UniformVectorValue"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/UniformScalarValue"
+            },
+            {
+              "$ref": "#/$defs/UniformVectorValue"
+            },
+            {
+              "$ref": "#/$defs/ProfileValue"
+            },
+            {
+              "$ref": "#/$defs/ExpressionValue"
+            }
+          ],
+          "title": "Initial"
+        },
+        "rank": {
+          "enum": [
+            "scalar",
+            "vector"
+          ],
+          "title": "Rank",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "fluent_name",
+        "rank",
+        "initial"
+      ],
+      "title": "FieldSpec",
+      "type": "object"
+    },
+    "FieldsDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/FieldSpec"
+          },
+          "minItems": 1,
+          "title": "Fields",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fields"
+      ],
+      "title": "FieldsDocument",
+      "type": "object"
+    },
+    "FiniteRateChemistry": {
+      "additionalProperties": false,
+      "properties": {
+        "mechanism": {
+          "discriminator": {
+            "mapping": {
+              "asset": "#/$defs/AssetMechanism",
+              "builtin": "#/$defs/BuiltinMechanism"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/BuiltinMechanism"
+            },
+            {
+              "$ref": "#/$defs/AssetMechanism"
+            }
+          ],
+          "title": "Mechanism"
+        },
+        "stiff_chemistry_solver": {
+          "default": true,
+          "title": "Stiff Chemistry Solver",
+          "type": "boolean"
+        },
+        "turbulence_interaction": {
+          "default": "none",
+          "enum": [
+            "none",
+            "eddy_dissipation",
+            "finite_rate_eddy_dissipation",
+            "edc"
+          ],
+          "title": "Turbulence Interaction",
+          "type": "string"
+        },
+        "type": {
+          "const": "finite_rate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "mechanism"
+      ],
+      "title": "FiniteRateChemistry",
+      "type": "object"
+    },
+    "FixedHeatFluxWall": {
+      "additionalProperties": false,
+      "properties": {
+        "heat_flux": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "$ref": "#/$defs/ProfileValue"
+            },
+            {
+              "$ref": "#/$defs/ExpressionValue"
+            }
+          ],
+          "title": "Heat Flux"
+        },
+        "type": {
+          "const": "heat_flux",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "heat_flux"
+      ],
+      "title": "FixedHeatFluxWall",
+      "type": "object"
+    },
+    "FixedTemperatureWall": {
+      "additionalProperties": false,
+      "properties": {
+        "temperature": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "$ref": "#/$defs/ProfileValue"
+            },
+            {
+              "$ref": "#/$defs/ExpressionValue"
+            }
+          ],
+          "title": "Temperature"
+        },
+        "type": {
+          "const": "temperature",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "temperature"
+      ],
+      "title": "FixedTemperatureWall",
+      "type": "object"
+    },
+    "FlameletChemistry": {
+      "additionalProperties": false,
+      "properties": {
+        "mechanism": {
+          "discriminator": {
+            "mapping": {
+              "asset": "#/$defs/AssetMechanism",
+              "builtin": "#/$defs/BuiltinMechanism"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/BuiltinMechanism"
+            },
+            {
+              "$ref": "#/$defs/AssetMechanism"
+            }
+          ],
+          "title": "Mechanism"
+        },
+        "nonadiabatic": {
+          "default": true,
+          "title": "Nonadiabatic",
+          "type": "boolean"
+        },
+        "partially_premixed": {
+          "default": false,
+          "title": "Partially Premixed",
+          "type": "boolean"
+        },
+        "progress_variable": {
+          "default": true,
+          "title": "Progress Variable",
+          "type": "boolean"
+        },
+        "table_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table Asset"
+        },
+        "table_mode": {
+          "default": "read",
+          "enum": [
+            "read",
+            "calculate"
+          ],
+          "title": "Table Mode",
+          "type": "string"
+        },
+        "type": {
+          "const": "flamelet",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "mechanism"
+      ],
+      "title": "FlameletChemistry",
+      "type": "object"
+    },
+    "FluentDatabaseMaterialSource": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "fluent_database",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "title": "FluentDatabaseMaterialSource",
+      "type": "object"
+    },
+    "FluentProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "fluent_database",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "title": "FluentProperty",
+      "type": "object"
+    },
+    "FluentRuntime": {
+      "additionalProperties": false,
+      "properties": {
+        "graphics": {
+          "default": "none",
+          "enum": [
+            "none",
+            "null",
+            "native"
+          ],
+          "title": "Graphics",
+          "type": "string"
+        },
+        "mode": {
+          "default": "solver",
+          "enum": [
+            "solver",
+            "meshing"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version"
+      ],
+      "title": "FluentRuntime",
+      "type": "object"
+    },
+    "GatePromotion": {
+      "additionalProperties": false,
+      "properties": {
+        "gates": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Gates",
+          "type": "array"
+        },
+        "role": {
+          "enum": [
+            "candidate",
+            "trusted",
+            "production_restart"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "type": {
+          "const": "when_gates_pass",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "gates",
+        "role"
+      ],
+      "title": "GatePromotion",
+      "type": "object"
+    },
+    "GateStage": {
+      "additionalProperties": false,
+      "properties": {
+        "gates": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Gates",
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "gate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "gates"
+      ],
+      "title": "GateStage",
+      "type": "object"
+    },
+    "HybridInitializationAction": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "hybrid",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "title": "HybridInitializationAction",
+      "type": "object"
+    },
+    "IdealGasProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "ideal_gas",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "IdealGasProperty",
+      "type": "object"
+    },
+    "InitializationDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "create_register": "#/$defs/CreateRegisterAction",
+                "hybrid": "#/$defs/HybridInitializationAction",
+                "patch": "#/$defs/PatchAction",
+                "read_checkpoint": "#/$defs/ReadCheckpointAction",
+                "standard": "#/$defs/StandardInitializationAction",
+                "tui": "#/$defs/TuiInitializationAction"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ReadCheckpointAction"
+              },
+              {
+                "$ref": "#/$defs/HybridInitializationAction"
+              },
+              {
+                "$ref": "#/$defs/StandardInitializationAction"
+              },
+              {
+                "$ref": "#/$defs/CreateRegisterAction"
+              },
+              {
+                "$ref": "#/$defs/PatchAction"
+              },
+              {
+                "$ref": "#/$defs/TuiInitializationAction"
+              }
+            ]
+          },
+          "title": "Actions",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "actions"
+      ],
+      "title": "InitializationDocument",
+      "type": "object"
+    },
+    "InitializeStage": {
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Actions",
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "initialize",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "actions"
+      ],
+      "title": "InitializeStage",
+      "type": "object"
+    },
+    "InlineStateSource": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "inline",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "$ref": "#/$defs/VectorQuantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "InlineStateSource",
+      "type": "object"
+    },
+    "IntensityHydraulicDiameter": {
+      "additionalProperties": false,
+      "properties": {
+        "hydraulic_diameter": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "intensity": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Intensity",
+          "type": "number"
+        },
+        "type": {
+          "const": "intensity_hydraulic_diameter",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "intensity",
+        "hydraulic_diameter"
+      ],
+      "title": "IntensityHydraulicDiameter",
+      "type": "object"
+    },
+    "IntensityLengthScale": {
+      "additionalProperties": false,
+      "properties": {
+        "intensity": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Intensity",
+          "type": "number"
+        },
+        "length_scale": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "type": {
+          "const": "intensity_length_scale",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "intensity",
+        "length_scale"
+      ],
+      "title": "IntensityLengthScale",
+      "type": "object"
+    },
+    "InvestigateAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitors": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Monitors",
+          "type": "array"
+        },
+        "priority": {
+          "default": "exploratory",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "questions": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Questions",
+          "type": "array"
+        },
+        "type": {
+          "const": "investigate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "questions"
+      ],
+      "title": "InvestigateAspect",
+      "type": "object"
+    },
+    "IterateStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "iterations": {
+          "minimum": 1,
+          "title": "Iterations",
+          "type": "integer"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "report_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Report Every",
+          "type": "integer"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "iterate",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "iterations"
+      ],
+      "title": "IterateStage",
+      "type": "object"
+    },
+    "KEpsilonInput": {
+      "additionalProperties": false,
+      "properties": {
+        "dissipation_rate": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "turbulent_kinetic_energy": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "type": {
+          "const": "k_epsilon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "turbulent_kinetic_energy",
+        "dissipation_rate"
+      ],
+      "title": "KEpsilonInput",
+      "type": "object"
+    },
+    "KEpsilonTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "near_wall": {
+          "default": "standard_wall_functions",
+          "enum": [
+            "standard_wall_functions",
+            "enhanced_wall_treatment",
+            "scalable_wall_functions"
+          ],
+          "title": "Near Wall",
+          "type": "string"
+        },
+        "type": {
+          "const": "k_epsilon",
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "default": "realizable",
+          "enum": [
+            "standard",
+            "realizable",
+            "rng"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "KEpsilonTurbulence",
+      "type": "object"
+    },
+    "KOmegaTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "k_omega",
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "default": "sst",
+          "enum": [
+            "standard",
+            "sst"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "KOmegaTurbulence",
+      "type": "object"
+    },
+    "LaminarTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "laminar",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "LaminarTurbulence",
+      "type": "object"
+    },
+    "LesTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "subgrid": {
+          "default": "wale",
+          "enum": [
+            "smagorinsky_lilly",
+            "wale",
+            "dynamic_smagorinsky"
+          ],
+          "title": "Subgrid",
+          "type": "string"
+        },
+        "synthetic_turbulence": {
+          "default": false,
+          "title": "Synthetic Turbulence",
+          "type": "boolean"
+        },
+        "type": {
+          "const": "les",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "LesTurbulence",
+      "type": "object"
+    },
+    "LiteralInput": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "type": {
+          "const": "literal",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "value"
+      ],
+      "title": "LiteralInput",
+      "type": "object"
+    },
+    "LoadAssetStage": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "data_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Asset"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "load_as": {
+          "enum": [
+            "mesh",
+            "case",
+            "case_data",
+            "chemistry_table",
+            "profile"
+          ],
+          "title": "Load As",
+          "type": "string"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "load_asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "asset",
+        "load_as"
+      ],
+      "title": "LoadAssetStage",
+      "type": "object"
+    },
+    "LocalPlatform": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "items": {
+            "enum": [
+              "settings_api",
+              "tui",
+              "udf_compile",
+              "dpm",
+              "postprocess"
+            ],
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "environment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EnvironmentSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fluent": {
+          "$ref": "#/$defs/FluentRuntime"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "local",
+          "title": "Kind",
+          "type": "string"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        },
+        "resources": {
+          "$ref": "#/$defs/ResourceSpec"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "resources",
+        "fluent"
+      ],
+      "title": "LocalPlatform",
+      "type": "object"
+    },
+    "LockedAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "mesh",
+            "case",
+            "data",
+            "chemistry",
+            "profile",
+            "reference_data",
+            "geometry",
+            "table",
+            "udf_source",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "media_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Media Type"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-fA-F]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size Bytes"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "environment": "#/$defs/EnvironmentAssetSource",
+              "remote": "#/$defs/RemoteAssetSource",
+              "repository": "#/$defs/RepositoryAssetSource"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RemoteAssetSource"
+            },
+            {
+              "$ref": "#/$defs/EnvironmentAssetSource"
+            },
+            {
+              "$ref": "#/$defs/RepositoryAssetSource"
+            }
+          ],
+          "title": "Source"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "source",
+        "sha256"
+      ],
+      "title": "LockedAsset",
+      "type": "object"
+    },
+    "LockedAssetReference": {
+      "additionalProperties": false,
+      "description": "An asset id plus the exact digest expected by this state policy.",
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-fA-F]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset",
+        "sha256"
+      ],
+      "title": "LockedAssetReference",
+      "type": "object"
+    },
+    "MassBalanceMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "include_discrete_phase": {
+          "default": false,
+          "title": "Include Discrete Phase",
+          "type": "boolean"
+        },
+        "inlets": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Inlets"
+        },
+        "outlets": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Outlets"
+        },
+        "type": {
+          "const": "mass_balance",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "inlets",
+        "outlets"
+      ],
+      "title": "MassBalanceMonitor",
+      "type": "object"
+    },
+    "MassFlowInlet": {
+      "additionalProperties": false,
+      "properties": {
+        "mass_flow": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "species": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Composition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "temperature": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "turbulence": {
+          "discriminator": {
+            "mapping": {
+              "intensity_hydraulic_diameter": "#/$defs/IntensityHydraulicDiameter",
+              "intensity_length_scale": "#/$defs/IntensityLengthScale",
+              "k_epsilon": "#/$defs/KEpsilonInput",
+              "none": "#/$defs/NoTurbulenceInput"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoTurbulenceInput"
+            },
+            {
+              "$ref": "#/$defs/IntensityHydraulicDiameter"
+            },
+            {
+              "$ref": "#/$defs/IntensityLengthScale"
+            },
+            {
+              "$ref": "#/$defs/KEpsilonInput"
+            }
+          ],
+          "title": "Turbulence"
+        },
+        "type": {
+          "const": "mass_flow_inlet",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "mass_flow",
+        "temperature"
+      ],
+      "title": "MassFlowInlet",
+      "type": "object"
+    },
+    "MatchReferenceAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ComparisonIntent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "priority": {
+          "default": "primary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "reference": {
+          "discriminator": {
+            "mapping": {
+              "experimental_value": "#/$defs/ExperimentalValueReference",
+              "reference_asset": "#/$defs/ReferenceAsset"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ExperimentalValueReference"
+            },
+            {
+              "$ref": "#/$defs/ReferenceAsset"
+            }
+          ],
+          "title": "Reference"
+        },
+        "type": {
+          "const": "match_reference",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitor",
+        "reference"
+      ],
+      "title": "MatchReferenceAspect",
+      "type": "object"
+    },
+    "MaterialSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "fluid",
+            "solid",
+            "mixture"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "properties": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "discriminator": {
+                "mapping": {
+                  "constant": "#/$defs/ConstantProperty",
+                  "fluent_database": "#/$defs/FluentProperty",
+                  "ideal_gas": "#/$defs/IdealGasProperty",
+                  "polynomial": "#/$defs/PolynomialProperty",
+                  "sutherland": "#/$defs/SutherlandProperty"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/ConstantProperty"
+                },
+                {
+                  "$ref": "#/$defs/IdealGasProperty"
+                },
+                {
+                  "$ref": "#/$defs/PolynomialProperty"
+                },
+                {
+                  "$ref": "#/$defs/SutherlandProperty"
+                },
+                {
+                  "$ref": "#/$defs/FluentProperty"
+                }
+              ]
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Properties",
+          "type": "object"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "chemistry_mixture": "#/$defs/ChemistryMixtureMaterialSource",
+              "explicit": "#/$defs/ExplicitMaterialSource",
+              "fluent_database": "#/$defs/FluentDatabaseMaterialSource"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/FluentDatabaseMaterialSource"
+            },
+            {
+              "$ref": "#/$defs/ExplicitMaterialSource"
+            },
+            {
+              "$ref": "#/$defs/ChemistryMixtureMaterialSource"
+            }
+          ],
+          "title": "Source"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "source"
+      ],
+      "title": "MaterialSpec",
+      "type": "object"
+    },
+    "MaterialsDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "materials": {
+          "items": {
+            "$ref": "#/$defs/MaterialSpec"
+          },
+          "minItems": 1,
+          "title": "Materials",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "zone_assignments": {
+          "items": {
+            "$ref": "#/$defs/ZoneMaterialAssignment"
+          },
+          "title": "Zone Assignments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "materials"
+      ],
+      "title": "MaterialsDocument",
+      "type": "object"
+    },
+    "MetricCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "operator": {
+          "enum": [
+            "lt",
+            "le",
+            "gt",
+            "ge",
+            "eq"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "type": {
+          "const": "metric",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "monitor",
+        "operator",
+        "limit"
+      ],
+      "title": "MetricCondition",
+      "type": "object"
+    },
+    "MonitorsDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "gates": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "artifact_exists": "#/$defs/ArtifactGate",
+                "range": "#/$defs/RangeGate",
+                "steady_window": "#/$defs/SteadyWindowGate",
+                "threshold": "#/$defs/ThresholdGate"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ThresholdGate"
+              },
+              {
+                "$ref": "#/$defs/RangeGate"
+              },
+              {
+                "$ref": "#/$defs/SteadyWindowGate"
+              },
+              {
+                "$ref": "#/$defs/ArtifactGate"
+              }
+            ]
+          },
+          "title": "Gates",
+          "type": "array"
+        },
+        "monitors": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "expression": "#/$defs/ExpressionMonitor",
+                "mass_balance": "#/$defs/MassBalanceMonitor",
+                "residual": "#/$defs/ResidualMonitor",
+                "surface_report": "#/$defs/SurfaceReportMonitor",
+                "volume_report": "#/$defs/VolumeReportMonitor"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ResidualMonitor"
+              },
+              {
+                "$ref": "#/$defs/SurfaceReportMonitor"
+              },
+              {
+                "$ref": "#/$defs/VolumeReportMonitor"
+              },
+              {
+                "$ref": "#/$defs/MassBalanceMonitor"
+              },
+              {
+                "$ref": "#/$defs/ExpressionMonitor"
+              }
+            ]
+          },
+          "title": "Monitors",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "monitors"
+      ],
+      "title": "MonitorsDocument",
+      "type": "object"
+    },
+    "NoChemistry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "NoChemistry",
+      "type": "object"
+    },
+    "NoPromotion": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "NoPromotion",
+      "type": "object"
+    },
+    "NoTurbulenceInput": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "NoTurbulenceInput",
+      "type": "object"
+    },
+    "NonPremixedPdf": {
+      "additionalProperties": false,
+      "properties": {
+        "nonadiabatic": {
+          "default": true,
+          "title": "Nonadiabatic",
+          "type": "boolean"
+        },
+        "progress_variable": {
+          "default": false,
+          "title": "Progress Variable",
+          "type": "boolean"
+        },
+        "type": {
+          "const": "nonpremixed_pdf",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "NonPremixedPdf",
+      "type": "object"
+    },
+    "NumericsDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "default_profile": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Default Profile",
+          "type": "string"
+        },
+        "profiles": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "$ref": "#/$defs/NumericsProfile"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Profiles",
+          "type": "object"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "default_profile",
+        "profiles"
+      ],
+      "title": "NumericsDocument",
+      "type": "object"
+    },
+    "NumericsProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "equations": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "$ref": "#/$defs/EquationNumerics"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Equations",
+          "type": "object"
+        },
+        "expert_controls": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Expert Controls",
+          "type": "object"
+        },
+        "extends": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Extends"
+        },
+        "gradient": {
+          "anyOf": [
+            {
+              "enum": [
+                "green_gauss_cell_based",
+                "green_gauss_node_based",
+                "least_squares_cell_based"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gradient"
+        },
+        "pressure": {
+          "anyOf": [
+            {
+              "enum": [
+                "standard",
+                "presto",
+                "linear",
+                "second_order",
+                "body_force_weighted"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pressure"
+        },
+        "pressure_velocity_coupling": {
+          "anyOf": [
+            {
+              "enum": [
+                "simple",
+                "simplec",
+                "piso",
+                "coupled"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pressure Velocity Coupling"
+        },
+        "transient": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransientNumerics"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "NumericsProfile",
+      "type": "object"
+    },
+    "ObjectiveRevision": {
+      "additionalProperties": false,
+      "description": "Identity and authorship of one objective-document revision.",
+      "properties": {
+        "change_summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Change Summary"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "recorded_by": {
+          "minLength": 1,
+          "title": "Recorded By",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        }
+      },
+      "required": [
+        "id",
+        "sequence",
+        "recorded_at",
+        "recorded_by"
+      ],
+      "title": "ObjectiveRevision",
+      "type": "object"
+    },
+    "ObserveAspect": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitors": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Monitors",
+          "type": "array"
+        },
+        "priority": {
+          "default": "secondary",
+          "enum": [
+            "primary",
+            "secondary",
+            "exploratory"
+          ],
+          "title": "Priority",
+          "type": "string"
+        },
+        "type": {
+          "const": "observe",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description",
+        "monitors"
+      ],
+      "title": "ObserveAspect",
+      "type": "object"
+    },
+    "ObservedStatePath": {
+      "additionalProperties": false,
+      "properties": {
+        "capture": {
+          "default": "exact",
+          "enum": [
+            "exact",
+            "summary",
+            "digest"
+          ],
+          "title": "Capture",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 512,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*$",
+          "title": "Path",
+          "type": "string"
+        },
+        "purpose": {
+          "default": "verification",
+          "enum": [
+            "verification",
+            "diagnostic",
+            "provenance"
+          ],
+          "title": "Purpose",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "ObservedStatePath",
+      "type": "object"
+    },
+    "P1Radiation": {
+      "additionalProperties": false,
+      "properties": {
+        "absorption": {
+          "default": "wsggm",
+          "enum": [
+            "wsggm",
+            "constant"
+          ],
+          "title": "Absorption",
+          "type": "string"
+        },
+        "type": {
+          "const": "p1",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "P1Radiation",
+      "type": "object"
+    },
+    "PartiallyPremixedPdf": {
+      "additionalProperties": false,
+      "properties": {
+        "nonadiabatic": {
+          "default": true,
+          "title": "Nonadiabatic",
+          "type": "boolean"
+        },
+        "progress_variable": {
+          "default": true,
+          "title": "Progress Variable",
+          "type": "boolean"
+        },
+        "type": {
+          "const": "partially_premixed_pdf",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "PartiallyPremixedPdf",
+      "type": "object"
+    },
+    "PatchAction": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "target": {
+          "discriminator": {
+            "mapping": {
+              "register": "#/$defs/RegisterPatchTarget",
+              "zones": "#/$defs/ZonePatchTarget"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RegisterPatchTarget"
+            },
+            {
+              "$ref": "#/$defs/ZonePatchTarget"
+            }
+          ],
+          "title": "Target"
+        },
+        "type": {
+          "const": "patch",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "discriminator": {
+            "mapping": {
+              "expression": "#/$defs/ExpressionValue",
+              "profile": "#/$defs/ProfileValue",
+              "uniform_scalar": "#/$defs/UniformScalarValue",
+              "uniform_vector": "#/$defs/UniformVectorValue"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/UniformScalarValue"
+            },
+            {
+              "$ref": "#/$defs/UniformVectorValue"
+            },
+            {
+              "$ref": "#/$defs/ProfileValue"
+            },
+            {
+              "$ref": "#/$defs/ExpressionValue"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "target",
+        "field",
+        "value"
+      ],
+      "title": "PatchAction",
+      "type": "object"
+    },
+    "PhysicsDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "case": {
+          "$ref": "#/$defs/CaseMetadata"
+        },
+        "discrete_phase": {
+          "$ref": "#/$defs/DiscretePhaseModel"
+        },
+        "radiation": {
+          "discriminator": {
+            "mapping": {
+              "discrete_ordinates": "#/$defs/DiscreteOrdinatesRadiation",
+              "none": "#/$defs/RadiationDisabled",
+              "p1": "#/$defs/P1Radiation"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RadiationDisabled"
+            },
+            {
+              "$ref": "#/$defs/P1Radiation"
+            },
+            {
+              "$ref": "#/$defs/DiscreteOrdinatesRadiation"
+            }
+          ],
+          "title": "Radiation"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "solver": {
+          "$ref": "#/$defs/SolverSpec"
+        },
+        "species": {
+          "discriminator": {
+            "mapping": {
+              "none": "#/$defs/SpeciesDisabled",
+              "nonpremixed_pdf": "#/$defs/NonPremixedPdf",
+              "partially_premixed_pdf": "#/$defs/PartiallyPremixedPdf",
+              "species_transport": "#/$defs/SpeciesTransport"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SpeciesDisabled"
+            },
+            {
+              "$ref": "#/$defs/SpeciesTransport"
+            },
+            {
+              "$ref": "#/$defs/NonPremixedPdf"
+            },
+            {
+              "$ref": "#/$defs/PartiallyPremixedPdf"
+            }
+          ],
+          "title": "Species"
+        },
+        "turbulence": {
+          "discriminator": {
+            "mapping": {
+              "k_epsilon": "#/$defs/KEpsilonTurbulence",
+              "k_omega": "#/$defs/KOmegaTurbulence",
+              "laminar": "#/$defs/LaminarTurbulence",
+              "les": "#/$defs/LesTurbulence",
+              "reynolds_stress": "#/$defs/ReynoldsStressTurbulence"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/LaminarTurbulence"
+            },
+            {
+              "$ref": "#/$defs/KEpsilonTurbulence"
+            },
+            {
+              "$ref": "#/$defs/KOmegaTurbulence"
+            },
+            {
+              "$ref": "#/$defs/ReynoldsStressTurbulence"
+            },
+            {
+              "$ref": "#/$defs/LesTurbulence"
+            }
+          ],
+          "title": "Turbulence"
+        }
+      },
+      "required": [
+        "case",
+        "solver",
+        "turbulence"
+      ],
+      "title": "PhysicsDocument",
+      "type": "object"
+    },
+    "PolynomialProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "coefficients": {
+          "items": {
+            "type": "number"
+          },
+          "minItems": 1,
+          "title": "Coefficients",
+          "type": "array"
+        },
+        "independent_unit": {
+          "title": "Independent Unit",
+          "type": "string"
+        },
+        "output_unit": {
+          "title": "Output Unit",
+          "type": "string"
+        },
+        "type": {
+          "const": "polynomial",
+          "title": "Type",
+          "type": "string"
+        },
+        "valid_range": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "$ref": "#/$defs/Quantity"
+                },
+                {
+                  "$ref": "#/$defs/Quantity"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid Range"
+        }
+      },
+      "required": [
+        "type",
+        "coefficients",
+        "independent_unit",
+        "output_unit"
+      ],
+      "title": "PolynomialProperty",
+      "type": "object"
+    },
+    "PressureOutlet": {
+      "additionalProperties": false,
+      "properties": {
+        "backflow_species": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Composition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "backflow_temperature": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "gauge_pressure": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "turbulence": {
+          "discriminator": {
+            "mapping": {
+              "intensity_hydraulic_diameter": "#/$defs/IntensityHydraulicDiameter",
+              "intensity_length_scale": "#/$defs/IntensityLengthScale",
+              "k_epsilon": "#/$defs/KEpsilonInput",
+              "none": "#/$defs/NoTurbulenceInput"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoTurbulenceInput"
+            },
+            {
+              "$ref": "#/$defs/IntensityHydraulicDiameter"
+            },
+            {
+              "$ref": "#/$defs/IntensityLengthScale"
+            },
+            {
+              "$ref": "#/$defs/KEpsilonInput"
+            }
+          ],
+          "title": "Turbulence"
+        },
+        "type": {
+          "const": "pressure_outlet",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "gauge_pressure"
+      ],
+      "title": "PressureOutlet",
+      "type": "object"
+    },
+    "ProfileValue": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "field": {
+          "minLength": 1,
+          "title": "Field",
+          "type": "string"
+        },
+        "scale": {
+          "default": 1.0,
+          "title": "Scale",
+          "type": "number"
+        },
+        "type": {
+          "const": "profile",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset",
+        "field"
+      ],
+      "title": "ProfileValue",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "RadiationDisabled": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "RadiationDisabled",
+      "type": "object"
+    },
+    "RangeGate": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "orchestration",
+            "numerical",
+            "scientific"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "severity": {
+          "default": "required",
+          "enum": [
+            "advisory",
+            "required"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "type": {
+          "const": "range",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "category",
+        "monitor"
+      ],
+      "title": "RangeGate",
+      "type": "object"
+    },
+    "ReadCheckpointAction": {
+      "additionalProperties": false,
+      "properties": {
+        "case_asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Case Asset",
+          "type": "string"
+        },
+        "data_asset": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Asset"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "read_checkpoint",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "case_asset"
+      ],
+      "title": "ReadCheckpointAction",
+      "type": "object"
+    },
+    "ReconcileStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "numerics_profile": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Numerics Profile"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "sections": {
+          "items": {
+            "enum": [
+              "physics",
+              "materials",
+              "chemistry",
+              "fields",
+              "boundary_conditions",
+              "numerics"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Sections",
+          "type": "array"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "reconcile",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "sections"
+      ],
+      "title": "ReconcileStage",
+      "type": "object"
+    },
+    "ReferenceAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        },
+        "observable": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observable"
+        },
+        "role": {
+          "enum": [
+            "experiment",
+            "simulation",
+            "analytical"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "type": {
+          "const": "reference_asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset",
+        "role"
+      ],
+      "title": "ReferenceAsset",
+      "type": "object"
+    },
+    "RegisterPatchTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "register": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Register",
+          "type": "string"
+        },
+        "type": {
+          "const": "register",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "register"
+      ],
+      "title": "RegisterPatchTarget",
+      "type": "object"
+    },
+    "RemoteAssetSource": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "remote",
+          "title": "Type",
+          "type": "string"
+        },
+        "uri": {
+          "minLength": 1,
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "uri"
+      ],
+      "title": "RemoteAssetSource",
+      "type": "object"
+    },
+    "RepositoryAssetSource": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "type": {
+          "const": "repository",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "path"
+      ],
+      "title": "RepositoryAssetSource",
+      "type": "object"
+    },
+    "ResidualMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "thresholds": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "type": "number"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Thresholds",
+          "type": "object"
+        },
+        "type": {
+          "const": "residual",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "thresholds"
+      ],
+      "title": "ResidualMonitor",
+      "type": "object"
+    },
+    "ResourceSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "accelerators_per_node": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Accelerators Per Node",
+          "type": "integer"
+        },
+        "exclusive": {
+          "default": false,
+          "title": "Exclusive",
+          "type": "boolean"
+        },
+        "memory_per_node": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "nodes": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Nodes",
+          "type": "integer"
+        },
+        "ranks": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Ranks",
+          "type": "integer"
+        },
+        "tasks_per_node": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tasks Per Node"
+        },
+        "threads_per_rank": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Threads Per Rank",
+          "type": "integer"
+        },
+        "walltime": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "memory_per_node",
+        "walltime"
+      ],
+      "title": "ResourceSpec",
+      "type": "object"
+    },
+    "RetryPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "backoff": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "max_attempts": {
+          "default": 1,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Max Attempts",
+          "type": "integer"
+        },
+        "retry_on": {
+          "items": {
+            "enum": [
+              "launcher_error",
+              "api_error",
+              "precondition",
+              "numerical_health"
+            ],
+            "type": "string"
+          },
+          "title": "Retry On",
+          "type": "array"
+        }
+      },
+      "title": "RetryPolicy",
+      "type": "object"
+    },
+    "ReynoldsStressTurbulence": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "reynolds_stress",
+          "title": "Type",
+          "type": "string"
+        },
+        "variant": {
+          "default": "ssg",
+          "enum": [
+            "linear_pressure_strain",
+            "ssg"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "ReynoldsStressTurbulence",
+      "type": "object"
+    },
+    "SampleStage": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "monitors": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Monitors",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "sample",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "monitors"
+      ],
+      "title": "SampleStage",
+      "type": "object"
+    },
+    "SlurmPlatform": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "items": {
+            "enum": [
+              "settings_api",
+              "tui",
+              "udf_compile",
+              "dpm",
+              "postprocess",
+              "accelerator"
+            ],
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "environment": {
+          "$ref": "#/$defs/EnvironmentSpec"
+        },
+        "fluent": {
+          "$ref": "#/$defs/FluentRuntime"
+        },
+        "hardware": {
+          "default": "cpu",
+          "enum": [
+            "cpu",
+            "gpu",
+            "dcu"
+          ],
+          "title": "Hardware",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "slurm",
+          "title": "Kind",
+          "type": "string"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        },
+        "resources": {
+          "$ref": "#/$defs/ResourceSpec"
+        },
+        "scheduler": {
+          "$ref": "#/$defs/SlurmScheduler"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "scheduler",
+        "resources",
+        "environment",
+        "fluent"
+      ],
+      "title": "SlurmPlatform",
+      "type": "object"
+    },
+    "SlurmScheduler": {
+      "additionalProperties": false,
+      "properties": {
+        "account_variable": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 2,
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Account Variable"
+        },
+        "constraint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Constraint"
+        },
+        "partition": {
+          "title": "Partition",
+          "type": "string"
+        },
+        "qos": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Qos"
+        }
+      },
+      "required": [
+        "partition"
+      ],
+      "title": "SlurmScheduler",
+      "type": "object"
+    },
+    "SolverSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "enum": [
+            "2d_planar",
+            "2d_axisymmetric",
+            "3d"
+          ],
+          "title": "Dimension",
+          "type": "string"
+        },
+        "energy": {
+          "default": true,
+          "title": "Energy",
+          "type": "boolean"
+        },
+        "formulation": {
+          "default": "pressure_based",
+          "enum": [
+            "pressure_based",
+            "density_based"
+          ],
+          "title": "Formulation",
+          "type": "string"
+        },
+        "operating_pressure": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "precision": {
+          "default": "double",
+          "enum": [
+            "single",
+            "double"
+          ],
+          "title": "Precision",
+          "type": "string"
+        },
+        "time": {
+          "default": "steady",
+          "enum": [
+            "steady",
+            "transient"
+          ],
+          "title": "Time",
+          "type": "string"
+        },
+        "velocity_formulation": {
+          "default": "absolute",
+          "enum": [
+            "absolute",
+            "relative"
+          ],
+          "title": "Velocity Formulation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dimension",
+        "operating_pressure"
+      ],
+      "title": "SolverSpec",
+      "type": "object"
+    },
+    "SourceAssetProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "interpretation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interpretation"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator"
+        },
+        "recorded_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recorded By"
+        },
+        "type": {
+          "const": "source_asset",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset"
+      ],
+      "title": "SourceAssetProvenance",
+      "type": "object"
+    },
+    "SpeciesDisabled": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "SpeciesDisabled",
+      "type": "object"
+    },
+    "SpeciesTransport": {
+      "additionalProperties": false,
+      "properties": {
+        "diffusion_energy_source": {
+          "default": true,
+          "title": "Diffusion Energy Source",
+          "type": "boolean"
+        },
+        "turbulence_chemistry": {
+          "default": "none",
+          "enum": [
+            "none",
+            "eddy_dissipation",
+            "finite_rate_eddy_dissipation",
+            "edc"
+          ],
+          "title": "Turbulence Chemistry",
+          "type": "string"
+        },
+        "type": {
+          "const": "species_transport",
+          "title": "Type",
+          "type": "string"
+        },
+        "volumetric_reactions": {
+          "default": true,
+          "title": "Volumetric Reactions",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "SpeciesTransport",
+      "type": "object"
+    },
+    "StageOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "case",
+            "data",
+            "checkpoint",
+            "report",
+            "metrics",
+            "log",
+            "field_data",
+            "image",
+            "manifest"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "path_template": {
+          "minLength": 1,
+          "title": "Path Template",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "sha256": {
+          "default": true,
+          "title": "Sha256",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "path_template"
+      ],
+      "title": "StageOutput",
+      "type": "object"
+    },
+    "StageOutputInput": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "output": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Output",
+          "type": "string"
+        },
+        "stage": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Stage",
+          "type": "string"
+        },
+        "type": {
+          "const": "stage_output",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "stage",
+        "output"
+      ],
+      "title": "StageOutputInput",
+      "type": "object"
+    },
+    "StandardInitializationAction": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "reference_zone": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "ids": "#/$defs/ZoneIdsSelector",
+                  "names": "#/$defs/ZoneNamesSelector",
+                  "pattern": "#/$defs/ZonePatternSelector",
+                  "zone_type": "#/$defs/ZoneTypeSelector"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/ZoneNamesSelector"
+                },
+                {
+                  "$ref": "#/$defs/ZonePatternSelector"
+                },
+                {
+                  "$ref": "#/$defs/ZoneTypeSelector"
+                },
+                {
+                  "$ref": "#/$defs/ZoneIdsSelector"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Zone"
+        },
+        "type": {
+          "const": "standard",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "title": "StandardInitializationAction",
+      "type": "object"
+    },
+    "StateCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "expected": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected"
+        },
+        "operator": {
+          "default": "exists",
+          "enum": [
+            "exists",
+            "equals",
+            "not_equals"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "type": {
+          "const": "state",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "path"
+      ],
+      "title": "StateCondition",
+      "type": "object"
+    },
+    "StateOwnershipDocument": {
+      "additionalProperties": false,
+      "description": "Declares only state this layer owns and state it intentionally records.\n\nIn ``checkpoint_overlay`` mode, every undeclared path remains inherited\nfrom the hash-locked baseline.  In ``full_definition`` mode, undeclared\npaths retain fresh-case or Fluent defaults.  Neither mode uses an exhaustive\nallowlist.",
+      "properties": {
+        "baseline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CheckpointBaseline"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "declared_paths": {
+          "items": {
+            "$ref": "#/$defs/DeclaredStatePath"
+          },
+          "title": "Declared Paths",
+          "type": "array"
+        },
+        "mode": {
+          "enum": [
+            "full_definition",
+            "checkpoint_overlay"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "observed_paths": {
+          "items": {
+            "$ref": "#/$defs/ObservedStatePath"
+          },
+          "title": "Observed Paths",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "title": "StateOwnershipDocument",
+      "type": "object"
+    },
+    "SteadyWindowGate": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "default": "numerical",
+          "enum": [
+            "orchestration",
+            "numerical",
+            "scientific"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "relative_span": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Relative Span",
+          "type": "number"
+        },
+        "samples": {
+          "minimum": 3,
+          "title": "Samples",
+          "type": "integer"
+        },
+        "severity": {
+          "default": "required",
+          "enum": [
+            "advisory",
+            "required"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "type": {
+          "const": "steady_window",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "monitor",
+        "samples",
+        "relative_span"
+      ],
+      "title": "SteadyWindowGate",
+      "type": "object"
+    },
+    "StreamSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "composition": {
+          "$ref": "#/$defs/Composition"
+        },
+        "temperature": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "temperature",
+        "composition"
+      ],
+      "title": "StreamSpec",
+      "type": "object"
+    },
+    "SurfaceReportMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "area_weighted_average",
+            "mass_weighted_average",
+            "integral",
+            "mass_flow_rate",
+            "minimum",
+            "maximum"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "type": {
+          "const": "surface_report",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "operation",
+        "field",
+        "zones",
+        "unit"
+      ],
+      "title": "SurfaceReportMonitor",
+      "type": "object"
+    },
+    "SutherlandProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "reference_temperature": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "reference_value": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "sutherland_temperature": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "type": {
+          "const": "sutherland",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "reference_value",
+        "reference_temperature",
+        "sutherland_temperature"
+      ],
+      "title": "SutherlandProperty",
+      "type": "object"
+    },
+    "SymmetryBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "symmetry",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "SymmetryBoundary",
+      "type": "object"
+    },
+    "ThresholdGate": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "orchestration",
+            "numerical",
+            "scientific"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "limit": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "monitor": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Monitor",
+          "type": "string"
+        },
+        "operator": {
+          "enum": [
+            "lt",
+            "le",
+            "gt",
+            "ge",
+            "eq"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "severity": {
+          "default": "required",
+          "enum": [
+            "advisory",
+            "required"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "type": {
+          "const": "threshold",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "category",
+        "monitor",
+        "operator",
+        "limit"
+      ],
+      "title": "ThresholdGate",
+      "type": "object"
+    },
+    "TransientNumerics": {
+      "additionalProperties": false,
+      "properties": {
+        "formulation": {
+          "enum": [
+            "first_order_implicit",
+            "second_order_implicit",
+            "bounded_second_order_implicit"
+          ],
+          "title": "Formulation",
+          "type": "string"
+        },
+        "max_courant": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Courant"
+        },
+        "max_iterations_per_step": {
+          "default": 20,
+          "minimum": 1,
+          "title": "Max Iterations Per Step",
+          "type": "integer"
+        },
+        "time_step": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "formulation"
+      ],
+      "title": "TransientNumerics",
+      "type": "object"
+    },
+    "TuiEscape": {
+      "additionalProperties": false,
+      "description": "An explicit, reviewable escape from the PyFluent settings API.",
+      "properties": {
+        "command": {
+          "minLength": 1,
+          "title": "Command",
+          "type": "string"
+        },
+        "expected_postcondition": {
+          "minLength": 8,
+          "title": "Expected Postcondition",
+          "type": "string"
+        },
+        "fluent_version": {
+          "minLength": 1,
+          "title": "Fluent Version",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 12,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "fluent_version",
+        "command",
+        "expected_postcondition"
+      ],
+      "title": "TuiEscape",
+      "type": "object"
+    },
+    "TuiInitializationAction": {
+      "additionalProperties": false,
+      "properties": {
+        "escape": {
+          "$ref": "#/$defs/TuiEscape"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "tui",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "escape"
+      ],
+      "title": "TuiInitializationAction",
+      "type": "object"
+    },
+    "TuiStage": {
+      "additionalProperties": false,
+      "properties": {
+        "escape": {
+          "$ref": "#/$defs/TuiEscape"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "inputs": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset": "#/$defs/AssetInput",
+                "literal": "#/$defs/LiteralInput",
+                "stage_output": "#/$defs/StageOutputInput"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetInput"
+              },
+              {
+                "$ref": "#/$defs/StageOutputInput"
+              },
+              {
+                "$ref": "#/$defs/LiteralInput"
+              }
+            ]
+          },
+          "title": "Inputs",
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/StageOutput"
+          },
+          "title": "Outputs",
+          "type": "array"
+        },
+        "platform": {
+          "anyOf": [
+            {
+              "maxLength": 96,
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Platform"
+        },
+        "postconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Postconditions",
+          "type": "array"
+        },
+        "preconditions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asset_available": "#/$defs/AssetAvailableCondition",
+                "metric": "#/$defs/MetricCondition",
+                "state": "#/$defs/StateCondition"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AssetAvailableCondition"
+              },
+              {
+                "$ref": "#/$defs/StateCondition"
+              },
+              {
+                "$ref": "#/$defs/MetricCondition"
+              }
+            ]
+          },
+          "title": "Preconditions",
+          "type": "array"
+        },
+        "requires": {
+          "items": {
+            "maxLength": 96,
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
+        "timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "tui",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "escape"
+      ],
+      "title": "TuiStage",
+      "type": "object"
+    },
+    "UniformScalarValue": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "uniform_scalar",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "UniformScalarValue",
+      "type": "object"
+    },
+    "UniformVectorValue": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "uniform_vector",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/VectorQuantity"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "UniformVectorValue",
+      "type": "object"
+    },
+    "VectorQuantity": {
+      "additionalProperties": false,
+      "description": "A three-component finite vector with one shared unit.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "VectorQuantity",
+      "type": "object"
+    },
+    "VelocityInlet": {
+      "additionalProperties": false,
+      "properties": {
+        "species": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Composition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "temperature": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "turbulence": {
+          "discriminator": {
+            "mapping": {
+              "intensity_hydraulic_diameter": "#/$defs/IntensityHydraulicDiameter",
+              "intensity_length_scale": "#/$defs/IntensityLengthScale",
+              "k_epsilon": "#/$defs/KEpsilonInput",
+              "none": "#/$defs/NoTurbulenceInput"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoTurbulenceInput"
+            },
+            {
+              "$ref": "#/$defs/IntensityHydraulicDiameter"
+            },
+            {
+              "$ref": "#/$defs/IntensityLengthScale"
+            },
+            {
+              "$ref": "#/$defs/KEpsilonInput"
+            }
+          ],
+          "title": "Turbulence"
+        },
+        "type": {
+          "const": "velocity_inlet",
+          "title": "Type",
+          "type": "string"
+        },
+        "velocity": {
+          "$ref": "#/$defs/VectorQuantity"
+        }
+      },
+      "required": [
+        "type",
+        "velocity"
+      ],
+      "title": "VelocityInlet",
+      "type": "object"
+    },
+    "VolumeReportMonitor": {
+      "additionalProperties": false,
+      "properties": {
+        "check_every": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Check Every",
+          "type": "integer"
+        },
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "volume_weighted_average",
+            "mass_weighted_average",
+            "integral",
+            "minimum",
+            "maximum"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "type": {
+          "const": "volume_report",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "operation",
+        "field",
+        "zones",
+        "unit"
+      ],
+      "title": "VolumeReportMonitor",
+      "type": "object"
+    },
+    "WallBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "shear": {
+          "default": "no_slip",
+          "enum": [
+            "no_slip",
+            "slip"
+          ],
+          "title": "Shear",
+          "type": "string"
+        },
+        "thermal": {
+          "discriminator": {
+            "mapping": {
+              "adiabatic": "#/$defs/AdiabaticWall",
+              "convection": "#/$defs/ConvectionWall",
+              "heat_flux": "#/$defs/FixedHeatFluxWall",
+              "temperature": "#/$defs/FixedTemperatureWall"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/AdiabaticWall"
+            },
+            {
+              "$ref": "#/$defs/FixedTemperatureWall"
+            },
+            {
+              "$ref": "#/$defs/FixedHeatFluxWall"
+            },
+            {
+              "$ref": "#/$defs/ConvectionWall"
+            }
+          ],
+          "title": "Thermal"
+        },
+        "type": {
+          "const": "wall",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "WallBoundary",
+      "type": "object"
+    },
+    "ZoneIdsSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "ids": {
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Ids",
+          "type": "array"
+        },
+        "type": {
+          "const": "ids",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "ids"
+      ],
+      "title": "ZoneIdsSelector",
+      "type": "object"
+    },
+    "ZoneMaterialAssignment": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "material": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Material",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "id",
+        "zones",
+        "material"
+      ],
+      "title": "ZoneMaterialAssignment",
+      "type": "object"
+    },
+    "ZoneNamesSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "names": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Names",
+          "type": "array"
+        },
+        "type": {
+          "const": "names",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "names"
+      ],
+      "title": "ZoneNamesSelector",
+      "type": "object"
+    },
+    "ZonePatchTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "zones",
+          "title": "Type",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "type",
+        "zones"
+      ],
+      "title": "ZonePatchTarget",
+      "type": "object"
+    },
+    "ZonePatternSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "pattern": {
+          "minLength": 1,
+          "title": "Pattern",
+          "type": "string"
+        },
+        "type": {
+          "const": "pattern",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "pattern"
+      ],
+      "title": "ZonePatternSelector",
+      "type": "object"
+    },
+    "ZoneRegion": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "zones",
+          "title": "Type",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "type",
+        "zones"
+      ],
+      "title": "ZoneRegion",
+      "type": "object"
+    },
+    "ZoneTypeSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "type": {
+          "const": "zone_type",
+          "title": "Type",
+          "type": "string"
+        },
+        "zone_type": {
+          "enum": [
+            "fluid",
+            "solid",
+            "mass-flow-inlet",
+            "velocity-inlet",
+            "pressure-outlet",
+            "wall",
+            "symmetry",
+            "axis",
+            "interior"
+          ],
+          "title": "Zone Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "zone_type"
+      ],
+      "title": "ZoneTypeSelector",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A fully assembled, cross-file-validated Fluent case intent.",
+  "properties": {
+    "assets": {
+      "$ref": "#/$defs/AssetsLock"
+    },
+    "boundary_conditions": {
+      "$ref": "#/$defs/BoundaryConditionsDocument"
+    },
+    "chemistry": {
+      "$ref": "#/$defs/ChemistryDocument"
+    },
+    "control": {
+      "$ref": "#/$defs/ControlDocument"
+    },
+    "fields": {
+      "$ref": "#/$defs/FieldsDocument"
+    },
+    "initialization": {
+      "$ref": "#/$defs/InitializationDocument"
+    },
+    "materials": {
+      "$ref": "#/$defs/MaterialsDocument"
+    },
+    "monitors": {
+      "$ref": "#/$defs/MonitorsDocument"
+    },
+    "numerics": {
+      "$ref": "#/$defs/NumericsDocument"
+    },
+    "objectives": {
+      "$ref": "#/$defs/EngineeringObjectiveDocument"
+    },
+    "physics": {
+      "$ref": "#/$defs/PhysicsDocument"
+    },
+    "platforms": {
+      "patternProperties": {
+        "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+          "discriminator": {
+            "mapping": {
+              "local": "#/$defs/LocalPlatform",
+              "slurm": "#/$defs/SlurmPlatform"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/SlurmPlatform"
+            },
+            {
+              "$ref": "#/$defs/LocalPlatform"
+            }
+          ]
+        }
+      },
+      "propertyNames": {
+        "maxLength": 96,
+        "minLength": 1
+      },
+      "title": "Platforms",
+      "type": "object"
+    },
+    "state": {
+      "$ref": "#/$defs/StateOwnershipDocument"
+    }
+  },
+  "required": [
+    "physics",
+    "materials",
+    "chemistry",
+    "fields",
+    "boundary_conditions",
+    "numerics",
+    "initialization",
+    "monitors",
+    "control",
+    "objectives",
+    "state",
+    "platforms",
+    "assets"
+  ],
+  "title": "CaseSpec",
+  "type": "object"
+}

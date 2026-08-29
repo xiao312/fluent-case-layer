@@ -8,6 +8,8 @@ python -m venv .venv
 python -m pip install -e '.[dev]'
 pytest
 ruff check .
+python -m fluent_case_layer.reference check --root .
+mkdocs build --strict
 ```
 
 Install the optional `fluent` extra only in an environment intended to launch
@@ -24,6 +26,12 @@ tests must not need a license.
   separately.
 - TUI support requires a documented settings-API gap and an observable
   postcondition.
+- Update `src/fluent_case_layer/reference/couplings.yaml` when a schema field's
+  Fluent concept, PyFluent path, runtime option source, or adapter support changes.
+- Never edit generated reference Markdown or `catalog.json` directly. Run
+  `python -m fluent_case_layer.reference build --root .`, then commit all outputs.
+- Mark a mapping `implemented` only with a version-qualified transform and an
+  adapter test that checks an observable postcondition.
 
 ## Pull requests
 

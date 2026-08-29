@@ -1,0 +1,245 @@
+{
+  "$defs": {
+    "ExpressionValue": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "type": {
+          "const": "expression",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "expression",
+        "unit"
+      ],
+      "title": "ExpressionValue",
+      "type": "object"
+    },
+    "FieldSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "fluent_name": {
+          "title": "Fluent Name",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "initial": {
+          "discriminator": {
+            "mapping": {
+              "expression": "#/$defs/ExpressionValue",
+              "profile": "#/$defs/ProfileValue",
+              "uniform_scalar": "#/$defs/UniformScalarValue",
+              "uniform_vector": "#/$defs/UniformVectorValue"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/UniformScalarValue"
+            },
+            {
+              "$ref": "#/$defs/UniformVectorValue"
+            },
+            {
+              "$ref": "#/$defs/ProfileValue"
+            },
+            {
+              "$ref": "#/$defs/ExpressionValue"
+            }
+          ],
+          "title": "Initial"
+        },
+        "rank": {
+          "enum": [
+            "scalar",
+            "vector"
+          ],
+          "title": "Rank",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "fluent_name",
+        "rank",
+        "initial"
+      ],
+      "title": "FieldSpec",
+      "type": "object"
+    },
+    "ProfileValue": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "field": {
+          "minLength": 1,
+          "title": "Field",
+          "type": "string"
+        },
+        "scale": {
+          "default": 1.0,
+          "title": "Scale",
+          "type": "number"
+        },
+        "type": {
+          "const": "profile",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset",
+        "field"
+      ],
+      "title": "ProfileValue",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "UniformScalarValue": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "uniform_scalar",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Quantity"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "UniformScalarValue",
+      "type": "object"
+    },
+    "UniformVectorValue": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "uniform_vector",
+          "title": "Type",
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/VectorQuantity"
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "title": "UniformVectorValue",
+      "type": "object"
+    },
+    "VectorQuantity": {
+      "additionalProperties": false,
+      "description": "A three-component finite vector with one shared unit.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "VectorQuantity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "fields": {
+      "items": {
+        "$ref": "#/$defs/FieldSpec"
+      },
+      "minItems": 1,
+      "title": "Fields",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "fields"
+  ],
+  "title": "FieldsDocument",
+  "type": "object"
+}

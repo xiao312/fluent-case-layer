@@ -1,0 +1,799 @@
+registry_version: "1.0"
+
+target:
+  product: ANSYS Fluent
+  fluent_version: 2026 R1
+  pyfluent_api: ansys-fluent-core
+  pyfluent_exposure: stable-first
+  qualification: >-
+    Paths marked official were checked against the official PyFluent settings
+    documentation. Candidate paths must be verified against the target Fluent
+    release before an adapter mapping is promoted.
+
+policy:
+  option_layers:
+    schema: Static choices, defaults, and constraints accepted by the authored YAML.
+    runtime: >-
+      State-dependent allowed values, active/read-only state, and limits reported
+      by a live PyFluent settings object for a specific Fluent version and case state.
+    adapter: The subset the current fluent-case PyFluent adapter can execute safely.
+  status_meanings:
+    implemented: Compiles to a supported adapter operation for the documented conditions.
+    partial: Only the documented options or prerequisites are implemented.
+    planned: Typed intent is accepted, but no automatic PyFluent mutation exists yet.
+    declaration_only: Consumed by the case layer, compiler, or evidence system; not a setting.
+    not_applicable: Metadata with no Fluent or PyFluent setting counterpart.
+  confidence_meanings:
+    official: Path or method is shown by official PyFluent documentation.
+    adapter_verified: Path or method is exercised by the current adapter tests.
+    candidate: Likely settings location; runtime verification is still required.
+    dynamic: Named-object path is assembled after discovering Fluent objects at runtime.
+    not_applicable: No settings path should exist.
+
+document_defaults:
+  constant/physics.yaml:
+    fluent:
+      mode: solver
+      concept: Setup > General and Setup > Models
+      activation: Model choices can expose or hide downstream settings.
+    pyfluent:
+      interface: settings
+      path: null
+      operation: set_state
+      option_source: schema_and_runtime_metadata
+      confidence: candidate
+    adapter:
+      status: planned
+      action: reconcile_settings
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Broad typed physics reconciliation currently fails closed without explicit operations.
+  constant/materials.yaml:
+    fluent:
+      mode: solver
+      concept: Setup > Materials and Cell Zone Conditions
+      activation: Available property models depend on material kind and enabled physics.
+    pyfluent:
+      interface: settings_named_objects
+      path: setup.materials
+      operation: create_or_set_state
+      option_source: runtime_named_objects
+      confidence: dynamic
+    adapter:
+      status: planned
+      action: reconcile_settings
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Material creation and zone assignment need a typed reconciler.
+  constant/chemistry.yaml:
+    fluent:
+      mode: solver
+      concept: Setup > Models > Species and Materials > Mixture
+      activation: Chemistry choices require compatible species and energy models.
+    pyfluent:
+      interface: settings
+      path: setup.models.species
+      operation: set_state_or_command
+      option_source: schema_and_runtime_metadata
+      confidence: candidate
+    adapter:
+      status: planned
+      action: reconcile_settings
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+  0/fields.yaml:
+    fluent:
+      mode: solver
+      concept: Solution > Initialization and Patch
+      activation: Field availability depends on enabled models and loaded mesh state.
+    pyfluent:
+      interface: settings
+      path: solution.initialization
+      operation: set_state_or_command
+      option_source: runtime_metadata
+      confidence: dynamic
+    adapter:
+      status: planned
+      action: reconcile_settings
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Initial-field declarations are typed but not automatically reconciled.
+  0/boundary-conditions.yaml:
+    fluent:
+      mode: solver
+      concept: Setup > Boundary Conditions
+      activation: Zone type, enabled models, and neighboring zones determine available fields.
+    pyfluent:
+      interface: settings_named_objects
+      path: setup.boundary_conditions
+      operation: set_state
+      option_source: runtime_named_objects_and_metadata
+      confidence: dynamic
+    adapter:
+      status: planned
+      action: reconcile_settings
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Zone selectors and typed conditions still require a boundary reconciler.
+  system/numerics.yaml:
+    fluent:
+      mode: solver
+      concept: Solution > Methods and Solution > Controls
+      activation: Schemes depend on solver formulation, time mode, and enabled equations.
+    pyfluent:
+      interface: settings
+      path: solution.methods
+      operation: set_state
+      option_source: schema_and_runtime_metadata
+      confidence: candidate
+    adapter:
+      status: planned
+      action: reconcile_settings
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Numerics profiles compile as intent but do not yet map to settings operations.
+  system/initialization.yaml:
+    fluent:
+      mode: solver
+      concept: Solution > Initialization and Cell Registers
+      activation: Registers and patchable fields depend on mesh and model state.
+    pyfluent:
+      interface: settings
+      path: solution.initialization
+      operation: command_or_set_state
+      option_source: schema_and_runtime_metadata
+      confidence: dynamic
+    adapter:
+      status: partial
+      action: initialize/create_register/patch
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Hybrid and checkpoint reads are direct; registers and patches require explicit operations.
+  system/monitors.yaml:
+    fluent:
+      mode: solver
+      concept: Solution > Reports, Monitors, and Report Definitions
+      activation: Fields and selectable zones depend on the active solution state.
+    pyfluent:
+      interface: settings_named_objects
+      path: solution.report_definitions
+      operation: create_or_get_state
+      option_source: runtime_named_objects_and_metadata
+      confidence: dynamic
+    adapter:
+      status: partial
+      action: sample/gate
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Gates evaluate captured metrics, but PyFluent collectors still require explicit operations.
+  system/objectives.yaml:
+    fluent:
+      mode: none
+      concept: Engineering investigation intent
+      activation: none
+    pyfluent:
+      interface: none
+      path: null
+      operation: none
+      option_source: schema
+      confidence: not_applicable
+    adapter:
+      status: declaration_only
+      action: candidate_compiler
+      implementation: src/fluent_case_layer/driver/candidate.py
+      note: Objectives guide attempts and evidence; they are deliberately non-enforcing.
+  system/state.yaml:
+    fluent:
+      mode: solver
+      concept: Declared mutation ownership over observed Fluent state
+      activation: A checkpoint overlay requires a hash-locked baseline.
+    pyfluent:
+      interface: observed_settings
+      path: dynamic
+      operation: reconcile_scope_and_snapshot
+      option_source: schema_and_observation
+      confidence: dynamic
+    adapter:
+      status: declaration_only
+      action: compiler_authorization
+      implementation: src/fluent_case_layer/driver/planner.py
+      note: Ownership authorizes mutations; it does not itself mutate Fluent.
+  system/control.yaml:
+    fluent:
+      mode: solver
+      concept: Ordered solver workflow
+      activation: Stage dependencies and preconditions determine execution order.
+    pyfluent:
+      interface: mixed
+      path: dynamic_by_stage_type
+      operation: command
+      option_source: schema_and_runtime_metadata
+      confidence: adapter_verified
+    adapter:
+      status: partial
+      action: semantic_action_dispatch
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Execution support is stage-type and option specific; inspect option_support.
+  platforms/*.yaml:
+    fluent:
+      mode: launcher
+      concept: Fluent process and scheduler resources
+      activation: Site environment and license availability are external prerequisites.
+    pyfluent:
+      interface: launcher
+      path: ansys.fluent.core.launch_fluent
+      operation: launch_or_attach
+      option_source: schema_and_site_runtime
+      confidence: adapter_verified
+    adapter:
+      status: partial
+      action: launch_solver
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Local launch intent is supported; SCNET Slurm submission remains outside the adapter.
+  assets.lock.yaml:
+    fluent:
+      mode: file_io
+      concept: External solver input provenance
+      activation: Referenced bytes must be materialized before solver mutation.
+    pyfluent:
+      interface: file_and_preflight
+      path: file.read_mesh/read_case/read_case_data
+      operation: verify_then_read
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: partial
+      action: prepare_and_load_asset
+      implementation: src/fluent_case_layer/driver/adapters/pyfluent.py
+      note: Repository and environment sources are verified; remote materialization is not implemented.
+
+patterns:
+  - match: "*#/schema_version"
+    coupling:
+      fluent:
+        mode: none
+        concept: Case-layer document version
+        activation: none
+      pyfluent:
+        interface: none
+        path: null
+        operation: none
+        option_source: schema
+        confidence: not_applicable
+      adapter:
+        status: not_applicable
+        action: schema_loader
+        implementation: src/fluent_case_layer/schema/loader.py
+        note: Selects the case-layer schema contract; it is never sent to Fluent.
+  - match: "constant/physics.yaml#/case/*"
+    coupling:
+      fluent:
+        mode: none
+        concept: Case metadata
+        activation: none
+      pyfluent:
+        interface: none
+        path: null
+        operation: none
+        option_source: schema
+        confidence: not_applicable
+      adapter:
+        status: not_applicable
+        action: plan_metadata
+        implementation: src/fluent_case_layer/driver/planner.py
+        note: Preserved in plan and evidence metadata; it does not change the solver.
+  - match: "*#*/id"
+    coupling:
+      authoring:
+        description: Stable case-layer identifier used for references, diffs, and evidence.
+      adapter:
+        status: declaration_only
+        note: Used to resolve authored references; not written to a Fluent setting.
+  - match: "*#*/cardinality/*"
+    coupling:
+      authoring:
+        description: Expected number of zones selected; validated before applying a mutation.
+      adapter:
+        status: planned
+        note: The future zone reconciler will compare the resolved Fluent zones with this contract.
+  - match: "0/boundary-conditions.yaml#/boundaries/*/zones*"
+    coupling:
+      fluent:
+        concept: Boundary zone lookup
+      pyfluent:
+        interface: settings_named_objects
+        path: setup.boundary_conditions.<zone_type>[<resolved-zone-name>]
+        operation: list_active/allowed_values/get_object_names
+        option_source: runtime_named_objects
+        confidence: dynamic
+      adapter:
+        status: planned
+        note: Selector resolution and cardinality checking are not implemented in PyFluent yet.
+  - match: "constant/materials.yaml#/zone_assignments/*/zones*"
+    coupling:
+      fluent:
+        concept: Cell Zone Conditions > Material Name
+      pyfluent:
+        interface: settings_named_objects
+        path: setup.cell_zone_conditions.<zone_type>[<resolved-zone-name>]
+        operation: set_state
+        option_source: runtime_named_objects
+        confidence: dynamic
+      adapter:
+        status: planned
+  - match: "system/numerics.yaml#/profiles/*/equations/*"
+    coupling:
+      fluent:
+        concept: Solution > Methods and Controls for an active equation
+      pyfluent:
+        interface: settings_named_objects
+        path: solution.methods.<equation-dependent>
+        operation: set_state
+        option_source: runtime_active_objects_and_allowed_values
+        confidence: dynamic
+      adapter:
+        status: planned
+        note: Equation names and available schemes must be discovered after models are active.
+
+entries:
+  "constant/physics.yaml#/solver/formulation":
+    authoring:
+      description: Select the pressure-based or density-based Fluent solver formulation.
+    fluent:
+      concept: Setup > General > Solver > Type
+    pyfluent:
+      path: setup.general.solver.type
+      operation: set_state
+      option_source: runtime_allowed_values
+      confidence: candidate
+    adapter:
+      status: planned
+      note: Candidate settings path must be verified for Fluent 2026 R1 before implementation.
+  "constant/physics.yaml#/solver/time":
+    authoring:
+      description: Select steady or transient time treatment.
+    fluent:
+      concept: Setup > General > Solver > Time
+    pyfluent:
+      path: setup.general.solver.time
+      operation: set_state
+      option_source: runtime_allowed_values
+      confidence: official
+    adapter:
+      status: planned
+  "constant/physics.yaml#/solver/energy":
+    authoring:
+      description: Enable or disable the Fluent energy equation.
+    fluent:
+      concept: Setup > Models > Energy
+    pyfluent:
+      path: setup.models.energy.enabled
+      operation: set_state
+      option_source: runtime_metadata
+      confidence: official
+    adapter:
+      status: planned
+  "constant/physics.yaml#/solver/operating_pressure":
+    authoring:
+      description: Absolute operating pressure used by Fluent for gauge-pressure relations.
+      allowed_units: [Pa, kPa, MPa, bar, atm]
+      semantic_constraints: Value must be positive.
+      example: {value: 101325, unit: Pa}
+    fluent:
+      concept: Setup > General > Operating Conditions > Operating Pressure
+    pyfluent:
+      path: setup.general.operating_conditions.operating_pressure
+      operation: set_state
+      option_source: runtime_metadata
+      confidence: candidate
+    adapter:
+      status: planned
+  "constant/physics.yaml#/turbulence/type":
+    authoring:
+      description: Choose the turbulence model family; variant fields become conditional.
+    fluent:
+      concept: Setup > Models > Viscous
+    pyfluent:
+      path: setup.models.viscous.model
+      operation: set_state
+      option_source: runtime_allowed_values
+      confidence: official
+    adapter:
+      status: planned
+  "constant/physics.yaml#/species/type":
+    authoring:
+      description: Choose whether and how Fluent transports reacting species or PDF variables.
+    fluent:
+      concept: Setup > Models > Species
+    pyfluent:
+      path: setup.models.species
+      operation: set_state
+      option_source: runtime_allowed_values
+      confidence: candidate
+    adapter:
+      status: planned
+  "constant/physics.yaml#/radiation/type":
+    authoring:
+      description: Choose the radiation model family or disable radiation.
+    fluent:
+      concept: Setup > Models > Radiation
+    pyfluent:
+      path: setup.models.radiation
+      operation: set_state
+      option_source: runtime_allowed_values
+      confidence: candidate
+    adapter:
+      status: planned
+  "constant/physics.yaml#/discrete_phase/enabled":
+    authoring:
+      description: Enable Fluent's discrete phase model.
+    fluent:
+      concept: Setup > Models > Discrete Phase
+    pyfluent:
+      path: setup.models.discrete_phase
+      operation: set_state
+      option_source: runtime_metadata
+      confidence: candidate
+    adapter:
+      status: planned
+  "constant/chemistry.yaml#/streams/*/temperature":
+    authoring:
+      description: Temperature assigned to one named fuel, oxidizer, or secondary stream.
+      allowed_units: [K, degC]
+      semantic_constraints: Kelvin values must be positive.
+      example: {value: 300, unit: K}
+  "0/boundary-conditions.yaml#/boundaries/*/condition/mass_flow":
+    authoring:
+      description: Total mass flow rate entering through the selected inlet zone or zones.
+      allowed_units: [kg/s, g/s]
+      semantic_constraints: Value cannot be negative.
+      example: {value: 0.02, unit: kg/s}
+  "0/boundary-conditions.yaml#/boundaries/*/condition/temperature":
+    authoring:
+      description: Static inlet temperature when that boundary variant accepts temperature.
+      allowed_units: [K, degC]
+      example: {value: 300, unit: K}
+  "0/boundary-conditions.yaml#/boundaries/*/condition/velocity":
+    authoring:
+      description: Cartesian inlet velocity vector in case coordinates.
+      allowed_units: [m/s, cm/s]
+      example: {value: [10, 0, 0], unit: m/s}
+  "0/boundary-conditions.yaml#/boundaries/*/condition/gauge_pressure":
+    authoring:
+      description: Outlet pressure relative to the operating pressure.
+      allowed_units: [Pa, kPa, MPa, bar, atm]
+      example: {value: 0, unit: Pa}
+  "0/boundary-conditions.yaml#/boundaries/*/condition/turbulence/hydraulic_diameter":
+    authoring:
+      description: Hydraulic diameter used with turbulence intensity at an inlet.
+      allowed_units: [m, cm, mm]
+      semantic_constraints: Value must be positive.
+  "0/boundary-conditions.yaml#/boundaries/*/condition/turbulence/length_scale":
+    authoring:
+      description: Turbulence length scale used with inlet intensity.
+      allowed_units: [m, cm, mm]
+      semantic_constraints: Value must be positive.
+  "0/boundary-conditions.yaml#/boundaries/*/condition/type":
+    authoring:
+      description: Select the typed condition attached to the resolved Fluent zone or zones.
+    pyfluent:
+      path: setup.boundary_conditions.<condition-type>[<resolved-zone-name>]
+      operation: set_state
+      option_source: schema_then_runtime_active_fields
+      confidence: dynamic
+    adapter:
+      status: planned
+      option_support:
+        mass_flow_inlet: planned
+        velocity_inlet: planned
+        pressure_outlet: planned
+        wall: planned
+        symmetry: planned
+        axis: planned
+  "system/numerics.yaml#/profiles/*/pressure_velocity_coupling":
+    authoring:
+      description: Select the pressure-velocity coupling algorithm for this profile.
+    fluent:
+      concept: Solution > Methods > Pressure-Velocity Coupling
+    pyfluent:
+      path: solution.methods.p_v_coupling.flow_scheme
+      operation: set_state
+      option_source: runtime_allowed_values
+      confidence: candidate
+    adapter:
+      status: planned
+  "system/numerics.yaml#/profiles/*/transient/time_step":
+    authoring:
+      description: Physical time-step size to set before advancing a transient solution.
+      allowed_units: [s, ms, us]
+      semantic_constraints: Value must be positive.
+      example: {value: 1.0e-6, unit: s}
+    fluent:
+      concept: Run Calculation > Time Step Size
+    pyfluent:
+      path: solution.run_calculation.transient_controls.time_step_size
+      operation: set_state
+      option_source: runtime_metadata
+      confidence: candidate
+    adapter:
+      status: planned
+      note: The current dual-time command advances steps but does not set this value.
+  "system/initialization.yaml#/actions/*/type":
+    authoring:
+      description: Dispatch one ordered initialization action.
+    pyfluent:
+      path: dynamic_by_action_type
+      operation: command_or_explicit_operation
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: partial
+      option_support:
+        read_checkpoint: implemented
+        hybrid: implemented
+        standard: planned
+        create_register: explicit_operations_required
+        patch: explicit_operations_required
+        tui: implemented_audited_escape
+      note: The adapter preflights the complete sequence before executing any action.
+  "system/initialization.yaml#/actions/*/case_asset":
+    fluent:
+      concept: File > Read > Case
+    pyfluent:
+      path: file.read_case
+      operation: command
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: read_checkpoint
+  "system/initialization.yaml#/actions/*/data_asset":
+    fluent:
+      concept: File > Read > Case & Data
+    pyfluent:
+      path: file.read_case_data
+      operation: command
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: read_checkpoint
+  "system/initialization.yaml#/actions/*/region":
+    fluent:
+      concept: Solution > Cell Registers
+    pyfluent:
+      path: solution.cell_registers
+      operation: explicit_settings_operations
+      option_source: runtime_metadata
+      confidence: dynamic
+    adapter:
+      status: partial
+      note: Typed geometry is retained, but execution currently needs explicit operations.
+  "system/initialization.yaml#/actions/*/region/radius":
+    authoring:
+      description: Cylinder radius; its unit must match the start and end coordinates.
+      semantic_constraints: Radius must be positive and use the same unit as start and end.
+  "system/initialization.yaml#/actions/*/region/start":
+    authoring:
+      description: Cylinder-axis start point in case coordinates.
+      semantic_constraints: Unit must match end and radius.
+  "system/initialization.yaml#/actions/*/region/end":
+    authoring:
+      description: Cylinder-axis end point in case coordinates.
+      semantic_constraints: Unit must match start and radius; end must differ from start.
+  "system/initialization.yaml#/actions/*/region/minimum":
+    authoring:
+      description: Minimum corner of an axis-aligned patch box.
+      semantic_constraints: Unit must match maximum and every component must be smaller.
+  "system/initialization.yaml#/actions/*/region/maximum":
+    authoring:
+      description: Maximum corner of an axis-aligned patch box.
+      semantic_constraints: Unit must match minimum and every component must be larger.
+  "system/initialization.yaml#/actions/*/target":
+    fluent:
+      concept: Solution > Initialization > Patch > Target
+    pyfluent:
+      path: solution.initialization.patch
+      operation: explicit_settings_operations
+      option_source: runtime_metadata
+      confidence: dynamic
+    adapter:
+      status: partial
+  "system/initialization.yaml#/actions/*/field":
+    fluent:
+      concept: Solution > Initialization > Patch > Variable
+    pyfluent:
+      path: solution.initialization.patch
+      operation: explicit_settings_operations
+      option_source: runtime_allowed_values
+      confidence: dynamic
+    adapter:
+      status: partial
+  "system/initialization.yaml#/actions/*/value":
+    fluent:
+      concept: Solution > Initialization > Patch > Value
+    pyfluent:
+      path: solution.initialization.patch
+      operation: explicit_settings_operations
+      option_source: schema_and_runtime_metadata
+      confidence: dynamic
+    adapter:
+      status: partial
+  "system/control.yaml#/stages/*/type":
+    authoring:
+      description: Select the semantic stage compiled into the deterministic action DAG.
+    pyfluent:
+      path: dynamic_by_stage_type
+      operation: command
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: partial
+      option_support:
+        load_asset: partial_by_load_as
+        reconcile: explicit_operations_required
+        initialize: partial_by_action_type
+        iterate: implemented
+        advance_time: partial_time_step_not_set
+        sample: explicit_operations_required
+        gate: implemented_evidence_only
+        checkpoint: implemented
+        tui: implemented_audited_escape
+  "system/control.yaml#/stages/*/load_as":
+    fluent:
+      concept: File read or typed import workflow
+    pyfluent:
+      path: file.read_mesh/file.read_case/file.read_case_data
+      operation: command
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: partial
+      option_support:
+        mesh: implemented
+        case: implemented
+        case_data: implemented
+        chemistry_table: explicit_operations_required
+        profile: explicit_operations_required
+  "system/control.yaml#/stages/*/iterations":
+    authoring:
+      description: Number of steady iterations executed by this stage.
+    fluent:
+      concept: Run Calculation > Number of Iterations
+    pyfluent:
+      path: solution.run_calculation.iterate
+      operation: command(iter_count)
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: iterate
+  "system/control.yaml#/stages/*/time_steps":
+    authoring:
+      description: Number of transient time steps executed by this stage.
+    fluent:
+      concept: Run Calculation > Number of Time Steps
+    pyfluent:
+      path: solution.run_calculation.dual_time_iterate
+      operation: command(time_step_count)
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: advance_time
+  "system/control.yaml#/stages/*/max_iterations_per_step":
+    authoring:
+      description: Maximum nonlinear iterations performed within each time step.
+    fluent:
+      concept: Run Calculation > Max Iterations/Time Step
+    pyfluent:
+      path: solution.run_calculation.dual_time_iterate
+      operation: command(max_iter_per_step)
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: advance_time
+  "system/control.yaml#/stages/*/time_step":
+    authoring:
+      description: Requested physical time-step size for this stage.
+      allowed_units: [s, ms, us]
+      semantic_constraints: Value must be positive.
+    fluent:
+      concept: Run Calculation > Time Step Size
+    pyfluent:
+      path: solution.run_calculation.transient_controls.time_step_size
+      operation: set_state_before_dual_time_iterate
+      option_source: runtime_metadata
+      confidence: candidate
+    adapter:
+      status: partial
+      note: The compiler retains this value, but the adapter does not apply it yet.
+  "system/control.yaml#/stages/*/timeout":
+    authoring:
+      description: Maximum wall-clock duration permitted for one stage attempt.
+      allowed_units: [s, min, h]
+      semantic_constraints: Value must be positive.
+  "system/control.yaml#/stages/*/retry/backoff":
+    authoring:
+      description: Delay between retry attempts.
+      allowed_units: [s, ms, min]
+      semantic_constraints: Value cannot be negative.
+  "system/control.yaml#/stages/*/write_case":
+    fluent:
+      concept: File > Write > Case
+    pyfluent:
+      path: file.write_case
+      operation: command
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: write_checkpoint
+  "system/control.yaml#/stages/*/write_data":
+    fluent:
+      concept: File > Write > Data
+    pyfluent:
+      path: file.write_data
+      operation: command
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: write_checkpoint
+  "platforms/*.yaml#/platform/fluent/version":
+    authoring:
+      description: Fluent release requested for launch and recorded in run evidence.
+    pyfluent:
+      path: launch_fluent(product_version)
+      operation: launch
+      option_source: site_runtime
+      confidence: candidate
+    adapter:
+      status: partial
+      note: Version intent is retained; exact launcher keyword mapping requires site verification.
+  "platforms/*.yaml#/platform/fluent/mode":
+    authoring:
+      description: Launch Fluent in solver or meshing mode.
+    pyfluent:
+      path: launch_fluent(mode)
+      operation: launch
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: launch_solver
+  "platforms/*.yaml#/platform/resources/ranks":
+    authoring:
+      description: Total MPI ranks requested for Fluent.
+    pyfluent:
+      path: launch_fluent(processor_count)
+      operation: launch
+      option_source: schema_and_scheduler
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: launch_solver
+  "platforms/*.yaml#/platform/resources/memory_per_node":
+    authoring:
+      description: Scheduler memory requested for each node.
+      allowed_units: [MiB, GiB, TiB]
+      semantic_constraints: Value must be positive.
+  "platforms/*.yaml#/platform/resources/walltime":
+    authoring:
+      description: Scheduler wall-time request.
+      allowed_units: [min, h]
+      semantic_constraints: Value must be positive.
+  "assets.lock.yaml#/assets/*/sha256":
+    authoring:
+      description: SHA-256 digest that the adapter verifies before any solver mutation.
+    pyfluent:
+      path: preflight_before_session_mutation
+      operation: hash_file
+      option_source: schema
+      confidence: adapter_verified
+    adapter:
+      status: implemented
+      action: prepare
+  "assets.lock.yaml#/assets/*/source/type":
+    authoring:
+      description: Select how the immutable asset is located without embedding a machine-local path.
+    adapter:
+      status: partial
+      option_support:
+        repository: implemented
+        environment: implemented
+        remote: materialization_planned

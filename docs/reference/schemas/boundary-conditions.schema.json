@@ -1,0 +1,876 @@
+{
+  "$defs": {
+    "AdiabaticWall": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "adiabatic",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "AdiabaticWall",
+      "type": "object"
+    },
+    "AxisBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "axis",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "AxisBoundary",
+      "type": "object"
+    },
+    "BoundarySpec": {
+      "additionalProperties": false,
+      "properties": {
+        "condition": {
+          "discriminator": {
+            "mapping": {
+              "axis": "#/$defs/AxisBoundary",
+              "mass_flow_inlet": "#/$defs/MassFlowInlet",
+              "pressure_outlet": "#/$defs/PressureOutlet",
+              "symmetry": "#/$defs/SymmetryBoundary",
+              "velocity_inlet": "#/$defs/VelocityInlet",
+              "wall": "#/$defs/WallBoundary"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/MassFlowInlet"
+            },
+            {
+              "$ref": "#/$defs/VelocityInlet"
+            },
+            {
+              "$ref": "#/$defs/PressureOutlet"
+            },
+            {
+              "$ref": "#/$defs/WallBoundary"
+            },
+            {
+              "$ref": "#/$defs/SymmetryBoundary"
+            },
+            {
+              "$ref": "#/$defs/AxisBoundary"
+            }
+          ],
+          "title": "Condition"
+        },
+        "id": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "zones": {
+          "discriminator": {
+            "mapping": {
+              "ids": "#/$defs/ZoneIdsSelector",
+              "names": "#/$defs/ZoneNamesSelector",
+              "pattern": "#/$defs/ZonePatternSelector",
+              "zone_type": "#/$defs/ZoneTypeSelector"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ZoneNamesSelector"
+            },
+            {
+              "$ref": "#/$defs/ZonePatternSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneTypeSelector"
+            },
+            {
+              "$ref": "#/$defs/ZoneIdsSelector"
+            }
+          ],
+          "title": "Zones"
+        }
+      },
+      "required": [
+        "id",
+        "zones",
+        "condition"
+      ],
+      "title": "BoundarySpec",
+      "type": "object"
+    },
+    "Cardinality": {
+      "additionalProperties": false,
+      "description": "Expected number of zones resolved by a selector.",
+      "properties": {
+        "at_least": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Least"
+        },
+        "at_most": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Most"
+        },
+        "exactly": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exactly"
+        }
+      },
+      "title": "Cardinality",
+      "type": "object"
+    },
+    "Composition": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "mass_fraction",
+            "mole_fraction"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "fractions": {
+          "patternProperties": {
+            "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$": {
+              "type": "number"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 96,
+            "minLength": 1
+          },
+          "title": "Fractions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "basis",
+        "fractions"
+      ],
+      "title": "Composition",
+      "type": "object"
+    },
+    "ConvectionWall": {
+      "additionalProperties": false,
+      "properties": {
+        "external_temperature": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "heat_transfer_coefficient": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "type": {
+          "const": "convection",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "heat_transfer_coefficient",
+        "external_temperature"
+      ],
+      "title": "ConvectionWall",
+      "type": "object"
+    },
+    "ExpressionValue": {
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "minLength": 1,
+          "title": "Expression",
+          "type": "string"
+        },
+        "type": {
+          "const": "expression",
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "expression",
+        "unit"
+      ],
+      "title": "ExpressionValue",
+      "type": "object"
+    },
+    "FixedHeatFluxWall": {
+      "additionalProperties": false,
+      "properties": {
+        "heat_flux": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "$ref": "#/$defs/ProfileValue"
+            },
+            {
+              "$ref": "#/$defs/ExpressionValue"
+            }
+          ],
+          "title": "Heat Flux"
+        },
+        "type": {
+          "const": "heat_flux",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "heat_flux"
+      ],
+      "title": "FixedHeatFluxWall",
+      "type": "object"
+    },
+    "FixedTemperatureWall": {
+      "additionalProperties": false,
+      "properties": {
+        "temperature": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "$ref": "#/$defs/ProfileValue"
+            },
+            {
+              "$ref": "#/$defs/ExpressionValue"
+            }
+          ],
+          "title": "Temperature"
+        },
+        "type": {
+          "const": "temperature",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "temperature"
+      ],
+      "title": "FixedTemperatureWall",
+      "type": "object"
+    },
+    "IntensityHydraulicDiameter": {
+      "additionalProperties": false,
+      "properties": {
+        "hydraulic_diameter": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "intensity": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Intensity",
+          "type": "number"
+        },
+        "type": {
+          "const": "intensity_hydraulic_diameter",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "intensity",
+        "hydraulic_diameter"
+      ],
+      "title": "IntensityHydraulicDiameter",
+      "type": "object"
+    },
+    "IntensityLengthScale": {
+      "additionalProperties": false,
+      "properties": {
+        "intensity": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Intensity",
+          "type": "number"
+        },
+        "length_scale": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "type": {
+          "const": "intensity_length_scale",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "intensity",
+        "length_scale"
+      ],
+      "title": "IntensityLengthScale",
+      "type": "object"
+    },
+    "KEpsilonInput": {
+      "additionalProperties": false,
+      "properties": {
+        "dissipation_rate": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "turbulent_kinetic_energy": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "type": {
+          "const": "k_epsilon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "turbulent_kinetic_energy",
+        "dissipation_rate"
+      ],
+      "title": "KEpsilonInput",
+      "type": "object"
+    },
+    "MassFlowInlet": {
+      "additionalProperties": false,
+      "properties": {
+        "mass_flow": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "species": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Composition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "temperature": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "turbulence": {
+          "discriminator": {
+            "mapping": {
+              "intensity_hydraulic_diameter": "#/$defs/IntensityHydraulicDiameter",
+              "intensity_length_scale": "#/$defs/IntensityLengthScale",
+              "k_epsilon": "#/$defs/KEpsilonInput",
+              "none": "#/$defs/NoTurbulenceInput"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoTurbulenceInput"
+            },
+            {
+              "$ref": "#/$defs/IntensityHydraulicDiameter"
+            },
+            {
+              "$ref": "#/$defs/IntensityLengthScale"
+            },
+            {
+              "$ref": "#/$defs/KEpsilonInput"
+            }
+          ],
+          "title": "Turbulence"
+        },
+        "type": {
+          "const": "mass_flow_inlet",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "mass_flow",
+        "temperature"
+      ],
+      "title": "MassFlowInlet",
+      "type": "object"
+    },
+    "NoTurbulenceInput": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "none",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "NoTurbulenceInput",
+      "type": "object"
+    },
+    "PressureOutlet": {
+      "additionalProperties": false,
+      "properties": {
+        "backflow_species": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Composition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "backflow_temperature": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "gauge_pressure": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "turbulence": {
+          "discriminator": {
+            "mapping": {
+              "intensity_hydraulic_diameter": "#/$defs/IntensityHydraulicDiameter",
+              "intensity_length_scale": "#/$defs/IntensityLengthScale",
+              "k_epsilon": "#/$defs/KEpsilonInput",
+              "none": "#/$defs/NoTurbulenceInput"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoTurbulenceInput"
+            },
+            {
+              "$ref": "#/$defs/IntensityHydraulicDiameter"
+            },
+            {
+              "$ref": "#/$defs/IntensityLengthScale"
+            },
+            {
+              "$ref": "#/$defs/KEpsilonInput"
+            }
+          ],
+          "title": "Turbulence"
+        },
+        "type": {
+          "const": "pressure_outlet",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "gauge_pressure"
+      ],
+      "title": "PressureOutlet",
+      "type": "object"
+    },
+    "ProfileValue": {
+      "additionalProperties": false,
+      "properties": {
+        "asset": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "field": {
+          "minLength": 1,
+          "title": "Field",
+          "type": "string"
+        },
+        "scale": {
+          "default": 1.0,
+          "title": "Scale",
+          "type": "number"
+        },
+        "type": {
+          "const": "profile",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "asset",
+        "field"
+      ],
+      "title": "ProfileValue",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "description": "A finite scalar whose unit is always explicit.\n\nUnit conversion deliberately belongs to the compiler.  The schema keeps\nthe authored value and unit intact so plans and evidence remain auditable.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "SymmetryBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "symmetry",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "SymmetryBoundary",
+      "type": "object"
+    },
+    "VectorQuantity": {
+      "additionalProperties": false,
+      "description": "A three-component finite vector with one shared unit.",
+      "properties": {
+        "unit": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "VectorQuantity",
+      "type": "object"
+    },
+    "VelocityInlet": {
+      "additionalProperties": false,
+      "properties": {
+        "species": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Composition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "temperature": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "turbulence": {
+          "discriminator": {
+            "mapping": {
+              "intensity_hydraulic_diameter": "#/$defs/IntensityHydraulicDiameter",
+              "intensity_length_scale": "#/$defs/IntensityLengthScale",
+              "k_epsilon": "#/$defs/KEpsilonInput",
+              "none": "#/$defs/NoTurbulenceInput"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NoTurbulenceInput"
+            },
+            {
+              "$ref": "#/$defs/IntensityHydraulicDiameter"
+            },
+            {
+              "$ref": "#/$defs/IntensityLengthScale"
+            },
+            {
+              "$ref": "#/$defs/KEpsilonInput"
+            }
+          ],
+          "title": "Turbulence"
+        },
+        "type": {
+          "const": "velocity_inlet",
+          "title": "Type",
+          "type": "string"
+        },
+        "velocity": {
+          "$ref": "#/$defs/VectorQuantity"
+        }
+      },
+      "required": [
+        "type",
+        "velocity"
+      ],
+      "title": "VelocityInlet",
+      "type": "object"
+    },
+    "WallBoundary": {
+      "additionalProperties": false,
+      "properties": {
+        "shear": {
+          "default": "no_slip",
+          "enum": [
+            "no_slip",
+            "slip"
+          ],
+          "title": "Shear",
+          "type": "string"
+        },
+        "thermal": {
+          "discriminator": {
+            "mapping": {
+              "adiabatic": "#/$defs/AdiabaticWall",
+              "convection": "#/$defs/ConvectionWall",
+              "heat_flux": "#/$defs/FixedHeatFluxWall",
+              "temperature": "#/$defs/FixedTemperatureWall"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/AdiabaticWall"
+            },
+            {
+              "$ref": "#/$defs/FixedTemperatureWall"
+            },
+            {
+              "$ref": "#/$defs/FixedHeatFluxWall"
+            },
+            {
+              "$ref": "#/$defs/ConvectionWall"
+            }
+          ],
+          "title": "Thermal"
+        },
+        "type": {
+          "const": "wall",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "WallBoundary",
+      "type": "object"
+    },
+    "ZoneIdsSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "ids": {
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Ids",
+          "type": "array"
+        },
+        "type": {
+          "const": "ids",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "ids"
+      ],
+      "title": "ZoneIdsSelector",
+      "type": "object"
+    },
+    "ZoneNamesSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "names": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Names",
+          "type": "array"
+        },
+        "type": {
+          "const": "names",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "names"
+      ],
+      "title": "ZoneNamesSelector",
+      "type": "object"
+    },
+    "ZonePatternSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "pattern": {
+          "minLength": 1,
+          "title": "Pattern",
+          "type": "string"
+        },
+        "type": {
+          "const": "pattern",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "pattern"
+      ],
+      "title": "ZonePatternSelector",
+      "type": "object"
+    },
+    "ZoneTypeSelector": {
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "$ref": "#/$defs/Cardinality"
+        },
+        "type": {
+          "const": "zone_type",
+          "title": "Type",
+          "type": "string"
+        },
+        "zone_type": {
+          "enum": [
+            "fluid",
+            "solid",
+            "mass-flow-inlet",
+            "velocity-inlet",
+            "pressure-outlet",
+            "wall",
+            "symmetry",
+            "axis",
+            "interior"
+          ],
+          "title": "Zone Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "zone_type"
+      ],
+      "title": "ZoneTypeSelector",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "boundaries": {
+      "items": {
+        "$ref": "#/$defs/BoundarySpec"
+      },
+      "minItems": 1,
+      "title": "Boundaries",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "boundaries"
+  ],
+  "title": "BoundaryConditionsDocument",
+  "type": "object"
+}
