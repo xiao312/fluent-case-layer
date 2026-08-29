@@ -120,12 +120,12 @@ features are checkpoint promotion transactions, DPM source epochs, complete
 particle fate accounting, numerical-scheme audits, chemistry-table
 compatibility and steady-window gates.
 
-### Five-geometry OpenFOAM reference
+### Five-geometry OpenFOAM historical reference
 
-Use one suite with five immutable geometry bindings and a per-item
-`mesh -> production` DAG. Matrix expansion and bounded cross-item execution are
-landed; this still requires an OpenFOAM adapter boundary and per-case artifact
-manifests, not Fluent settings in the OpenFOAM cases.
+Retain only the reusable orchestration lessons: one suite with five immutable
+geometry bindings, independent per-item DAGs, bounded cross-item execution,
+and per-case artifact manifests. The product is Fluent-only; these OpenFOAM
+cases are not migration targets and do not require an adapter boundary here.
 
 ## Audit artifacts expected from every example
 

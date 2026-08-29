@@ -5,6 +5,9 @@
 Build a solver-aware configuration compiler and state reconciler for Fluent,
 not a collection of opaque automation scripts. User-authored case files must
 remain readable, typed, versionable, and independent of machine-local paths.
+This product is Fluent/PyFluent-only; OpenFOAM is a historical inspiration,
+not an adapter or compatibility target. The primary users are the internal CFD
+simulation team.
 
 ## Engineering rules
 
@@ -13,12 +16,20 @@ remain readable, typed, versionable, and independent of machine-local paths.
 - Separate desired case intent, compiled plan, observed Fluent state, and run
   evidence.
 - Treat stages as a dependency graph with typed inputs, outputs, preconditions,
-  postconditions, retries, gates, and checkpoint promotion.
+  postconditions, retries, optional case-local judgments, and checkpoint
+  evidence.
 - Keep large meshes, case/data files, chemistry tables, and result fields out
   of Git. Reference immutable assets by URI and SHA-256.
+- Permit typed partial mutation layers over hash-locked Fluent checkpoints.
+  Require precision for declared state, but do not require exhaustive ownership
+  or reconstruction of inherited solver state.
 - Never hard-code personal SCNET paths into reusable case definitions.
-- Distinguish orchestration success, numerical health, and scientific
-  validation status.
+- Keep orchestration facts, current numerical/scientific judgments, and human
+  review separate. There is no mandatory universal acceptance or promotion
+  contract; absent judgments remain `not_evaluated`.
+- Agents may explore changes across in-scope Fluent settings. Record every
+  mutation, rationale, observation, and artifact so an engineer can inspect and
+  continue the evolving investigation.
 - Tests must run without Fluent by using a recording/fake adapter.
 - Keep examples honest about readiness and known blockers.
 

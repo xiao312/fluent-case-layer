@@ -3,7 +3,8 @@
 An OpenFOAM-inspired, typed, staged, and auditable case layer for ANSYS
 Fluent/PyFluent. It keeps simulation intent in reviewable YAML, compiles that
 intent into a deterministic action DAG, and records what an adapter actually
-did.
+did. The filesystem idea is the inspiration; this is a Fluent-only product and
+does not plan to support OpenFOAM.
 
 This is the first development baseline. Schema validation, planning,
 recording-adapter execution, evidence capture, and multi-case campaign
@@ -31,6 +32,12 @@ authored CaseSpec -> canonical Plan + SHA-256 -> adapter mutations
 The authored files declare desired physics and the order-sensitive stage graph.
 Version-specific settings paths live behind adapters. Large or licensed inputs
 remain outside Git and are referenced by immutable SHA-256 locks.
+
+The target authoring model also supports partial mutation layers over locked
+Fluent case/data checkpoints. Such a layer declares what it owns or changes and
+labels the rest as inherited or merely observed; it does not need to reconstruct
+or allowlist every setting already stored in Fluent. The current strict schema
+baseline is the first implementation step toward that model.
 
 ## Case layout
 
@@ -117,10 +124,11 @@ Repository-checkout wrappers are also provided in [`scripts/`](scripts/).
 
 [`examples/campaign.yaml`](examples/campaign.yaml) compiles the three together.
 The wider inventory documents TUM7, Rocket 500N, transient H2, effusion,
-Sandia, MASCOTTE, Mayer, blocked cases, and the five-geometry OpenFOAM
-campaign—without conflating solver execution with numerical or scientific
-acceptance. See the [case catalog](docs/case-catalog.md) and [migration
-notes](docs/example-migration-notes.md).
+Sandia, MASCOTTE, Mayer, and blocked cases. A historical five-geometry OpenFOAM
+campaign is retained only as a campaign-orchestration reference, not as a
+supported case or adapter roadmap. The catalog does not conflate solver
+execution with current numerical or scientific judgment. See the [case
+catalog](docs/case-catalog.md) and [migration notes](docs/example-migration-notes.md).
 
 ## PyFluent and SCNET boundary
 
@@ -146,8 +154,9 @@ disabled DCU profile.
 
 Each apply run writes an immutable plan lock, run identity/summary,
 hash-chained `events.jsonl`, per-stage snapshots, and artifact/checkpoint
-manifests. Orchestration, numerical health, and scientific validation remain
-separate statuses: a Fluent process exiting normally is not a scientific pass.
+manifests. Orchestration facts, evolving case-local judgments, and human review
+remain separate: a Fluent process exiting normally is neither a scientific
+pass nor a failure by itself, and absent judgments stay `not_evaluated`.
 
 See [architecture](docs/architecture.md), [contributing](CONTRIBUTING.md), and
 the [design interview](docs/design-interview.md). Project progress and weekly

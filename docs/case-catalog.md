@@ -91,14 +91,14 @@ Representative failure modes include:
 - runs that finish operationally but fail mass closure, stationarity, or
   experimental comparison gates.
 
-## OpenFOAM campaign reference
+## OpenFOAM campaign reference (historical pattern only)
 
 | Case | Definition | Execution | Science | Why it belongs in this project | Provenance |
 | --- | --- | --- | --- | --- | --- |
-| Five private injector geometries, `g01`-`g05` | runnable through an OpenFOAM adapter when geometry bindings are supplied | an end-to-end five-case campaign was executed; the checked-in benchmark manifest remains `draft` | solver completion only; no cross-geometry scientific validation claimed | canonical campaign expansion: one template plus five immutable geometry overlays, independent `mesh -> production` DAGs, bounded concurrency, shared scripts, and per-item evidence | `CFD_AGENT_BENCH_ROOT/tasks/injector-five-stl/` |
+| Five private injector geometries, `g01`-`g05` | reference-only; not a supported case in this repository | an end-to-end five-case campaign was executed historically; the benchmark manifest remains `draft` | solver completion only; no cross-geometry scientific validation claimed | reusable orchestration pattern: one template plus five immutable geometry overlays, independent DAGs, bounded concurrency, shared scripts, and per-item evidence | `CFD_AGENT_BENCH_ROOT/tasks/injector-five-stl/` |
 
-This is an orchestration and adapter reference. OpenFOAM dictionaries should
-not become the internal PyFluent representation.
+This is an orchestration reference only. The product supports Fluent/PyFluent;
+an OpenFOAM adapter and solver-neutral case model are explicitly out of scope.
 
 ## Blocked and archive-only physical cases
 
@@ -127,7 +127,7 @@ license-consuming `apply` stage unless its blockers are resolved explicitly.
 | `internal-cfd-001` | benchmark-template fixture only; its QoI and units are placeholders | `CFD_AGENT_BENCH_ROOT/tasks/internal-cfd-001/` |
 | Phoenix 500 N design workflow | useful five-stage DAG and provenance reference, but it is a multiphysics engine-design task rather than a Fluent case | `CFD_AGENT_BENCH_ROOT/tasks/phoenix-rocket-500n/` |
 
-## Recommended qualification ladder
+## Recommended execution order (not case tiers)
 
 1. **Compile-only:** all three repository examples, including asset and DAG
    validation without Fluent.
@@ -136,9 +136,9 @@ license-consuming `apply` stage unless its blockers are resolved explicitly.
 4. **Multi-stage construction:** effusion mesh, FGM, DPM, cold and reacting
    stages.
 5. **Medium physics:** Sandia RANS/URANS and A60 counterflow.
-6. **Large restart/campaign:** TUM7, Rocket 500N, Sandia LES and the five-item
-   OpenFOAM matrix.
+6. **Large restart/campaign:** TUM7, Rocket 500N, and Sandia LES.
 
-The first three steps cover the principal state transitions at modest cost;
-the later cases should qualify scalability and recovery rather than define the
-initial API.
+All Fluent cases exercise the same semantic product tier. This order reflects
+compute cost, data size, and debugging risk only: the first three steps cover
+principal state transitions at modest cost, while later cases stress
+scalability and recovery rather than define a separate advanced API.
