@@ -27,6 +27,31 @@ use cheap scalar samples to decide whether to continue, interrupt, or retain a
 checkpoint. It must not infer that an unqualified vector stream is safe because
 scalar streams from the same service are valid.
 
+## Variable identity and cell ordering
+
+Treat solution-variable identifiers as version-qualified Fluent API tokens,
+not human-readable abbreviations. The adapter must retain the requested token,
+the physical quantity and unit it maps to, and readback evidence for the active
+Fluent version. Similar-looking tokens are not interchangeable: in one Fluent
+2026 R1 case, `SV_DENSITY` was physical density while `SV_D` held a different
+internal quantity with values up to `3.14e8`. A plausible shape does not prove
+the semantic mapping.
+
+Likewise, a checkpoint cell dataset and a live PyFluent cell-zone buffer may
+contain the same cells in different orders. Before pairing a checkpoint field
+with live centroids, require one of these alignment proofs:
+
+1. stable cell identifiers exposed by both sources and an explicit ID join; or
+2. a one-to-one permutation built from an exact, unique scalar anchor, then
+   independently reproduced by multiple additional checkpoint/live scalar
+   fields.
+
+Record the alignment method, zone/domain, cell count, anchor identity,
+permutation digest, comparison tolerances, and cross-field parity results.
+Reject ambiguous anchors, duplicate mappings, incomplete coverage, or failed
+cross-field parity. Bounds, component count, and row-sum invariants are
+necessary but do not establish spatial alignment.
+
 ## Multi-component qualification
 
 Before a vector-valued solution variable is used for a numerical or scientific
@@ -39,7 +64,9 @@ judgment, verify all of the following:
    allowed tolerance of `[0, 1]` and sums to one.
 5. A representative live extraction agrees with the same state written by
    Fluent to a checkpoint, within a declared tolerance.
-6. The parity evidence is qualified by Fluent version, PyFluent version, domain,
+6. Checkpoint rows are explicitly aligned to the coordinates or topology used
+   for spatial interpretation, with ID-join or permutation evidence.
+7. The parity evidence is qualified by Fluent version, PyFluent version, domain,
    zone type, field, dimension, and precision.
 
 Until step 5 succeeds, the checkpoint is authoritative for postprocessing and
@@ -65,6 +92,11 @@ validation:
   finite: true
   bounds: [0.0, 1.0]
   maximum_row_sum_error: 2.3e-15
+  row_alignment:
+    method: exact_unique_scalar_anchor_with_cross_field_parity
+    anchor: SV_T
+    permutation_sha256: <64 lowercase hex characters>
+    parity_fields: [SV_P, SV_U, SV_V]
 derived_outputs:
   - role: field_data
     path: reacting-preliminary-fields.npz
@@ -83,7 +115,12 @@ case, scalar SVARs were valid while the nine-component `SV_Y` byte stream
 decoded to non-finite and extreme values. Fluent's completed `.dat.h5` held a
 normalized cell-by-species matrix for the same state. The case runner therefore
 used live scalar health sampling and checkpoint-backed species/OH export, with
-independent bounds and row-sum verification.
+independent bounds and row-sum verification. A subsequent spatial audit found
+that the checkpoint matrix used global cell ordering while live PyFluent
+centroids used partition-local ordering. The retained checkpoint remained
+valid, but the first derived contour artifact was superseded. An exact
+temperature-based permutation, independently confirmed against pressure and
+both velocity components, produced the corrected spatial evidence.
 
 This incident is not evidence that every PyFluent vector read is broken. It is
 evidence that support must be qualified by field, dimension, solver state, and
