@@ -1,0 +1,47 @@
+{
+  "schema_version": "1",
+  "case_id": "mascotte-g2-jl-fgm",
+  "source_revision": "4d40647ebccb2674cadf19f0bf19a02efd26550b",
+  "simulation_assets": [
+    {
+      "id": "g2-medium-mesh",
+      "source_root": "generated",
+      "source_path": "mesh/g2-medium.msh",
+      "staged_path": "runtime-assets/mesh/g2-medium.msh",
+      "sha256": "3e25883157ac1459f6b21a722faec672134f23b4325c516a7e506771f7bb6f97",
+      "size_bytes": 7641999
+    },
+    {
+      "id": "jl9-kinetics",
+      "source_root": "generated",
+      "source_path": "jl9/jl9.inp",
+      "staged_path": "runtime-assets/jl9/jl9.inp",
+      "sha256": "84cfcea7f44efe64f28dfe9504df4b288ac8b91cc9cb2276d9471d95a6201630",
+      "size_bytes": 739
+    },
+    {
+      "id": "jl9-thermodynamics",
+      "source_root": "generated",
+      "source_path": "jl9/jl9-thermo.dat",
+      "staged_path": "runtime-assets/jl9/jl9-thermo.dat",
+      "sha256": "0ce753ecb5aa37ba61c36a37087fbf47ab91dfc2600613dd983800fa90cc68d7",
+      "size_bytes": 3546
+    },
+    {
+      "id": "jl9-transport",
+      "source_root": "generated",
+      "source_path": "jl9/jl9-transport.dat",
+      "staged_path": "runtime-assets/jl9/jl9-transport.dat",
+      "sha256": "1fe96c9d2549a403f23274f579c924088f007b95ec9a393035b38d96de0a061f",
+      "size_bytes": 1092
+    },
+    {
+      "id": "singla-ohstar-relative",
+      "source_root": "reference",
+      "source_path": "singla-g2-ohstar-relative.npz",
+      "staged_path": "runtime-assets/reference/singla-g2-ohstar-relative.npz",
+      "sha256": "0c1897910ac7d4a70c7d7d4501849ca6d5d72ac41acefc02a914e18979375fc2",
+      "size_bytes": 5928
+    }
+  ]
+}

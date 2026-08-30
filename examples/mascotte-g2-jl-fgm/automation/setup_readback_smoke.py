@@ -9,9 +9,13 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import json
 import os
 import sys
+import traceback
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPOSITORY_ROOT / "src"))
@@ -38,6 +42,12 @@ def parse_args() -> argparse.Namespace:
         required=True,
         help="Destination for the complete setup/readback JSON evidence.",
     )
+    parser.add_argument(
+        "--execution-provenance",
+        type=Path,
+        required=True,
+        help="Preflighted scheduler, revision, runtime, and staged-asset provenance JSON.",
+    )
     parser.add_argument("--processors", type=int, default=1)
     parser.add_argument(
         "--confirm-setup-readback-only",
@@ -45,6 +55,16 @@ def parse_args() -> argparse.Namespace:
         help="Acknowledge that this run must stop before all calculations and iterations.",
     )
     return parser.parse_args()
+
+
+def _load_execution_provenance(path: Path) -> Mapping[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"cannot read execution provenance {path}: {exc}") from exc
+    if not isinstance(value, Mapping):
+        raise SystemExit("execution provenance must contain one JSON object")
+    return value
 
 
 def main() -> int:
@@ -55,6 +75,7 @@ def main() -> int:
         raise SystemExit("--processors must be positive")
 
     case = load_case(args.case)
+    execution = _load_execution_provenance(args.execution_provenance.resolve())
     readiness = assess_flamelet_table_readiness(case)
     if readiness.ready or readiness.mode != "setup_readback_only":
         raise SystemExit(
@@ -67,29 +88,45 @@ def main() -> int:
     except ImportError as exc:
         raise SystemExit("install the project 'fluent' extra before this smoke") from exc
 
-    session = pyfluent.launch_fluent(
-        product_version="26.1.0",
-        mode="solver",
-        dimension=2,
-        precision="double",
-        processor_count=args.processors,
-        additional_arguments=os.environ.get(
-            "FLUENT_ADDITIONAL_ARGUMENTS", f"-t{args.processors}"
-        ),
-        ui_mode="no_gui",
-        start_transcript=True,
-        cleanup_on_exit=True,
-        start_timeout=600,
-    )
+    session = None
     try:
+        session = pyfluent.launch_fluent(
+            product_version="26.1.0",
+            mode="solver",
+            dimension=2,
+            precision="double",
+            processor_count=args.processors,
+            additional_arguments=os.environ.get(
+                "FLUENT_ADDITIONAL_ARGUMENTS", f"-t{args.processors}"
+            ),
+            ui_mode="no_gui",
+            start_transcript=True,
+            cleanup_on_exit=True,
+            start_timeout=600,
+        )
         evidence = run_diffusion_fgm_setup_probe(
             session,
             case,
             repository_root=REPOSITORY_ROOT,
         )
-        atomic_write_json(args.output.resolve(), evidence)
+        atomic_write_json(args.output.resolve(), {**evidence, "execution": execution})
+    except BaseException as exc:
+        failure = {
+            "schema_version": "1",
+            "case_id": case.physics.case.id,
+            "status": "setup_readback_failed",
+            "error": {
+                "type": type(exc).__name__,
+                "message": str(exc),
+                "traceback": traceback.format_exc(),
+            },
+            "execution": execution,
+        }
+        atomic_write_json(args.output.resolve(), failure)
+        raise
     finally:
-        session.exit()
+        if session is not None:
+            session.exit()
     return 0
 
 

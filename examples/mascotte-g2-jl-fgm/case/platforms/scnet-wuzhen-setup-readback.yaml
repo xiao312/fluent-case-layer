@@ -1,0 +1,26 @@
+schema_version: "1.0"
+platform:
+  id: scnet-wuzhen-setup-readback
+  kind: slurm
+  enabled: true
+  hardware: cpu
+  scheduler:
+    partition: wzacnormal03
+    account_variable: SCNET_SLURM_ACCOUNT
+  resources:
+    nodes: 1
+    ranks: 1
+    tasks_per_node: 4
+    threads_per_rank: 1
+    memory_per_node: {value: 7, unit: GiB}
+    accelerators_per_node: 0
+    walltime: {value: 20, unit: min}
+    exclusive: false
+  environment:
+    setup_script_variable: FCL_WUZHEN_FLUENT_ENV
+    python_environment_variable: FCL_WUZHEN_PYFLUENT_ENV
+  fluent: {version: 2026R1, mode: solver, graphics: none}
+  capabilities: [settings_api, tui, postprocess]
+  notes:
+    - Wuzhen CPU profile for one Fluent rank on a four-CPU scheduler allocation.
+    - Authorizes only the exact setup/readback probe; no table calculation, initialization, or iterations.

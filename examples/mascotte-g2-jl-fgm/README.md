@@ -25,10 +25,43 @@ the bytes locked in `case/assets.lock.yaml`. Set `MASCOTTE_G2_REFERENCE_ROOT` to
 the directory containing the locked digitized OH-star NPZ. The reusable case
 contains no machine-specific SCNET path.
 
-`automation/setup_readback_smoke.py` is only a future execution scaffold. It
-requires an explicit setup-only confirmation, launches no scheduler job, and
-contains no table-calculation or iteration path. Its JSON result is a discovery
-artifact, not a table, converged solution, or validation result.
+`automation/setup_readback_smoke.py` requires an explicit setup-only confirmation
+and contains no table-calculation, initialization, or iteration path. Its JSON
+result is a discovery artifact, not a table, converged solution, or validation
+result.
+
+## Wuzhen setup/readback probe
+
+`case/platforms/scnet-wuzhen-setup-readback.yaml` is the bounded CPU profile:
+one Fluent rank in a four-CPU, 7 GiB, 20-minute `wzacnormal03` allocation. The
+site-specific wrapper is
+`automation/submit_wuzhen_setup_readback.sh`. It refuses a dirty or unpushed
+revision and submits under Slurm account `ac8azwcnf1`.
+
+The wrapper stages exactly five simulation inputs from the immutable source
+revision recorded in `automation/wuzhen-setup-readback-assets.json`: the locked
+86,400-cell mesh, three JL9 CHEMKIN files, and digitized relative OH-star data.
+The OH-star data is retained as comparison provenance and is not consumed by
+the Fluent setup. A separate five-wheel manifest supplies Pydantic v2 to the
+proven PyFluent Python 3.11 environment without network access; wheels are
+runtime dependencies, not simulation inputs.
+
+Prepare those wheels in a local directory, set `FCL_WUZHEN_WHEELHOUSE` to it,
+then run the wrapper from a clean, pushed branch:
+
+```bash
+FCL_WUZHEN_WHEELHOUSE=/path/to/locked-wheels \
+  examples/mascotte-g2-jl-fgm/automation/submit_wuzhen_setup_readback.sh RUN_LABEL
+```
+
+The defaults target the established `ac8azwcnf1-wuzhen` SSH alias and the
+hash-locked MASCOTTE source revision. They can be changed with the documented
+`FCL_WUZHEN_*` environment variables in the wrapper, but asset bytes must still
+match the checked-in contract. A successful run contains
+`execution-provenance.json`, `setup-readback.json`, `verification.json`, and
+`evidence.sha256`. `SUCCESS` is created only after independent verification of
+all artifacts. Failed setup attempts retain structured failure JSON and Slurm
+logs and never create `SUCCESS`.
 
 Primary context:
 
