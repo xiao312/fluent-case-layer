@@ -11,6 +11,7 @@ import pytest
 from fluent_case_layer.driver.flamelet import (
     FlameletSetupError,
     ProbeAssets,
+    _object_names,
     resolve_probe_assets,
     run_diffusion_fgm_setup_probe,
 )
@@ -67,11 +68,33 @@ class FakeGroup(SimpleNamespace):
 
 
 class FakeNamedObjects(dict[str, object]):
-    def list(self) -> list[str]:
+    def list(self) -> None:
+        """Match the Fluent 2026 R1 print command, which returns no data."""
+
+    def get_object_names(self) -> list[str]:
         return list(self)
 
     def get_state(self) -> dict[str, object]:
         return {name: snapshot(value) for name, value in self.items()}
+
+
+def test_object_name_discovery_uses_2026_r1_programmatic_readback() -> None:
+    container = FakeNamedObjects({"ch4": object(), "o2": object()})
+
+    assert _object_names(container) == ["ch4", "o2"]
+
+
+@pytest.mark.parametrize("value", [None, (), "ch4", [""], ["ch4", "ch4"]])
+def test_object_name_discovery_fails_closed_on_incomplete_readback(value: object) -> None:
+    class IncompleteNames:
+        def list(self) -> None:
+            return None
+
+        def get_object_names(self) -> object:
+            return value
+
+    with pytest.raises(FlameletSetupError, match="(required list|non-empty|unique)"):
+        _object_names(IncompleteNames())
 
 
 def make_fake_session() -> tuple[object, CallRecorder, CallRecorder, FakeValue]:

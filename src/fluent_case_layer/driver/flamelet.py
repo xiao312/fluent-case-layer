@@ -233,14 +233,35 @@ def _set_exact(node: Any, expected: Any, label: str, *, require_allowed: bool = 
 
 
 def _object_names(container: Any) -> list[str]:
-    for name in ("list", "get_object_names"):
-        getter = getattr(container, name, None)
-        if callable(getter):
+    # In Fluent 2026 R1, ``NamedObject.list()`` is a print command routed through
+    # the settings root and returns ``None``.  ``get_object_names()`` is the
+    # programmatic readback API backed by ``flproxy.get_object_names(path)``.
+    getter = getattr(container, "get_object_names", None)
+    if callable(getter):
+        try:
             values = getter()
-            return [str(value) for value in values]
-    if isinstance(container, Mapping):
-        return [str(value) for value in container]
-    raise FlameletSetupError("Fluent named-object container does not expose object names")
+        except Exception as exc:
+            raise FlameletSetupError(
+                f"cannot read Fluent named-object names: {exc}"
+            ) from exc
+        if not isinstance(values, list):
+            raise FlameletSetupError(
+                "Fluent get_object_names() did not return the required list"
+            )
+    elif isinstance(container, Mapping):
+        values = list(container)
+    else:
+        raise FlameletSetupError(
+            "Fluent named-object container does not expose get_object_names()"
+        )
+
+    if not values:
+        raise FlameletSetupError("Fluent named-object container returned no object names")
+    if not all(isinstance(value, str) and value for value in values):
+        raise FlameletSetupError("Fluent named-object names must be non-empty strings")
+    if len(values) != len(set(values)):
+        raise FlameletSetupError("Fluent named-object names must be unique")
+    return values
 
 
 def _require_2026_r1(session: Any) -> str:
