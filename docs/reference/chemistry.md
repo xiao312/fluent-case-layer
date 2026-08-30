@@ -4,11 +4,11 @@
 
 - Dictionary: `constant/chemistry.yaml`
 - Schema: [`chemistry.schema.json`](schemas/chemistry.schema.json)
-- Entries: **33**
+- Entries: **56**
 
 Reaction model, mechanism assets, streams, and tracked species.
 
-Support summary: **not_applicable** 1, **planned** 32.
+Support summary: **not_applicable** 1, **planned** 55.
 
 The status describes the repository adapter, not whether Fluent itself supports the feature.
 
@@ -20,6 +20,29 @@ The status describes the repository adapter, not whether Fluent itself supports 
 | [`/model/edc_controls`](#entry-model-edc-controls-5817f3b8) | optional | `null`, `object` | — | **planned** |
 | [`/model/edc_controls/aggressiveness_factor`](#entry-model-edc-controls-aggressiveness-factor-64f4fdcc) | conditional | `number` | — | **planned** |
 | [`/model/edc_controls/flow_iterations_per_chemistry_update`](#entry-model-edc-controls-flow-iterations-per-chemistry-update-d3ef9af8) | conditional | `integer` | — | **planned** |
+| [`/model/generation`](#entry-model-generation-014e72a0) | optional | `null`, `object` | — | **planned** |
+| [`/model/generation/classification`](#entry-model-generation-classification-cfd51eb7) | conditional | `string` | `engineer_selected_exploratory` | **planned** |
+| [`/model/generation/compressibility`](#entry-model-generation-compressibility-ff6eae1a) | optional | `boolean` | `true` | **planned** |
+| [`/model/generation/equilibrium_operating_pressure`](#entry-model-generation-equilibrium-operating-pressure-ec0e8e95) | conditional | `object` | — | **planned** |
+| [`/model/generation/equilibrium_operating_pressure/unit`](#entry-model-generation-equilibrium-operating-pressure-unit-3d38741c) | conditional | `string` | — | **planned** |
+| [`/model/generation/equilibrium_operating_pressure/value`](#entry-model-generation-equilibrium-operating-pressure-value-594da443) | conditional | `number` | — | **planned** |
+| [`/model/generation/execution_scope`](#entry-model-generation-execution-scope-53e24508) | conditional | `string` | `setup_readback_only` | **planned** |
+| [`/model/generation/fluent_release`](#entry-model-generation-fluent-release-d5a9e7ba) | conditional | `string` | `2026R1` | **planned** |
+| [`/model/generation/fuel_stream`](#entry-model-generation-fuel-stream-bd924bf2) | conditional | `string` | — | **planned** |
+| [`/model/generation/mixture_name`](#entry-model-generation-mixture-name-4e7ebf77) | conditional | `string` | — | **planned** |
+| [`/model/generation/oxidizer_stream`](#entry-model-generation-oxidizer-stream-235f19e1) | conditional | `string` | — | **planned** |
+| [`/model/generation/probability_density_function`](#entry-model-generation-probability-density-function-aaee5281) | conditional | `string` | `beta` | **planned** |
+| [`/model/generation/progress_variable_definition`](#entry-model-generation-progress-variable-definition-15f27611) | conditional | `string` | `fluent_default` | **planned** |
+| [`/model/generation/progress_variable_variance`](#entry-model-generation-progress-variable-variance-633f4374) | conditional | `string` | `transport` | **planned** |
+| [`/model/generation/runtime_defaults`](#entry-model-generation-runtime-defaults-a44459f2) | conditional | `object` | — | **planned** |
+| [`/model/generation/runtime_defaults/fluent_release`](#entry-model-generation-runtime-defaults-fluent-release-6c2fb11b) | conditional | `string` | `2026R1` | **planned** |
+| [`/model/generation/runtime_defaults/freeze_before_table_generation`](#entry-model-generation-runtime-defaults-freeze-before-table-generation-66263886) | optional | `boolean` | `true` | **planned** |
+| [`/model/generation/runtime_defaults/groups`](#entry-model-generation-runtime-defaults-groups-d10b3a28) | conditional | `array` | `boundary`, `chemistry`, `combustion_parameters`, `control`, `flamelet`, `material_density`, `premix`, `progress_variable_definition`, `table` | **planned** |
+| [`/model/generation/runtime_defaults/record_allowed_values`](#entry-model-generation-runtime-defaults-record-allowed-values-97e9e5cc) | optional | `boolean` | `true` | **planned** |
+| [`/model/generation/runtime_defaults/require_complete_group_state`](#entry-model-generation-runtime-defaults-require-complete-group-state-c4d9bc90) | optional | `boolean` | `true` | **planned** |
+| [`/model/generation/table_generation_permission`](#entry-model-generation-table-generation-permission-e6f6a7e1) | conditional | `string` | `prohibited` | **planned** |
+| [`/model/generation/turbulence_chemistry_interaction`](#entry-model-generation-turbulence-chemistry-interaction-16f3e226) | conditional | `string` | `finite_rate` | **planned** |
+| [`/model/generation/type`](#entry-model-generation-type-6688f292) | conditional | `string` | `fluent_diffusion_fgm_setup_probe` | **planned** |
 | [`/model/mechanism`](#entry-model-mechanism-d724d30b) | conditional | `object` | — | **planned** |
 | [`/model/mechanism/format`](#entry-model-mechanism-format-b3f0368f) | conditional | `string` | `cantera_yaml`, `chemkin`, `fluent_table` | **planned** |
 | [`/model/mechanism/mechanism_asset`](#entry-model-mechanism-mechanism-asset-656fcdc4) | conditional | `string` | — | **planned** |
@@ -237,6 +260,1098 @@ Canonical ID: `constant/chemistry.yaml#/model/edc_controls/flow_iterations_per_c
 | Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
 
 Typed intent is documented, but the generic chemistry reconciler is not implemented.
+
+<a id="entry-model-generation-014e72a0"></a>
+
+## `/model/generation`
+
+Fully declared exploratory setup for discovering Fluent 2026 R1 defaults.
+
+The scope is deliberately limited to model setup and readback.  ``calc_fla`` and
+``calc_pdf`` are prohibited until every runtime-derived value is reviewed and
+replaced by a frozen, hash-audited table-generation definition.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `null`, `object` |
+| Requirement | `optional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-classification-cfd51eb7"></a>
+
+## `/model/generation/classification`
+
+Authored key `classification`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/classification`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `engineer_selected_exploratory` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-compressibility-ff6eae1a"></a>
+
+## `/model/generation/compressibility`
+
+Authored key `compressibility`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/compressibility`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `boolean` |
+| Requirement | `optional` |
+| Default | `true` |
+| Choices | `true` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-equilibrium-operating-pressure-ec0e8e95"></a>
+
+## `/model/generation/equilibrium_operating_pressure`
+
+A finite scalar whose unit is always explicit.
+
+Unit conversion deliberately belongs to the compiler.  The schema keeps
+the authored value and unit intact so plans and evidence remain auditable.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/equilibrium_operating_pressure`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `object` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-equilibrium-operating-pressure-unit-3d38741c"></a>
+
+## `/model/generation/equilibrium_operating_pressure/unit`
+
+Authored key `unit`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/equilibrium_operating_pressure/unit`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"maxLength": 64, "minLength": 1} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-equilibrium-operating-pressure-value-594da443"></a>
+
+## `/model/generation/equilibrium_operating_pressure/value`
+
+Authored key `value`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/equilibrium_operating_pressure/value`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `number` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-execution-scope-53e24508"></a>
+
+## `/model/generation/execution_scope`
+
+Authored key `execution_scope`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/execution_scope`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `setup_readback_only` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-fluent-release-d5a9e7ba"></a>
+
+## `/model/generation/fluent_release`
+
+Authored key `fluent_release`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/fluent_release`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `2026R1` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-fuel-stream-bd924bf2"></a>
+
+## `/model/generation/fuel_stream`
+
+Authored key `fuel_stream`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/fuel_stream`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"maxLength": 96, "minLength": 1, "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$"} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-mixture-name-4e7ebf77"></a>
+
+## `/model/generation/mixture_name`
+
+Authored key `mixture_name`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/mixture_name`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"maxLength": 96, "minLength": 1, "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$"} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-oxidizer-stream-235f19e1"></a>
+
+## `/model/generation/oxidizer_stream`
+
+Authored key `oxidizer_stream`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/oxidizer_stream`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"maxLength": 96, "minLength": 1, "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$"} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-probability-density-function-aaee5281"></a>
+
+## `/model/generation/probability_density_function`
+
+Authored key `probability_density_function`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/probability_density_function`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `beta` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-progress-variable-definition-15f27611"></a>
+
+## `/model/generation/progress_variable_definition`
+
+Authored key `progress_variable_definition`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/progress_variable_definition`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `fluent_default` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-progress-variable-variance-633f4374"></a>
+
+## `/model/generation/progress_variable_variance`
+
+Authored key `progress_variable_variance`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/progress_variable_variance`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `transport` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-runtime-defaults-a44459f2"></a>
+
+## `/model/generation/runtime_defaults`
+
+Runtime defaults that must be captured and frozen before table generation.
+
+This is intentionally a setup-only contract.  It makes release-specific Fluent
+defaults visible without pretending that a paper specified them or allowing a
+table calculation to proceed with implicit choices.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/runtime_defaults`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `object` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-runtime-defaults-fluent-release-6c2fb11b"></a>
+
+## `/model/generation/runtime_defaults/fluent_release`
+
+Authored key `fluent_release`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/runtime_defaults/fluent_release`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `2026R1` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-runtime-defaults-freeze-before-table-generation-66263886"></a>
+
+## `/model/generation/runtime_defaults/freeze_before_table_generation`
+
+Authored key `freeze_before_table_generation`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/runtime_defaults/freeze_before_table_generation`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `boolean` |
+| Requirement | `optional` |
+| Default | `true` |
+| Choices | `true` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-runtime-defaults-groups-d10b3a28"></a>
+
+## `/model/generation/runtime_defaults/groups`
+
+Authored key `groups`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/runtime_defaults/groups`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `array` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | `boundary`, `chemistry`, `combustion_parameters`, `control`, `flamelet`, `material_density`, `premix`, `progress_variable_definition`, `table` |
+| Constraints | {"minItems": 1} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-runtime-defaults-record-allowed-values-97e9e5cc"></a>
+
+## `/model/generation/runtime_defaults/record_allowed_values`
+
+Authored key `record_allowed_values`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/runtime_defaults/record_allowed_values`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `boolean` |
+| Requirement | `optional` |
+| Default | `true` |
+| Choices | `true` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-runtime-defaults-require-complete-group-state-c4d9bc90"></a>
+
+## `/model/generation/runtime_defaults/require_complete_group_state`
+
+Authored key `require_complete_group_state`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/runtime_defaults/require_complete_group_state`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `boolean` |
+| Requirement | `optional` |
+| Default | `true` |
+| Choices | `true` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-table-generation-permission-e6f6a7e1"></a>
+
+## `/model/generation/table_generation_permission`
+
+Authored key `table_generation_permission`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/table_generation_permission`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `prohibited` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-turbulence-chemistry-interaction-16f3e226"></a>
+
+## `/model/generation/turbulence_chemistry_interaction`
+
+Authored key `turbulence_chemistry_interaction`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/turbulence_chemistry_interaction`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `finite_rate` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-generation-type-6688f292"></a>
+
+## `/model/generation/type`
+
+Authored key `type`.
+
+Canonical ID: `constant/chemistry.yaml#/model/generation/type`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `string` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | `fluent_diffusion_fgm_setup_probe` |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=flamelet` |
+| Required in variants | `/model:type=flamelet` |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
 
 <a id="entry-model-mechanism-d724d30b"></a>
 

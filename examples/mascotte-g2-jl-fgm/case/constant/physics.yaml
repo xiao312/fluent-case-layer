@@ -1,0 +1,33 @@
+schema_version: "1.0"
+case:
+  id: mascotte-g2-jl-fgm
+  title: MASCOTTE G2 SRK plus reduced-JL diffusion-FGM comparator
+  readiness: blocked
+  description: >-
+    Axisymmetric G2 comparator preserving the locked Cavalieri-style geometry,
+    operating point, exact SRK request, and nine-species/six-reaction JL evidence.
+    The selected FGM profile may only discover and serialize Fluent defaults.
+  known_blockers:
+    - No G2 JL-FGM Fluent flamelet or PDF table was found locally, in Lark, or in the known SCNET roots.
+    - The primary FGM paper omits settings needed to reproduce its table uniquely.
+    - Runtime-derived Fluent defaults must be reviewed and frozen before any table calculation.
+    - Exact k-epsilon C1=1.4 reconciliation must be merged and read back before a flow solve.
+solver:
+  dimension: 2d_axisymmetric
+  formulation: pressure_based
+  time: steady
+  precision: double
+  velocity_formulation: absolute
+  energy: true
+  operating_pressure: {value: 5610000, unit: Pa}
+turbulence:
+  type: k_epsilon
+  variant: standard
+  near_wall: standard_wall_functions
+  coefficients: {c1_epsilon: 1.4}
+species:
+  type: partially_premixed_pdf
+  nonadiabatic: true
+  progress_variable: true
+radiation: {type: none}
+discrete_phase: {enabled: false}

@@ -1,0 +1,63 @@
+schema_version: "1.0"
+monitors:
+  - id: residuals
+    type: residual
+    thresholds:
+      continuity: 0.001
+      x-velocity: 0.001
+      energy: 0.000001
+      k: 0.001
+      epsilon: 0.001
+      fmean: 0.001
+      fvar: 0.001
+      premixc: 0.001
+      premix-g-var: 0.001
+    check_every: 1
+  - id: mass-closure
+    type: mass_balance
+    inlets: {type: names, names: [lox-inlet, gch4-inlet], cardinality: {exactly: 2}}
+    outlets: {type: names, names: [outlet], cardinality: {exactly: 1}}
+    check_every: 20
+  - id: maximum-temperature
+    type: volume_report
+    operation: maximum
+    field: temperature
+    zones: {type: names, names: [fluid], cardinality: {exactly: 1}}
+    unit: K
+    check_every: 20
+  - id: maximum-oh
+    type: volume_report
+    operation: maximum
+    field: mass-fraction-oh
+    zones: {type: names, names: [fluid], cardinality: {exactly: 1}}
+    unit: "1"
+    check_every: 20
+  - id: lox-inlet-velocity
+    type: surface_report
+    operation: area_weighted_average
+    field: velocity-magnitude
+    zones: {type: names, names: [lox-inlet], cardinality: {exactly: 1}}
+    unit: m/s
+    check_every: 20
+  - id: lox-inlet-density
+    type: surface_report
+    operation: area_weighted_average
+    field: density
+    zones: {type: names, names: [lox-inlet], cardinality: {exactly: 1}}
+    unit: kg/m^3
+    check_every: 20
+  - id: gch4-inlet-velocity
+    type: surface_report
+    operation: area_weighted_average
+    field: velocity-magnitude
+    zones: {type: names, names: [gch4-inlet], cardinality: {exactly: 1}}
+    unit: m/s
+    check_every: 20
+  - id: gch4-inlet-density
+    type: surface_report
+    operation: area_weighted_average
+    field: density
+    zones: {type: names, names: [gch4-inlet], cardinality: {exactly: 1}}
+    unit: kg/m^3
+    check_every: 20
+gates: []

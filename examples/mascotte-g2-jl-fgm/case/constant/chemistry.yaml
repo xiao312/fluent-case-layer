@@ -1,0 +1,51 @@
+schema_version: "1.0"
+model:
+  type: flamelet
+  mechanism:
+    type: asset
+    format: chemkin
+    mechanism_asset: jl9-kinetics
+    thermodynamics_asset: jl9-thermodynamics
+    transport_asset: jl9-transport
+  table_mode: calculate
+  nonadiabatic: true
+  partially_premixed: true
+  progress_variable: true
+  generation:
+    type: fluent_diffusion_fgm_setup_probe
+    classification: engineer_selected_exploratory
+    execution_scope: setup_readback_only
+    table_generation_permission: prohibited
+    fluent_release: 2026R1
+    mixture_name: mascotte-g2-jl9-fgm
+    fuel_stream: methane
+    oxidizer_stream: lox
+    equilibrium_operating_pressure: {value: 5610000, unit: Pa}
+    compressibility: true
+    progress_variable_definition: fluent_default
+    turbulence_chemistry_interaction: finite_rate
+    progress_variable_variance: transport
+    probability_density_function: beta
+    runtime_defaults:
+      fluent_release: 2026R1
+      groups:
+        - chemistry
+        - boundary
+        - progress_variable_definition
+        - control
+        - flamelet
+        - table
+        - premix
+        - combustion_parameters
+        - material_density
+      require_complete_group_state: true
+      record_allowed_values: true
+      freeze_before_table_generation: true
+streams:
+  lox:
+    temperature: {value: 85, unit: K}
+    composition: {basis: mass_fraction, fractions: {o2: 1.0}}
+  methane:
+    temperature: {value: 288, unit: K}
+    composition: {basis: mass_fraction, fractions: {ch4: 1.0}}
+tracked_species: [ch4, o2, co, h2, h2o, o, h, oh, co2]

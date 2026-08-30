@@ -6,6 +6,14 @@ from .campaign import CompiledCampaign, apply_campaign, compile_campaign
 from .candidate import compile_candidate_plan
 from .errors import AdapterMappingError
 from .executor import ExecutionSummary, PlanExecutor, capture_snapshot
+from .flamelet import (
+    FlameletSetupError,
+    FlameletTableReadiness,
+    assess_flamelet_table_readiness,
+    require_flamelet_table_ready,
+    resolve_probe_assets,
+    run_diffusion_fgm_setup_probe,
+)
 from .loading import AutoCaseLoader, CaseLoader, DirectoryCaseLoader, LoadedCase, load_case
 from .planner import ValidationReport, compile_plan, dependency_order, validate_case
 from .types import ActionKind, CompiledPlan, SemanticAction
@@ -22,6 +30,8 @@ __all__ = [
     "DirectoryCaseLoader",
     "ExecutionAdapter",
     "ExecutionSummary",
+    "FlameletSetupError",
+    "FlameletTableReadiness",
     "LoadedCase",
     "PlanExecutor",
     "PyFluentAdapter",
@@ -30,11 +40,15 @@ __all__ = [
     "ValidationReport",
     "apply_campaign",
     "apply_candidate_attempt",
+    "assess_flamelet_table_readiness",
     "capture_snapshot",
     "compile_campaign",
     "compile_candidate_plan",
     "compile_plan",
     "dependency_order",
     "load_case",
+    "require_flamelet_table_ready",
+    "resolve_probe_assets",
+    "run_diffusion_fgm_setup_probe",
     "validate_case",
 ]

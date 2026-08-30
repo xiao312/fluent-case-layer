@@ -1,0 +1,17 @@
+schema_version: "1.0"
+materials:
+  - id: mascotte-g2-jl9-fgm
+    kind: mixture
+    source: {type: chemistry_mixture, mixture: mascotte-g2-jl9-fgm}
+    properties:
+      density:
+        type: cubic_eos
+        model: soave_redlich_kwong
+        volume_translation: false
+zone_assignments:
+  - id: assign-reacting-fluid
+    zones:
+      type: names
+      names: [fluid]
+      cardinality: {exactly: 1}
+    material: mascotte-g2-jl9-fgm

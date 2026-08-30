@@ -1,0 +1,26 @@
+schema_version: "1.0"
+platform:
+  id: scnet-cpu-small
+  kind: slurm
+  enabled: true
+  hardware: cpu
+  scheduler:
+    partition: "${SCNET_CPU_PARTITION}"
+    account_variable: SCNET_SLURM_ACCOUNT
+  resources:
+    nodes: 1
+    ranks: 1
+    tasks_per_node: 4
+    threads_per_rank: 1
+    memory_per_node: {value: 8, unit: GiB}
+    accelerators_per_node: 0
+    walltime: {value: 1, unit: h}
+    exclusive: false
+  environment:
+    setup_script_variable: SCNET_FLUENT_2026_ENV
+    python_environment_variable: SCNET_PYFLUENT_VENV
+  fluent: {version: 2026R1, mode: solver, graphics: none}
+  capabilities: [settings_api, tui, postprocess]
+  notes:
+    - One Fluent rank on a four-CPU allocation is sufficient for setup and readback.
+    - This profile does not authorize table generation or iterations.

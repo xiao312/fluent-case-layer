@@ -1,0 +1,64 @@
+schema_version: "1.0"
+assets:
+  - id: g2-baseline-mesh
+    kind: mesh
+    source:
+      type: environment
+      root_variable: MASCOTTE_G2_ASSET_ROOT
+      relative_path: mesh/g2-baseline.msh
+    sha256: f40d9affc89aca0d6af7fe41339a94e73b73c7ff2dca0a0c705b1db978fbdef1
+    size_bytes: 931783
+    description: Deterministic 11,000-cell setup mesh; not a mesh-independence claim.
+  - id: g2-medium-mesh
+    kind: mesh
+    source:
+      type: environment
+      root_variable: MASCOTTE_G2_ASSET_ROOT
+      relative_path: mesh/g2-medium.msh
+    sha256: 3e25883157ac1459f6b21a722faec672134f23b4325c516a7e506771f7bb6f97
+    size_bytes: 7641999
+    description: Deterministic 86,400-cell geometry-identical comparison mesh.
+  - id: g2-fine-mesh
+    kind: mesh
+    source:
+      type: environment
+      root_variable: MASCOTTE_G2_ASSET_ROOT
+      relative_path: mesh/g2-fine.msh
+    sha256: 2db11fcb27d5dcbde35c5bd95d4a2e7e429d4ff4578401d60896beafdc27dfe8
+    size_bytes: 17837031
+    description: Deterministic 194,400-cell sensitivity mesh; not selected by this probe.
+  - id: jl9-kinetics
+    kind: chemistry
+    source:
+      type: environment
+      root_variable: MASCOTTE_G2_ASSET_ROOT
+      relative_path: jl9/jl9.inp
+    sha256: 84cfcea7f44efe64f28dfe9504df4b288ac8b91cc9cb2276d9471d95a6201630
+    size_bytes: 739
+    description: Reduced Jones-Lindstedt nine-species, six-reaction CHEMKIN kinetics.
+  - id: jl9-thermodynamics
+    kind: chemistry
+    source:
+      type: environment
+      root_variable: MASCOTTE_G2_ASSET_ROOT
+      relative_path: jl9/jl9-thermo.dat
+    sha256: 0ce753ecb5aa37ba61c36a37087fbf47ab91dfc2600613dd983800fa90cc68d7
+    size_bytes: 3546
+  - id: jl9-transport
+    kind: chemistry
+    source:
+      type: environment
+      root_variable: MASCOTTE_G2_ASSET_ROOT
+      relative_path: jl9/jl9-transport.dat
+    sha256: 1fe96c9d2549a403f23274f579c924088f007b95ec9a393035b38d96de0a061f
+    size_bytes: 1092
+  - id: singla-ohstar-relative
+    kind: reference_data
+    source:
+      type: environment
+      root_variable: MASCOTTE_G2_REFERENCE_ROOT
+      relative_path: singla-g2-ohstar-relative.npz
+    sha256: 0c1897910ac7d4a70c7d7d4501849ca6d5d72ac41acefc02a914e18979375fc2
+    size_bytes: 5928
+    media_type: application/x-npz
+    description: Figure-digitized relative OH-star shape; not calibrated concentration data.

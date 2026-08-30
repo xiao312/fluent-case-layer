@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 from pydantic import model_validator
 
 from .assets import AssetsLock, LockedAsset
@@ -42,7 +44,11 @@ from .fields import (
     WallBoundary,
 )
 from .initialization import InitializationDocument, PatchAction, ReadCheckpointAction
-from .materials import MaterialsDocument
+from .materials import (
+    ChemistryMixtureMaterialSource,
+    CubicEquationOfStateProperty,
+    MaterialsDocument,
+)
 from .monitors import ArtifactGate, MonitorsDocument
 from .numerics import NumericsDocument
 from .objectives import (
@@ -188,6 +194,7 @@ class CaseSpec(StrictModel):
         self._validate_platforms()
         self._validate_stage_references()
         self._validate_load_asset_kinds(asset_by_id)
+        self._validate_flamelet_setup_probe(asset_by_id)
         self._validate_objectives(asset_by_id)
         self._validate_state_baseline(asset_by_id)
         self._validate_state_document_pointers()
@@ -208,6 +215,82 @@ class CaseSpec(StrictModel):
             "partially_premixed_pdf",
         }:
             raise ValueError("flamelet chemistry requires a PDF species model")
+
+    def _validate_flamelet_setup_probe(self, asset_by_id: dict[str, LockedAsset]) -> None:
+        chemistry = self.chemistry.model
+        if not isinstance(chemistry, FlameletChemistry) or chemistry.generation is None:
+            return
+        generation = chemistry.generation
+        if self.physics.species.type != "partially_premixed_pdf":
+            raise ValueError(
+                "diffusion FGM setup probe requires physics.species.type=partially_premixed_pdf"
+            )
+        mechanism = chemistry.mechanism
+        if not isinstance(mechanism, AssetMechanism) or mechanism.format != "chemkin":
+            raise ValueError("diffusion FGM setup probe requires an asset-backed CHEMKIN mechanism")
+        mechanism_assets = {
+            "kinetics": mechanism.mechanism_asset,
+            "thermodynamics": mechanism.thermodynamics_asset,
+            "transport": mechanism.transport_asset,
+        }
+        missing_roles = sorted(role for role, asset in mechanism_assets.items() if asset is None)
+        if missing_roles:
+            raise ValueError(
+                "diffusion FGM setup probe requires locked CHEMKIN "
+                + ", ".join(missing_roles)
+            )
+        wrong_kinds = sorted(
+            f"{role}={asset_id} ({asset_by_id[asset_id].kind})"
+            for role, asset_id in mechanism_assets.items()
+            if asset_id in asset_by_id and asset_by_id[asset_id].kind != "chemistry"
+        )
+        if wrong_kinds:
+            raise ValueError(
+                "diffusion FGM CHEMKIN inputs must have kind=chemistry: "
+                + ", ".join(wrong_kinds)
+            )
+
+        pressure = self.physics.solver.operating_pressure
+        pressure_scales = {
+            "Pa": 1.0,
+            "kPa": 1.0e3,
+            "MPa": 1.0e6,
+            "bar": 1.0e5,
+            "atm": 101325.0,
+        }
+        operating_pressure_pa = pressure.value * pressure_scales[pressure.unit]
+        if not math.isclose(
+            operating_pressure_pa,
+            generation.equilibrium_operating_pressure.value,
+            rel_tol=0.0,
+            abs_tol=1.0e-6,
+        ):
+            raise ValueError(
+                "FGM equilibrium operating pressure must equal the case operating pressure"
+            )
+
+        matching_materials = [
+            material
+            for material in self.materials.materials
+            if isinstance(material.source, ChemistryMixtureMaterialSource)
+            and material.source.mixture == generation.mixture_name
+        ]
+        if len(matching_materials) != 1:
+            raise ValueError(
+                "diffusion FGM setup probe requires exactly one chemistry-mixture material "
+                f"for {generation.mixture_name!r}"
+            )
+        density = matching_materials[0].properties.get("density")
+        if not isinstance(density, CubicEquationOfStateProperty):
+            # Pydantic model validators must surface authored-data failures as
+            # ValidationError so the split-document loader can add path context.
+            raise ValueError(  # noqa: TRY004
+                "diffusion FGM setup probe requires an explicit cubic EOS density"
+            )
+        if density.model != "soave_redlich_kwong" or density.fallback_model is not None:
+            raise ValueError(
+                "the G2 diffusion FGM setup probe requires exact SRK with no fallback model"
+            )
 
     def _validate_platforms(self) -> None:
         if not self.platforms:

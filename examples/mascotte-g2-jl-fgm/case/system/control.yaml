@@ -1,0 +1,21 @@
+schema_version: "1.0"
+default_platform: scnet-cpu-small
+stages:
+  - id: load-medium-mesh
+    type: load_asset
+    asset: g2-medium-mesh
+    load_as: mesh
+    preconditions: [{type: asset_available, asset: g2-medium-mesh}]
+  - id: configure-fgm-setup-probe
+    type: reconcile
+    requires: [load-medium-mesh]
+    sections: [physics, materials, chemistry]
+    inputs:
+      - {type: asset, name: kinetics, asset: jl9-kinetics}
+      - {type: asset, name: thermodynamics, asset: jl9-thermodynamics}
+      - {type: asset, name: transport, asset: jl9-transport}
+      - {type: literal, name: permitted-scope, value: setup_readback_only}
+      - {type: literal, name: table-generation-permitted, value: false}
+    postconditions:
+      - {type: state, path: setup.models.species, operator: exists}
+      - {type: state, path: setup.materials.mixture.mascotte-g2-jl9-fgm.density, operator: exists}

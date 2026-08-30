@@ -1,0 +1,32 @@
+schema_version: "1.0"
+mode: full_definition
+declared_paths:
+  - path: mesh.source
+    source: {type: case_document, document: system/control.yaml, pointer: /stages/0/asset}
+    rationale: Own the deterministic, hash-locked 86,400-cell comparison mesh.
+  - path: setup.solver
+    source: {type: case_document, document: constant/physics.yaml, pointer: /solver}
+  - path: setup.models.turbulence
+    source: {type: case_document, document: constant/physics.yaml, pointer: /turbulence}
+  - path: setup.models.species
+    source: {type: case_document, document: constant/physics.yaml, pointer: /species}
+  - path: setup.materials
+    source: {type: case_document, document: constant/materials.yaml, pointer: /materials}
+  - path: setup.chemistry
+    source: {type: case_document, document: constant/chemistry.yaml, pointer: ""}
+  - path: setup.boundary_conditions
+    source: {type: case_document, document: 0/boundary-conditions.yaml, pointer: /boundaries}
+  - path: solution.fields
+    source: {type: case_document, document: 0/fields.yaml, pointer: /fields}
+  - path: solution.methods
+    source: {type: case_document, document: system/numerics.yaml, pointer: /profiles}
+  - path: solution.initialization
+    source: {type: case_document, document: system/initialization.yaml, pointer: /actions}
+observed_paths:
+  - {path: mesh.summary, capture: summary, purpose: provenance, required: true}
+  - {path: setup.models.species, capture: exact, purpose: verification, required: true}
+  - {path: setup.materials.mixture.mascotte-g2-jl9-fgm.density, capture: exact, purpose: verification, required: true}
+  - {path: setup.chemistry.runtime_defaults, capture: exact, purpose: verification, required: true}
+  - {path: setup.boundary_conditions, capture: exact, purpose: verification, required: false}
+  - {path: solution.methods, capture: exact, purpose: verification, required: false}
+  - {path: solution.fields, capture: summary, purpose: diagnostic, required: false}

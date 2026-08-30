@@ -1370,6 +1370,108 @@
       "title": "DeclaredStatePath",
       "type": "object"
     },
+    "DiffusionFgmSetupProbe": {
+      "additionalProperties": false,
+      "description": "Fully declared exploratory setup for discovering Fluent 2026 R1 defaults.\n\nThe scope is deliberately limited to model setup and readback.  ``calc_fla`` and\n``calc_pdf`` are prohibited until every runtime-derived value is reviewed and\nreplaced by a frozen, hash-audited table-generation definition.",
+      "properties": {
+        "classification": {
+          "const": "engineer_selected_exploratory",
+          "title": "Classification",
+          "type": "string"
+        },
+        "compressibility": {
+          "const": true,
+          "default": true,
+          "title": "Compressibility",
+          "type": "boolean"
+        },
+        "equilibrium_operating_pressure": {
+          "$ref": "#/$defs/Quantity"
+        },
+        "execution_scope": {
+          "const": "setup_readback_only",
+          "title": "Execution Scope",
+          "type": "string"
+        },
+        "fluent_release": {
+          "const": "2026R1",
+          "title": "Fluent Release",
+          "type": "string"
+        },
+        "fuel_stream": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Fuel Stream",
+          "type": "string"
+        },
+        "mixture_name": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Mixture Name",
+          "type": "string"
+        },
+        "oxidizer_stream": {
+          "maxLength": 96,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9]*(?:[-_.][a-z0-9]+)*$",
+          "title": "Oxidizer Stream",
+          "type": "string"
+        },
+        "probability_density_function": {
+          "const": "beta",
+          "title": "Probability Density Function",
+          "type": "string"
+        },
+        "progress_variable_definition": {
+          "const": "fluent_default",
+          "title": "Progress Variable Definition",
+          "type": "string"
+        },
+        "progress_variable_variance": {
+          "const": "transport",
+          "title": "Progress Variable Variance",
+          "type": "string"
+        },
+        "runtime_defaults": {
+          "$ref": "#/$defs/FluentDefaultsProbe"
+        },
+        "table_generation_permission": {
+          "const": "prohibited",
+          "title": "Table Generation Permission",
+          "type": "string"
+        },
+        "turbulence_chemistry_interaction": {
+          "const": "finite_rate",
+          "title": "Turbulence Chemistry Interaction",
+          "type": "string"
+        },
+        "type": {
+          "const": "fluent_diffusion_fgm_setup_probe",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "classification",
+        "execution_scope",
+        "table_generation_permission",
+        "fluent_release",
+        "mixture_name",
+        "fuel_stream",
+        "oxidizer_stream",
+        "equilibrium_operating_pressure",
+        "progress_variable_definition",
+        "turbulence_chemistry_interaction",
+        "progress_variable_variance",
+        "probability_density_function",
+        "runtime_defaults"
+      ],
+      "title": "DiffusionFgmSetupProbe",
+      "type": "object"
+    },
     "DirectionalAspect": {
       "additionalProperties": false,
       "properties": {
@@ -2120,6 +2222,17 @@
     "FlameletChemistry": {
       "additionalProperties": false,
       "properties": {
+        "generation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DiffusionFgmSetupProbe"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "mechanism": {
           "discriminator": {
             "mapping": {
@@ -2208,6 +2321,60 @@
         "name"
       ],
       "title": "FluentDatabaseMaterialSource",
+      "type": "object"
+    },
+    "FluentDefaultsProbe": {
+      "additionalProperties": false,
+      "description": "Runtime defaults that must be captured and frozen before table generation.\n\nThis is intentionally a setup-only contract.  It makes release-specific Fluent\ndefaults visible without pretending that a paper specified them or allowing a\ntable calculation to proceed with implicit choices.",
+      "properties": {
+        "fluent_release": {
+          "const": "2026R1",
+          "title": "Fluent Release",
+          "type": "string"
+        },
+        "freeze_before_table_generation": {
+          "const": true,
+          "default": true,
+          "title": "Freeze Before Table Generation",
+          "type": "boolean"
+        },
+        "groups": {
+          "items": {
+            "enum": [
+              "chemistry",
+              "boundary",
+              "progress_variable_definition",
+              "control",
+              "flamelet",
+              "table",
+              "premix",
+              "combustion_parameters",
+              "material_density"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Groups",
+          "type": "array"
+        },
+        "record_allowed_values": {
+          "const": true,
+          "default": true,
+          "title": "Record Allowed Values",
+          "type": "boolean"
+        },
+        "require_complete_group_state": {
+          "const": true,
+          "default": true,
+          "title": "Require Complete Group State",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "fluent_release",
+        "groups"
+      ],
+      "title": "FluentDefaultsProbe",
       "type": "object"
     },
     "FluentProperty": {

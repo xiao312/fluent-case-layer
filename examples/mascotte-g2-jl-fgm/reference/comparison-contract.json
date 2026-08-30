@@ -1,0 +1,104 @@
+{
+  "case_id": "mascotte-g2-jl-fgm",
+  "contract_kind": "historical-replication-boundary-and-exploratory-probe",
+  "exploratory_setup_probe": {
+    "classification": "engineer_selected_exploratory",
+    "explicit_selections": {
+      "chemistry": "reduced JL9 CHEMKIN assets locked by SHA-256",
+      "compressibility": true,
+      "energy_treatment": "nonadiabatic",
+      "equation_of_state": "soave_redlich_kwong_without_fallback",
+      "flamelet_type": "diffusion_flamelet",
+      "operating_pressure_pa": 5610000,
+      "probability_density_function": "beta",
+      "progress_variable_definition": "fluent_default",
+      "progress_variable_variance": "transport",
+      "state_relation": "fgm",
+      "turbulence_chemistry_interaction": "finite_rate"
+    },
+    "prohibited_operations": [
+      "calculate_flamelets",
+      "calculate_pdf_table",
+      "flow_iterations"
+    ],
+    "runtime_groups_captured_in_full": [
+      "chemistry",
+      "boundary",
+      "progress_variable_definition",
+      "control",
+      "flamelet",
+      "table",
+      "premix",
+      "combustion_parameters",
+      "material_density"
+    ],
+    "status": "eligible_for_setup_readback_only",
+    "table_generation_eligible": false
+  },
+  "historical_replication": {
+    "audited_locations": [
+      "fluent-case-layer repository and Git history",
+      "dedicated MASCOTTE G2 source repository",
+      "internal project and progress Lark documents",
+      "known Wuzhen MASCOTTE G2 SCNET root",
+      "known Cancon MASCOTTE G2 SCNET root"
+    ],
+    "exact_fluent_flamelet_or_pdf_tables_found": [],
+    "missing_reproduction_inputs": [
+      "binary Fluent flamelet or PDF table with content hash",
+      "progress-variable species and weights used by the historical table",
+      "scalar-dissipation start, minimum, multiplier, step, and termination values",
+      "flamelet integration and convergence controls",
+      "nonadiabatic enthalpy discretization and bounds",
+      "PDF-table variance-axis discretization and refinement thresholds",
+      "complete Fluent release-specific table-generation state"
+    ],
+    "source_reported_but_not_unambiguously_mapped": [
+      "automatic 64-point resolution in mean mixture-fraction and progress-variable space"
+    ],
+    "status": "blocked"
+  },
+  "comparison": {
+    "common_basis": [
+      "G2 geometry and named zones",
+      "5.61 MPa operating pressure",
+      "0.0444 kg/s LOX at 85 K",
+      "0.1431 kg/s methane at 288 K",
+      "locked reduced JL9 chemistry",
+      "exact SRK request without PR fallback",
+      "medium mesh for the first closure comparison"
+    ],
+    "initialization_rule": "Start each reacting closure from a declared common cold basis; never warm-start FGM from an EDC reacting field.",
+    "metrics": [
+      "residual and mass-closure histories",
+      "temperature and OH fields",
+      "relative OH-star proxy axial extent and spread",
+      "radial profiles at x=15, 45, and 70 mm",
+      "inlet velocity and density readback",
+      "successive-window field change"
+    ],
+    "promotion_rule": "Engineer review only; the objective is not a mandatory universal gate."
+  },
+  "schema_version": "1",
+  "sources": [
+    {
+      "doi": "10.1016/j.proci.2004.08.063",
+      "role": "experimental G2 operating point and relative optical evidence",
+      "url": "https://doi.org/10.1016/j.proci.2004.08.063"
+    },
+    {
+      "doi": "10.1016/j.ijheatmasstransfer.2025.127284",
+      "role": "modern G2 geometry, real-fluid context, and comparison stations",
+      "url": "https://doi.org/10.1016/j.ijheatmasstransfer.2025.127284"
+    },
+    {
+      "doi": "10.1615/InterJEnerCleanEnv.2022045212",
+      "role": "partially-premixed diffusion-flamelet FGM method evidence and omitted-control audit",
+      "url": "https://doi.org/10.1615/InterJEnerCleanEnv.2022045212"
+    },
+    {
+      "role": "Fluent 2026 R1 settings API surface for complete group readback",
+      "url": "https://fluent.docs.pyansys.com/version/stable/api/solver/_autosummary/settings/partially_premixed_model_options.html"
+    }
+  ]
+}

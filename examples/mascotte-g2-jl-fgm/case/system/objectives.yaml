@@ -1,0 +1,55 @@
+schema_version: "1.0"
+revision:
+  id: jl-fgm-controlled-comparator
+  sequence: 1
+  recorded_at: "2026-08-30T23:40:00+08:00"
+  recorded_by: Xiao Ke and CFD agent working session
+  change_summary: >-
+    Separate a blocked historical replication from an engineer-selected,
+    setup-only Fluent-default discovery profile.
+provenance:
+  type: engineer_statement
+  author: Xiao Ke
+  role: internal CFD engineer
+  context: Controlled TCI-closure comparison against the common MASCOTTE G2 basis.
+statement: >-
+  Assess whether an exact-SRK, reduced-JL diffusion-FGM branch improves the G2
+  flame structure relative to the finite-rate/EDC basis while preserving geometry,
+  operating conditions, chemistry provenance, and comparison metrics. Do not treat
+  a setup smoke, a generated table, or qualitative OH agreement as acceptance.
+enforcement: none
+aspects:
+  - id: controlled-numerical-health
+    type: observe
+    description: Retain residual, mass-closure, temperature, and OH histories.
+    monitors: [residuals, mass-closure, maximum-temperature, maximum-oh]
+    priority: primary
+  - id: experimental-ohstar-shape
+    type: match_reference
+    description: Compare normalized simulated OH/OH-star flame length and spread with G2 radiation.
+    monitor: maximum-oh
+    reference:
+      type: reference_asset
+      asset: singla-ohstar-relative
+      role: experiment
+      locator: relative_intensity in singla-g2-ohstar-relative.npz
+      observable: figure-digitized relative OH-star radiation shape
+    comparison:
+      method: profile_shape
+      alignment: x=0 at injector exit; axisymmetric reflection; each field independently normalized.
+      notes: No calibrated OH concentration or absolute radiation comparison is implied.
+    priority: primary
+  - id: inlet-state-fidelity
+    type: observe
+    description: Retain area-averaged inlet velocity and density for EOS verification.
+    monitors: [lox-inlet-velocity, lox-inlet-density, gch4-inlet-velocity, gch4-inlet-density]
+    priority: primary
+  - id: closure-comparison
+    type: investigate
+    description: Isolate the effect of FGM from geometry, operating point, EOS, and mechanism changes.
+    questions:
+      - Does the FGM branch reproduce the approximately 55–60 mm flame termination region?
+      - Are differences robust to grid and iteration-window checks rather than startup transients?
+      - Does the table cover the enthalpy and progress-variable states used by the solution?
+    monitors: [maximum-temperature, maximum-oh, mass-closure]
+    priority: exploratory

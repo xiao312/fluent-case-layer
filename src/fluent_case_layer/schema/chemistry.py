@@ -88,6 +88,103 @@ class FiniteRateChemistry(StrictModel):
         return self
 
 
+FlameletReadbackGroup = Literal[
+    "chemistry",
+    "boundary",
+    "progress_variable_definition",
+    "control",
+    "flamelet",
+    "table",
+    "premix",
+    "combustion_parameters",
+    "material_density",
+]
+
+REQUIRED_FLAMELET_READBACK_GROUPS = {
+    "chemistry",
+    "boundary",
+    "progress_variable_definition",
+    "control",
+    "flamelet",
+    "table",
+    "premix",
+    "combustion_parameters",
+    "material_density",
+}
+
+
+class FluentDefaultsProbe(StrictModel):
+    """Runtime defaults that must be captured and frozen before table generation.
+
+    This is intentionally a setup-only contract.  It makes release-specific Fluent
+    defaults visible without pretending that a paper specified them or allowing a
+    table calculation to proceed with implicit choices.
+    """
+
+    fluent_release: Literal["2026R1"]
+    groups: Annotated[list[FlameletReadbackGroup], Field(min_length=1)]
+    require_complete_group_state: Literal[True] = True
+    record_allowed_values: Literal[True] = True
+    freeze_before_table_generation: Literal[True] = True
+
+    @field_validator("groups")
+    @classmethod
+    def complete_unique_groups(cls, groups: list[str]) -> list[str]:
+        if len(groups) != len(set(groups)):
+            raise ValueError("Fluent default readback groups must be unique")
+        missing = sorted(REQUIRED_FLAMELET_READBACK_GROUPS - set(groups))
+        extra = sorted(set(groups) - REQUIRED_FLAMELET_READBACK_GROUPS)
+        if missing or extra:
+            details = []
+            if missing:
+                details.append("missing " + ", ".join(missing))
+            if extra:
+                details.append("unknown " + ", ".join(extra))
+            raise ValueError(
+                "setup-only FGM probes must capture the complete active state: "
+                + "; ".join(details)
+            )
+        return groups
+
+
+class DiffusionFgmSetupProbe(StrictModel):
+    """Fully declared exploratory setup for discovering Fluent 2026 R1 defaults.
+
+    The scope is deliberately limited to model setup and readback.  ``calc_fla`` and
+    ``calc_pdf`` are prohibited until every runtime-derived value is reviewed and
+    replaced by a frozen, hash-audited table-generation definition.
+    """
+
+    type: Literal["fluent_diffusion_fgm_setup_probe"]
+    classification: Literal["engineer_selected_exploratory"]
+    execution_scope: Literal["setup_readback_only"]
+    table_generation_permission: Literal["prohibited"]
+    fluent_release: Literal["2026R1"]
+    mixture_name: Identifier
+    fuel_stream: Identifier
+    oxidizer_stream: Identifier
+    equilibrium_operating_pressure: Quantity
+    compressibility: Literal[True] = True
+    progress_variable_definition: Literal["fluent_default"]
+    turbulence_chemistry_interaction: Literal["finite_rate"]
+    progress_variable_variance: Literal["transport"]
+    probability_density_function: Literal["beta"]
+    runtime_defaults: FluentDefaultsProbe
+
+    @field_validator("equilibrium_operating_pressure")
+    @classmethod
+    def pressure_in_pascal(cls, value: Quantity) -> Quantity:
+        if value.value <= 0:
+            raise ValueError("equilibrium operating pressure must be positive")
+        return require_unit(value, {"Pa"}, "FGM equilibrium operating pressure")
+
+    @model_validator(mode="after")
+    def matching_release(self) -> DiffusionFgmSetupProbe:
+        if self.runtime_defaults.fluent_release != self.fluent_release:
+            raise ValueError("runtime-default probe release must match the generation release")
+        return self
+
+
 class FlameletChemistry(StrictModel):
     type: Literal["flamelet"]
     mechanism: MechanismSource
@@ -96,11 +193,24 @@ class FlameletChemistry(StrictModel):
     nonadiabatic: bool = True
     partially_premixed: bool = False
     progress_variable: bool = True
+    generation: DiffusionFgmSetupProbe | None = None
 
     @model_validator(mode="after")
     def table_required_when_reading(self) -> FlameletChemistry:
         if self.table_mode == "read" and self.table_asset is None:
             raise ValueError("flamelet table_mode=read requires table_asset")
+        if self.table_mode == "read" and self.generation is not None:
+            raise ValueError("flamelet generation is incompatible with table_mode=read")
+        if self.generation is not None:
+            if self.table_mode != "calculate":
+                raise ValueError("flamelet generation requires table_mode=calculate")
+            if not self.partially_premixed or not self.progress_variable:
+                raise ValueError(
+                    "diffusion FGM setup requires partially_premixed=true and "
+                    "progress_variable=true"
+                )
+            if not self.nonadiabatic:
+                raise ValueError("the typed diffusion FGM setup probe is nonadiabatic")
         return self
 
 
@@ -133,3 +243,23 @@ class ChemistryDocument(VersionedDocument):
         if len(species) != len(set(species)):
             raise ValueError("tracked_species must be unique")
         return species
+
+    @model_validator(mode="after")
+    def generation_streams(self) -> ChemistryDocument:
+        if not isinstance(self.model, FlameletChemistry) or self.model.generation is None:
+            return self
+        generation = self.model.generation
+        if generation.fuel_stream == generation.oxidizer_stream:
+            raise ValueError("FGM fuel_stream and oxidizer_stream must differ")
+        missing = sorted(
+            {generation.fuel_stream, generation.oxidizer_stream} - self.streams.keys()
+        )
+        if missing:
+            raise ValueError("FGM generation references unknown streams: " + ", ".join(missing))
+        stream_temperatures = [
+            self.streams[generation.fuel_stream].temperature,
+            self.streams[generation.oxidizer_stream].temperature,
+        ]
+        if any(item.unit != "K" for item in stream_temperatures):
+            raise ValueError("FGM setup-probe stream temperatures must use K")
+        return self

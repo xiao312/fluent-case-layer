@@ -1,0 +1,40 @@
+schema_version: "1.0"
+boundaries:
+  - id: lox-inlet
+    zones: {type: names, names: [lox-inlet], cardinality: {exactly: 1}}
+    condition:
+      type: mass_flow_inlet
+      mass_flow: {value: 0.0444, unit: kg/s}
+      temperature: {value: 85, unit: K}
+      species: {basis: mass_fraction, fractions: {o2: 1.0}}
+      turbulence:
+        type: intensity_hydraulic_diameter
+        intensity: 0.03
+        hydraulic_diameter: {value: 3.6, unit: mm}
+  - id: methane-inlet
+    zones: {type: names, names: [gch4-inlet], cardinality: {exactly: 1}}
+    condition:
+      type: mass_flow_inlet
+      mass_flow: {value: 0.1431, unit: kg/s}
+      temperature: {value: 288, unit: K}
+      species: {basis: mass_fraction, fractions: {ch4: 1.0}}
+      turbulence:
+        type: intensity_hydraulic_diameter
+        intensity: 0.03
+        hydraulic_diameter: {value: 4.4, unit: mm}
+  - id: chamber-outlet
+    zones: {type: names, names: [outlet], cardinality: {exactly: 1}}
+    condition:
+      type: pressure_outlet
+      gauge_pressure: {value: 0, unit: Pa}
+      backflow_temperature: {value: 288, unit: K}
+      backflow_species: {basis: mass_fraction, fractions: {ch4: 1.0}}
+  - id: adiabatic-walls
+    zones:
+      type: names
+      names: [lox-tube-wall, gch4-tube-wall, injector-lip, faceplate, chamber-wall]
+      cardinality: {exactly: 5}
+    condition: {type: wall, shear: no_slip, thermal: {type: adiabatic}}
+  - id: centerline
+    zones: {type: names, names: [axis], cardinality: {exactly: 1}}
+    condition: {type: axis}

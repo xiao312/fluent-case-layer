@@ -1,0 +1,31 @@
+schema_version: "1.0"
+default_profile: reacting-first-order
+profiles:
+  reacting-first-order:
+    pressure_velocity_coupling: simple
+    gradient: least_squares_cell_based
+    pressure: standard
+    equations:
+      momentum: {spatial_scheme: first_order_upwind}
+      energy: {spatial_scheme: first_order_upwind}
+      k: {spatial_scheme: first_order_upwind}
+      epsilon: {spatial_scheme: first_order_upwind}
+      fmean: {spatial_scheme: first_order_upwind}
+      fvar: {spatial_scheme: first_order_upwind}
+      premixc: {spatial_scheme: first_order_upwind}
+      premix-g-var: {spatial_scheme: first_order_upwind}
+    expert_controls:
+      requested_c1_epsilon: 1.4
+      requested_cubic_eos: soave-redlich-kwong
+  reacting-second-order:
+    extends: reacting-first-order
+    pressure: second_order
+    equations:
+      momentum: {spatial_scheme: second_order_upwind}
+      energy: {spatial_scheme: second_order_upwind}
+      k: {spatial_scheme: second_order_upwind}
+      epsilon: {spatial_scheme: second_order_upwind}
+      fmean: {spatial_scheme: second_order_upwind}
+      fvar: {spatial_scheme: second_order_upwind}
+      premixc: {spatial_scheme: second_order_upwind}
+      premix-g-var: {spatial_scheme: second_order_upwind}
