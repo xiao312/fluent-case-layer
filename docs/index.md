@@ -27,6 +27,7 @@ before applying a case.
 - [Using the reference as an agent](manual/agent-guide.md)
 - [Documentation architecture and provenance](manual/documentation-system.md)
 - [Runtime option discovery](manual/runtime-discovery.md)
+- [Field evidence and extraction](manual/field-evidence.md)
 - [Case-layer architecture](architecture.md)
 - [SCNET platform contract](scnet-platform.md)
 - [Example case catalog](case-catalog.md)

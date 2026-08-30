@@ -17,6 +17,7 @@ nav:
       - Agent guide: manual/agent-guide.md
       - Documentation system: manual/documentation-system.md
       - Runtime discovery: manual/runtime-discovery.md
+      - Field evidence and extraction: manual/field-evidence.md
   - Dictionary reference:
       - Overview: reference/index.md
       - Coupling coverage: reference/coverage.md
