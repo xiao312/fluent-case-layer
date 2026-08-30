@@ -7,14 +7,14 @@ It combines static Pydantic/JSON Schema facts with reviewed Fluent/PyFluent
 coupling metadata. The [machine catalog](catalog.json) contains the same entries
 for agents and tools.
 
-Current catalog: **564 entries** for Fluent
+Current catalog: **570 entries** for Fluent
 **2026 R1**.
 
 | Dictionary | Purpose | Entries | Reference |
 | --- | --- | ---: | --- |
 | `constant/physics.yaml` | Solver formulation and enabled physical models. | 43 | [Physics](physics.md) |
 | `constant/materials.yaml` | Material definitions, properties, and cell-zone assignments. | 44 | [Materials](materials.md) |
-| `constant/chemistry.yaml` | Reaction model, mechanism assets, streams, and tracked species. | 27 | [Chemistry](chemistry.md) |
+| `constant/chemistry.yaml` | Reaction model, mechanism assets, streams, and tracked species. | 33 | [Chemistry](chemistry.md) |
 | `0/fields.yaml` | Named initial field intent and value representations. | 16 | [Initial fields](fields.md) |
 | `0/boundary-conditions.yaml` | Zone selection and typed Fluent boundary intent. | 78 | [Boundary conditions](boundary-conditions.md) |
 | `system/numerics.yaml` | Reusable discretization, coupling, relaxation, and transient profiles. | 22 | [Numerics](numerics.md) |

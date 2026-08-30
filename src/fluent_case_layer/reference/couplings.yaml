@@ -514,6 +514,76 @@ entries:
       allowed_units: [K, degC]
       semantic_constraints: Kelvin values must be positive.
       example: {value: 300, unit: K}
+  "constant/chemistry.yaml#/model/stiff_solver_controls/absolute_ode_tolerance":
+    authoring:
+      description: Absolute integration tolerance used by Fluent's stiff chemistry solver.
+      semantic_constraints: Value must be finite and greater than zero.
+      example: 1.0e-8
+    fluent:
+      concept: Setup > Models > Species > Integration Parameters > Absolute Tolerance
+      activation: Active only when the stiff chemistry solver is selected.
+    pyfluent:
+      path: setup.models.species.integration_parameters.integration_options.absolute_ode_tolerance
+      operation: set_state
+      option_source: runtime_metadata
+      confidence: official
+    adapter:
+      status: planned
+      note: Typed intent is documented, but the generic chemistry reconciler is not implemented.
+  "constant/chemistry.yaml#/model/stiff_solver_controls/relative_ode_tolerance":
+    authoring:
+      description: Relative integration tolerance used by Fluent's stiff chemistry solver.
+      semantic_constraints: Value must be finite and greater than zero.
+      example: 1.0e-9
+    fluent:
+      concept: Setup > Models > Species > Integration Parameters > Relative Tolerance
+      activation: Active only when the stiff chemistry solver is selected.
+    pyfluent:
+      path: setup.models.species.integration_parameters.integration_options.relative_ode_tolerance
+      operation: set_state
+      option_source: runtime_metadata
+      confidence: official
+    adapter:
+      status: planned
+      note: Typed intent is documented, but the generic chemistry reconciler is not implemented.
+  "constant/chemistry.yaml#/model/edc_controls/aggressiveness_factor":
+    authoring:
+      description: >-
+        Fluent steady-EDC aggressiveness factor. Zero is the most conservative update;
+        one is the most aggressive and may be less stable.
+      semantic_constraints: Value must be between zero and one, inclusive.
+      example: 0.0
+    fluent:
+      concept: Setup > Models > Species > Turbulence-Chemistry Interaction > EDC
+      activation: Active only for the Eddy-Dissipation Concept in a steady calculation.
+    pyfluent:
+      path: setup.models.species.turb_chem_interaction_options.aggressiveness_factor
+      operation: set_state
+      option_source: runtime_metadata
+      confidence: official
+    adapter:
+      status: planned
+      note: Typed intent is documented, but the generic chemistry reconciler is not implemented.
+  "constant/chemistry.yaml#/model/edc_controls/flow_iterations_per_chemistry_update":
+    authoring:
+      description: >-
+        Number of steady flow iterations between detailed-chemistry updates. Values above
+        one reduce chemistry cost but also loosen flow/chemistry coupling.
+      semantic_constraints: Value must be an integer of at least one.
+      example: 5
+    fluent:
+      concept: >-
+        Setup > Models > Species > Turbulence-Chemistry Interaction > EDC >
+        Flow Iterations per Chemistry Update
+      activation: Active only for the Eddy-Dissipation Concept in a steady calculation.
+    pyfluent:
+      path: setup.models.species.turb_chem_interaction_options.chemistry_iterations
+      operation: set_state
+      option_source: runtime_metadata
+      confidence: official
+    adapter:
+      status: planned
+      note: Typed intent is documented, but the generic chemistry reconciler is not implemented.
   "0/boundary-conditions.yaml#/boundaries/*/condition/mass_flow":
     authoring:
       description: Total mass flow rate entering through the selected inlet zone or zones.

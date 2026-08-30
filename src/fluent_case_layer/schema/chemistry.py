@@ -47,6 +47,23 @@ class NoChemistry(StrictModel):
     type: Literal["none"]
 
 
+class StiffSolverControls(StrictModel):
+    absolute_ode_tolerance: float = Field(gt=0)
+    relative_ode_tolerance: float = Field(gt=0)
+
+    @field_validator("absolute_ode_tolerance", "relative_ode_tolerance")
+    @classmethod
+    def finite_tolerance(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("ODE tolerance must be finite")
+        return value
+
+
+class EdcControls(StrictModel):
+    aggressiveness_factor: float = Field(ge=0, le=1)
+    flow_iterations_per_chemistry_update: int = Field(ge=1)
+
+
 class FiniteRateChemistry(StrictModel):
     type: Literal["finite_rate"]
     mechanism: MechanismSource
@@ -57,6 +74,18 @@ class FiniteRateChemistry(StrictModel):
         "edc",
     ] = "none"
     stiff_chemistry_solver: bool = True
+    stiff_solver_controls: StiffSolverControls | None = None
+    edc_controls: EdcControls | None = None
+
+    @model_validator(mode="after")
+    def controls_match_selected_closures(self) -> FiniteRateChemistry:
+        if self.stiff_solver_controls is not None and not self.stiff_chemistry_solver:
+            raise ValueError(
+                "stiff_solver_controls require stiff_chemistry_solver=true"
+            )
+        if self.edc_controls is not None and self.turbulence_interaction != "edc":
+            raise ValueError("edc_controls require turbulence_interaction=edc")
+        return self
 
 
 class FlameletChemistry(StrictModel):

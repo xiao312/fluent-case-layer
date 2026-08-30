@@ -14,7 +14,7 @@ so agents cannot mistake documentation coverage for execution coverage.
 | `implemented` | 10 | Compiles to a supported adapter operation for the documented conditions. |
 | `not_applicable` | 17 | Metadata with no Fluent or PyFluent setting counterpart. |
 | `partial` | 221 | Only the documented options or prerequisites are implemented. |
-| `planned` | 233 | Typed intent is accepted, but no automatic PyFluent mutation exists yet. |
+| `planned` | 239 | Typed intent is accepted, but no automatic PyFluent mutation exists yet. |
 
 ## By dictionary
 
@@ -22,7 +22,7 @@ so agents cannot mistake documentation coverage for execution coverage.
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | [`constant/physics.yaml`](physics.md) | 43 | 0 | 0 | 37 | 1 | 5 |
 | [`constant/materials.yaml`](materials.md) | 44 | 0 | 0 | 41 | 2 | 1 |
-| [`constant/chemistry.yaml`](chemistry.md) | 27 | 0 | 0 | 26 | 0 | 1 |
+| [`constant/chemistry.yaml`](chemistry.md) | 33 | 0 | 0 | 32 | 0 | 1 |
 | [`0/fields.yaml`](fields.md) | 16 | 0 | 0 | 14 | 1 | 1 |
 | [`0/boundary-conditions.yaml`](boundary-conditions.md) | 78 | 0 | 0 | 76 | 1 | 1 |
 | [`system/numerics.yaml`](numerics.md) | 22 | 0 | 0 | 21 | 0 | 1 |

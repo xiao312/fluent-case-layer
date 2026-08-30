@@ -4,11 +4,11 @@
 
 - Dictionary: `constant/chemistry.yaml`
 - Schema: [`chemistry.schema.json`](schemas/chemistry.schema.json)
-- Entries: **27**
+- Entries: **33**
 
 Reaction model, mechanism assets, streams, and tracked species.
 
-Support summary: **not_applicable** 1, **planned** 26.
+Support summary: **not_applicable** 1, **planned** 32.
 
 The status describes the repository adapter, not whether Fluent itself supports the feature.
 
@@ -17,6 +17,9 @@ The status describes the repository adapter, not whether Fluent itself supports 
 | Pointer | Requirement | Type | Static choices | Adapter |
 | --- | --- | --- | --- | --- |
 | [`/model`](#entry-model-9515fc13) | required | `object` | — | **planned** |
+| [`/model/edc_controls`](#entry-model-edc-controls-5817f3b8) | optional | `null`, `object` | — | **planned** |
+| [`/model/edc_controls/aggressiveness_factor`](#entry-model-edc-controls-aggressiveness-factor-64f4fdcc) | conditional | `number` | — | **planned** |
+| [`/model/edc_controls/flow_iterations_per_chemistry_update`](#entry-model-edc-controls-flow-iterations-per-chemistry-update-d3ef9af8) | conditional | `integer` | — | **planned** |
 | [`/model/mechanism`](#entry-model-mechanism-d724d30b) | conditional | `object` | — | **planned** |
 | [`/model/mechanism/format`](#entry-model-mechanism-format-b3f0368f) | conditional | `string` | `cantera_yaml`, `chemkin`, `fluent_table` | **planned** |
 | [`/model/mechanism/mechanism_asset`](#entry-model-mechanism-mechanism-asset-656fcdc4) | conditional | `string` | — | **planned** |
@@ -28,6 +31,9 @@ The status describes the repository adapter, not whether Fluent itself supports 
 | [`/model/partially_premixed`](#entry-model-partially-premixed-424eee5f) | optional | `boolean` | `false`, `true` | **planned** |
 | [`/model/progress_variable`](#entry-model-progress-variable-41be5b6c) | optional | `boolean` | `false`, `true` | **planned** |
 | [`/model/stiff_chemistry_solver`](#entry-model-stiff-chemistry-solver-638758fd) | optional | `boolean` | `false`, `true` | **planned** |
+| [`/model/stiff_solver_controls`](#entry-model-stiff-solver-controls-b49471ff) | optional | `null`, `object` | — | **planned** |
+| [`/model/stiff_solver_controls/absolute_ode_tolerance`](#entry-model-stiff-solver-controls-absolute-ode-tolerance-4ef5755c) | conditional | `number` | — | **planned** |
+| [`/model/stiff_solver_controls/relative_ode_tolerance`](#entry-model-stiff-solver-controls-relative-ode-tolerance-0b1eb19a) | conditional | `number` | — | **planned** |
 | [`/model/table_asset`](#entry-model-table-asset-4595b137) | optional | `null`, `string` | — | **planned** |
 | [`/model/table_mode`](#entry-model-table-mode-a64d37f1) | optional | `string` | `calculate`, `read` | **planned** |
 | [`/model/turbulence_interaction`](#entry-model-turbulence-interaction-b9825da6) | optional | `string` | `edc`, `eddy_dissipation`, `finite_rate_eddy_dissipation`, `none` | **planned** |
@@ -90,6 +96,147 @@ Canonical ID: `constant/chemistry.yaml#/model`
 | Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
 
 Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-edc-controls-5817f3b8"></a>
+
+## `/model/edc_controls`
+
+Authored key `edc_controls`.
+
+Canonical ID: `constant/chemistry.yaml#/model/edc_controls`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `null`, `object` |
+| Requirement | `optional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=finite_rate` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-edc-controls-aggressiveness-factor-64f4fdcc"></a>
+
+## `/model/edc_controls/aggressiveness_factor`
+
+Fluent steady-EDC aggressiveness factor. Zero is the most conservative update; one is the most aggressive and may be less stable.
+
+Canonical ID: `constant/chemistry.yaml#/model/edc_controls/aggressiveness_factor`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `number` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"maximum": 1, "minimum": 0} |
+| Available in variants | `/model:type=finite_rate` |
+| Required in variants | `/model:type=finite_rate` |
+| Allowed units | — |
+| Semantic constraints | Value must be between zero and one, inclusive. |
+| Example | `0.0` |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species > Turbulence-Chemistry Interaction > EDC |
+| Activation/order | Active only for the Eddy-Dissipation Concept in a steady calculation. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species.turb_chem_interaction_options.aggressiveness_factor` |
+| Operation | `set_state` |
+| Option source | `runtime_metadata` |
+| Path confidence | `official` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Typed intent is documented, but the generic chemistry reconciler is not implemented.
+
+<a id="entry-model-edc-controls-flow-iterations-per-chemistry-update-d3ef9af8"></a>
+
+## `/model/edc_controls/flow_iterations_per_chemistry_update`
+
+Number of steady flow iterations between detailed-chemistry updates. Values above one reduce chemistry cost but also loosen flow/chemistry coupling.
+
+Canonical ID: `constant/chemistry.yaml#/model/edc_controls/flow_iterations_per_chemistry_update`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `integer` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"minimum": 1} |
+| Available in variants | `/model:type=finite_rate` |
+| Required in variants | `/model:type=finite_rate` |
+| Allowed units | — |
+| Semantic constraints | Value must be an integer of at least one. |
+| Example | `5` |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species > Turbulence-Chemistry Interaction > EDC > Flow Iterations per Chemistry Update |
+| Activation/order | Active only for the Eddy-Dissipation Concept in a steady calculation. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species.turb_chem_interaction_options.chemistry_iterations` |
+| Operation | `set_state` |
+| Option source | `runtime_metadata` |
+| Path confidence | `official` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Typed intent is documented, but the generic chemistry reconciler is not implemented.
 
 <a id="entry-model-mechanism-d724d30b"></a>
 
@@ -607,6 +754,147 @@ Canonical ID: `constant/chemistry.yaml#/model/stiff_chemistry_solver`
 | Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
 
 Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-stiff-solver-controls-b49471ff"></a>
+
+## `/model/stiff_solver_controls`
+
+Authored key `stiff_solver_controls`.
+
+Canonical ID: `constant/chemistry.yaml#/model/stiff_solver_controls`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `null`, `object` |
+| Requirement | `optional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {} |
+| Available in variants | `/model:type=finite_rate` |
+| Required in variants | — |
+| Allowed units | — |
+| Semantic constraints | — |
+| Example | — |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species and Materials > Mixture |
+| Activation/order | Chemistry choices require compatible species and energy models. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species` |
+| Operation | `set_state_or_command` |
+| Option source | `schema_and_runtime_metadata` |
+| Path confidence | `candidate` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Mechanism import, mixture creation, and flamelet-table workflows are not mapped yet.
+
+<a id="entry-model-stiff-solver-controls-absolute-ode-tolerance-4ef5755c"></a>
+
+## `/model/stiff_solver_controls/absolute_ode_tolerance`
+
+Absolute integration tolerance used by Fluent's stiff chemistry solver.
+
+Canonical ID: `constant/chemistry.yaml#/model/stiff_solver_controls/absolute_ode_tolerance`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `number` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"exclusiveMinimum": 0} |
+| Available in variants | `/model:type=finite_rate` |
+| Required in variants | `/model:type=finite_rate` |
+| Allowed units | — |
+| Semantic constraints | Value must be finite and greater than zero. |
+| Example | `1e-08` |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species > Integration Parameters > Absolute Tolerance |
+| Activation/order | Active only when the stiff chemistry solver is selected. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species.integration_parameters.integration_options.absolute_ode_tolerance` |
+| Operation | `set_state` |
+| Option source | `runtime_metadata` |
+| Path confidence | `official` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Typed intent is documented, but the generic chemistry reconciler is not implemented.
+
+<a id="entry-model-stiff-solver-controls-relative-ode-tolerance-0b1eb19a"></a>
+
+## `/model/stiff_solver_controls/relative_ode_tolerance`
+
+Relative integration tolerance used by Fluent's stiff chemistry solver.
+
+Canonical ID: `constant/chemistry.yaml#/model/stiff_solver_controls/relative_ode_tolerance`
+
+### Authored YAML
+
+| Property | Value |
+| --- | --- |
+| Type | `number` |
+| Requirement | `conditional` |
+| Default | — |
+| Choices | — |
+| List-item choices | — |
+| Constraints | {"exclusiveMinimum": 0} |
+| Available in variants | `/model:type=finite_rate` |
+| Required in variants | `/model:type=finite_rate` |
+| Allowed units | — |
+| Semantic constraints | Value must be finite and greater than zero. |
+| Example | `1e-09` |
+
+### Fluent and PyFluent coupling
+
+| Layer | Value |
+| --- | --- |
+| Fluent mode | `solver` |
+| Fluent concept | Setup > Models > Species > Integration Parameters > Relative Tolerance |
+| Activation/order | Active only when the stiff chemistry solver is selected. |
+| PyFluent interface | `settings` |
+| PyFluent path | `setup.models.species.integration_parameters.integration_options.relative_ode_tolerance` |
+| Operation | `set_state` |
+| Option source | `runtime_metadata` |
+| Path confidence | `official` |
+
+### Current adapter boundary
+
+| Property | Value |
+| --- | --- |
+| Status | **planned** |
+| Action | `reconcile_settings` |
+| Implementation | `src/fluent_case_layer/driver/adapters/pyfluent.py` |
+
+Typed intent is documented, but the generic chemistry reconciler is not implemented.
 
 <a id="entry-model-table-asset-4595b137"></a>
 

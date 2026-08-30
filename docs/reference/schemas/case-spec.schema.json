@@ -1490,6 +1490,28 @@
       "title": "DiscretePhaseModel",
       "type": "object"
     },
+    "EdcControls": {
+      "additionalProperties": false,
+      "properties": {
+        "aggressiveness_factor": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Aggressiveness Factor",
+          "type": "number"
+        },
+        "flow_iterations_per_chemistry_update": {
+          "minimum": 1,
+          "title": "Flow Iterations Per Chemistry Update",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "aggressiveness_factor",
+        "flow_iterations_per_chemistry_update"
+      ],
+      "title": "EdcControls",
+      "type": "object"
+    },
     "EngineerStatementProvenance": {
       "additionalProperties": false,
       "properties": {
@@ -1966,6 +1988,17 @@
     "FiniteRateChemistry": {
       "additionalProperties": false,
       "properties": {
+        "edc_controls": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EdcControls"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "mechanism": {
           "discriminator": {
             "mapping": {
@@ -1988,6 +2021,17 @@
           "default": true,
           "title": "Stiff Chemistry Solver",
           "type": "boolean"
+        },
+        "stiff_solver_controls": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StiffSolverControls"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "turbulence_interaction": {
           "default": "none",
@@ -6145,6 +6189,27 @@
         "relative_span"
       ],
       "title": "SteadyWindowGate",
+      "type": "object"
+    },
+    "StiffSolverControls": {
+      "additionalProperties": false,
+      "properties": {
+        "absolute_ode_tolerance": {
+          "exclusiveMinimum": 0,
+          "title": "Absolute Ode Tolerance",
+          "type": "number"
+        },
+        "relative_ode_tolerance": {
+          "exclusiveMinimum": 0,
+          "title": "Relative Ode Tolerance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "absolute_ode_tolerance",
+        "relative_ode_tolerance"
+      ],
+      "title": "StiffSolverControls",
       "type": "object"
     },
     "StreamSpec": {
