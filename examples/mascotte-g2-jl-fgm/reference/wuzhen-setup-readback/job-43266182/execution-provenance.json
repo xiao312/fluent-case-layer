@@ -1,0 +1,105 @@
+{
+  "case_id": "mascotte-g2-jl-fgm",
+  "created_at_utc": "2026-08-30T16:18:20.077312+00:00",
+  "mode": "setup_readback_only",
+  "runtime": {
+    "container_image": "scnet-compute-runtime:wuzhen-default",
+    "fluent_install": "/work/home/ac8azwcnf1/apprepo/fluent/2026r1-none",
+    "fluent_product_version": "2026R1 (26.1.0)",
+    "pydantic_version": "2.13.5",
+    "pyfluent_environment": "/work/home/ac8azwcnf1/xk/envs/dfode-fluent-cantera32",
+    "pyfluent_version": "0.40.2",
+    "python_executable": "/work/home/ac8azwcnf1/xk/envs/dfode-fluent-cantera32/bin/python",
+    "python_version": "3.11.15",
+    "pyyaml_version": "6.0.3"
+  },
+  "runtime_dependencies": {
+    "annotated_types-0.8.0-py3-none-any.whl": {
+      "sha256": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+      "size_bytes": 13427,
+      "verified": true
+    },
+    "pydantic-2.13.5-py3-none-any.whl": {
+      "sha256": "346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73",
+      "size_bytes": 472589,
+      "verified": true
+    },
+    "pydantic_core-2.46.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": {
+      "sha256": "49776eab08766a08dfff7012f8b422dcd7e25e43b316eedf0477c24fcfa84b7c",
+      "size_bytes": 2062091,
+      "verified": true
+    },
+    "typing_extensions-4.16.0-py3-none-any.whl": {
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "size_bytes": 45571,
+      "verified": true
+    },
+    "typing_inspection-0.4.4-py3-none-any.whl": {
+      "sha256": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+      "size_bytes": 14750,
+      "verified": true
+    }
+  },
+  "safety_contract": {
+    "flamelet_calculation_permitted": false,
+    "initialization_permitted": false,
+    "iterations_permitted": false,
+    "pdf_calculation_permitted": false
+  },
+  "scheduler": {
+    "account": "ac8azwcnf1",
+    "cpus_per_task": 4,
+    "hostfile": [
+      "b10r4n33:1"
+    ],
+    "job_id": "43266182",
+    "node_list": "b10r4n33",
+    "partition": "wzacnormal03",
+    "ranks": 1,
+    "run_dir": "/work/home/ac8azwcnf1/xk/260831_fluent_case_layer/runs/g2-jl-fgm-setup-readback-d409049-20260831a",
+    "system": "slurm"
+  },
+  "schema_version": "1",
+  "source": {
+    "asset_source_revision": "4d40647ebccb2674cadf19f0bf19a02efd26550b",
+    "generated_asset_source_root": "/work/home/ac8azwcnf1/xk/260829_mascotte_g2/revisions/4d40647ebccb2674cadf19f0bf19a02efd26550b/assets/generated",
+    "git_branch": "feat/g2-wuzhen-setup-readback",
+    "git_commit": "d409049f4827dc942e4b66b518a5f10a60d8496c",
+    "reference_asset_source_root": "/work/home/ac8azwcnf1/xk/260829_mascotte_g2/revisions/4d40647ebccb2674cadf19f0bf19a02efd26550b/assets/reference",
+    "repository_root": "/work/home/ac8azwcnf1/xk/260831_fluent_case_layer/revisions/d409049f4827dc942e4b66b518a5f10a60d8496c/repository",
+    "revision_root": "/work/home/ac8azwcnf1/xk/260831_fluent_case_layer/revisions/d409049f4827dc942e4b66b518a5f10a60d8496c",
+    "snapshot_sha256": "470d240a0c7ab6f88768f75865fbb6b99084431646d60d2131c018a32174b665"
+  },
+  "staged_assets": {
+    "g2-medium-mesh": {
+      "sha256": "3e25883157ac1459f6b21a722faec672134f23b4325c516a7e506771f7bb6f97",
+      "size_bytes": 7641999,
+      "staged_path": "runtime-assets/mesh/g2-medium.msh",
+      "verified": true
+    },
+    "jl9-kinetics": {
+      "sha256": "84cfcea7f44efe64f28dfe9504df4b288ac8b91cc9cb2276d9471d95a6201630",
+      "size_bytes": 739,
+      "staged_path": "runtime-assets/jl9/jl9.inp",
+      "verified": true
+    },
+    "jl9-thermodynamics": {
+      "sha256": "0ce753ecb5aa37ba61c36a37087fbf47ab91dfc2600613dd983800fa90cc68d7",
+      "size_bytes": 3546,
+      "staged_path": "runtime-assets/jl9/jl9-thermo.dat",
+      "verified": true
+    },
+    "jl9-transport": {
+      "sha256": "1fe96c9d2549a403f23274f579c924088f007b95ec9a393035b38d96de0a061f",
+      "size_bytes": 1092,
+      "staged_path": "runtime-assets/jl9/jl9-transport.dat",
+      "verified": true
+    },
+    "singla-ohstar-relative": {
+      "sha256": "0c1897910ac7d4a70c7d7d4501849ca6d5d72ac41acefc02a914e18979375fc2",
+      "size_bytes": 5928,
+      "staged_path": "runtime-assets/reference/singla-g2-ohstar-relative.npz",
+      "verified": true
+    }
+  }
+}

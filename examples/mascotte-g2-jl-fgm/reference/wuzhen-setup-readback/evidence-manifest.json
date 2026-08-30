@@ -1,0 +1,126 @@
+{
+  "schema_version": "1",
+  "case_id": "mascotte-g2-jl-fgm",
+  "evidence_scope": "small_nonlicensed_structured_records_only",
+  "retrieved_on": "2026-08-31",
+  "retention": {
+    "copied": [
+      "execution provenance JSON",
+      "structured setup/readback failure JSON"
+    ],
+    "excluded": [
+      "mesh assets",
+      "chemistry assets",
+      "reference-data assets",
+      "Fluent case/data files",
+      "Fluent transcripts",
+      "Slurm logs",
+      "generated CHEMKIN diagnostic files"
+    ]
+  },
+  "attempts": [
+    {
+      "job_id": "43266182",
+      "git_commit": "d409049f4827dc942e4b66b518a5f10a60d8496c",
+      "snapshot_sha256": "470d240a0c7ab6f88768f75865fbb6b99084431646d60d2131c018a32174b665",
+      "run_path": "/work/home/ac8azwcnf1/xk/260831_fluent_case_layer/runs/g2-jl-fgm-setup-readback-d409049-20260831a",
+      "scheduler": {
+        "account": "ac8azwcnf1",
+        "partition": "wzacnormal03",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 60,
+        "start": "2026-08-31T00:18:01+08:00",
+        "end": "2026-08-31T00:19:01+08:00",
+        "node": "b10r4n33",
+        "requested_cpus": 4,
+        "ranks": 1
+      },
+      "failure": {
+        "stage": "species_boundary_name_discovery",
+        "message": "'NoneType' object is not iterable",
+        "classification": "fixed_in_followup_commit_12f08439e0d2e749e910194b0abb7a406510e766"
+      },
+      "copied_artifacts": [
+        {
+          "path": "job-43266182/execution-provenance.json",
+          "sha256": "d1c28cac1b3429714b4b8949923c78469393197aaafa1355020d175262a7660b",
+          "size_bytes": 4253
+        },
+        {
+          "path": "job-43266182/setup-readback-failure.json",
+          "sha256": "9fabd7fd4f18e4d4a6c6ac4e7724b772089558c4a023d0f59536beaae12c957e",
+          "size_bytes": 6000
+        }
+      ],
+      "remote_only_artifact_hashes": {
+        "campaign.log": "065811d67cbb34a8f713dbb9cd1497063ceb5d884fcfe3de0e326f44e90397c2",
+        "fluent_transcript": "c073c4bab4f7bdd3469bba81eaa406574c60040e9a77d9cf4d50edc4e1978f77",
+        "slurm_stdout": "065811d67cbb34a8f713dbb9cd1497063ceb5d884fcfe3de0e326f44e90397c2",
+        "slurm_stderr": "956c70518ba64f566516d055a51cb9dc8fdc8942ab6340a3660ecd4f57fe8b09"
+      },
+      "terminal_guards": {
+        "success_marker": "absent",
+        "verification_json": "absent",
+        "transcript_scan_pattern": "calc[_ -]?fla|calc[_ -]?pdf|initialize|iterate",
+        "transcript_scan_matches": []
+      }
+    },
+    {
+      "job_id": "43266815",
+      "git_commit": "12f08439e0d2e749e910194b0abb7a406510e766",
+      "snapshot_sha256": "dab838c09834a092870f9ae6b4aeb0bf889790815267b3069b5bfded5b0ceb98",
+      "run_path": "/work/home/ac8azwcnf1/xk/260831_fluent_case_layer/runs/g2-jl-fgm-setup-readback-12f0843-20260831a",
+      "scheduler": {
+        "account": "ac8azwcnf1",
+        "partition": "wzacnormal03",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 52,
+        "start": "2026-08-31T00:23:49+08:00",
+        "end": "2026-08-31T00:24:41+08:00",
+        "node": "b10r4n33",
+        "requested_cpus": 4,
+        "ranks": 1
+      },
+      "failure": {
+        "stage": "probability_density_function_allowed_values_readback",
+        "message": "Fluent does not expose exact probability density function='beta'; allowed values are []",
+        "classification": "current_runtime_blocker"
+      },
+      "copied_artifacts": [
+        {
+          "path": "job-43266815/execution-provenance.json",
+          "sha256": "9156dbd866e62d833387fcc623eb20b855343e065d5c1019c0de176fad4c0d49",
+          "size_bytes": 4253
+        },
+        {
+          "path": "job-43266815/setup-readback-failure.json",
+          "sha256": "3fa1662a9c59a14e0448cb39aa379493d49ef2efffea8d3d229da4bc69b90e8a",
+          "size_bytes": 5681
+        }
+      ],
+      "remote_only_artifact_hashes": {
+        "campaign.log": "eea2a60fe3eccb426a29a763500c999e9045a35f033b9b727b1b7fe081619384",
+        "fluent_transcript": "02b11702dddc090a79cebea885b238335c7dea9e63b3702070a5d78200a15bef",
+        "slurm_stdout": "eea2a60fe3eccb426a29a763500c999e9045a35f033b9b727b1b7fe081619384",
+        "slurm_stderr": "956c70518ba64f566516d055a51cb9dc8fdc8942ab6340a3660ecd4f57fe8b09"
+      },
+      "terminal_guards": {
+        "success_marker": "absent",
+        "verification_json": "absent",
+        "transcript_scan_pattern": "calc[_ -]?fla|calc[_ -]?pdf|initialize|iterate",
+        "transcript_scan_matches": []
+      }
+    }
+  ],
+  "claim_boundary": {
+    "species_discovery_gap": "resolved_by_get_object_names_and_demonstrated_past_on_retry",
+    "complete_settings_readback": false,
+    "table_generation_performed": false,
+    "pdf_calculation_performed": false,
+    "initialization_performed": false,
+    "iterations_performed": false,
+    "scientific_result": "not_evaluated"
+  }
+}

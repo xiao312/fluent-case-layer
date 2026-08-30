@@ -9,14 +9,15 @@ This case keeps two claims separate:
    Fluent 2026 R1. It imports the locked reduced-JL CHEMKIN files, selects the
    partially-premixed diffusion-FGM model, pure G2 streams, finite-rate TCI,
    transported progress-variable variance, beta PDF, automatic Fluent progress
-   variable, and exact SRK density. It serializes every active settings group and
-   allowed enum value without calculating flamelets, calculating a PDF table, or
-   advancing the flow solution.
+   variable, and exact SRK density. A complete probe is required to serialize
+   every active settings group and allowed enum value without calculating
+   flamelets, calculating a PDF table, or advancing the flow solution.
 
 The probe deliberately leaves flamelet integration, scalar-dissipation,
 adaptation, enthalpy, and PDF-table grid controls at their active Fluent 2026 R1
-runtime values. Those complete groups are read back as evidence. A later revision
-must review and freeze every value before any table-generation code may exist.
+runtime values. Those complete groups must be read back as evidence. A later
+revision must review and freeze every value before any table-generation code may
+exist.
 The paper's statement of 64-point automatic resolution is retained in the
 comparison contract, but is not mapped onto a guessed Fluent node.
 
@@ -31,6 +32,15 @@ result is a discovery artifact, not a table, converged solution, or validation
 result.
 
 ## Wuzhen setup/readback probe
+
+Two Wuzhen attempts on 2026-08-31 stopped before complete readback. The first
+identified a `NamedObject.list()` versus `get_object_names()` discovery bug;
+that bug is fixed and the retry progressed past species enumeration. The retry
+then failed closed because Fluent returned no allowed-value evidence for the
+active PDF option. The setup/readback execution is therefore still blocked,
+and no `SUCCESS` artifact exists. See the
+[auditable attempt note](reference/wuzhen-setup-readback/README.md) and its
+[structured evidence manifest](reference/wuzhen-setup-readback/evidence-manifest.json).
 
 `case/platforms/scnet-wuzhen-setup-readback.yaml` is the bounded CPU profile:
 one Fluent rank in a four-CPU, 7 GiB, 20-minute `wzacnormal03` allocation. The

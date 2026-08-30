@@ -35,6 +35,19 @@
     "status": "eligible_for_setup_readback_only",
     "table_generation_eligible": false
   },
+  "execution_evidence": {
+    "as_of": "2026-08-31",
+    "attempted_jobs": [
+      "43266182",
+      "43266815"
+    ],
+    "complete_settings_readback": false,
+    "current_blocker": "Fluent returned an empty allowed-values list for the active probability-density-function option",
+    "result_note": "reference/wuzhen-setup-readback/README.md",
+    "species_discovery_gap": "fixed by commit 12f08439e0d2e749e910194b0abb7a406510e766 and passed on retry",
+    "status": "blocked_before_complete_readback",
+    "success_artifacts": []
+  },
   "historical_replication": {
     "audited_locations": [
       "fluent-case-layer repository and Git history",
