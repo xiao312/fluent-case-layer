@@ -5,13 +5,16 @@ import hashlib
 from collections.abc import Mapping
 from pathlib import Path
 from types import SimpleNamespace
+from typing import ClassVar
 
 import pytest
 
 from fluent_case_layer.driver.flamelet import (
     FlameletSetupError,
+    ProbabilityDensityFunctionProbeError,
     ProbeAssets,
     _object_names,
+    _select_probability_density_function,
     resolve_probe_assets,
     run_diffusion_fgm_setup_probe,
 )
@@ -34,6 +37,114 @@ class FakeValue:
 
     def allowed_values(self) -> list[object]:
         return list(self.allowed)
+
+
+def make_pdf_static_info(
+    allowed: list[str] | None = None,
+    *,
+    node_type: str = "string",
+) -> dict[str, object]:
+    components = [
+        "setup",
+        "models",
+        "species",
+        "partially-premixed-combustion-parameters",
+        "probability-density-function",
+    ]
+    root: dict[str, object] = {"type": "group", "children": {}}
+    current = root
+    for component in components[:-1]:
+        child: dict[str, object] = {"type": "group", "children": {}}
+        current["children"][component] = child  # type: ignore[index]
+        current = child
+    current["children"][components[-1]] = {  # type: ignore[index]
+        "type": node_type,
+        "has-allowed-values": True,
+        "allowed-values": list(allowed or ["double-delta", "beta"]),
+    }
+    return root
+
+
+class FakeSettingsProxy:
+    def __init__(
+        self,
+        static_info: Mapping[str, object],
+        error: Exception | None = None,
+    ) -> None:
+        self.static_info = static_info
+        self.error = error
+        self.calls = 0
+
+    def get_static_info(self) -> Mapping[str, object]:
+        self.calls += 1
+        if self.error is not None:
+            raise self.error
+        return self.static_info
+
+
+class FakePdfValue(FakeValue):
+    __module__ = "ansys.fluent.core.generated.solver.settings_261"
+    _version = "261"
+    exposure_level = "stable"
+    fluent_name = "probability-density-function"
+    _python_name = "probability_density_function"
+    BETA = "beta"
+    _allowed_values: ClassVar[list[str]] = ["double-delta", "beta"]
+    path = (
+        "setup/models/species/partially-premixed-combustion-parameters/probability-density-function"
+    )
+    python_path = (
+        "<session>.settings.setup.models.species."
+        "partially_premixed_combustion_parameters.probability_density_function"
+    )
+
+    def __init__(
+        self,
+        value: object = "double-delta",
+        *,
+        helper_values: list[object] | None = None,
+        helper_error: Exception | None = None,
+        raw_attrs: Mapping[str, object] | None = None,
+        raw_error: Exception | None = None,
+        static_info: Mapping[str, object] | None = None,
+        static_error: Exception | None = None,
+    ) -> None:
+        super().__init__(value, helper_values)
+        self.helper_error = helper_error
+        self.raw_attrs = dict(
+            raw_attrs
+            or {
+                "active?": True,
+                "read-only?": False,
+                "allowed-values": [],
+            }
+        )
+        self.raw_error = raw_error
+        self.flproxy = FakeSettingsProxy(
+            static_info or make_pdf_static_info(),
+            static_error,
+        )
+        self.raw_attr_requests: list[list[str]] = []
+        self.set_calls = 0
+
+    def allowed_values(self) -> list[object]:
+        if self.helper_error is not None:
+            raise self.helper_error
+        return super().allowed_values()
+
+    def get_attrs(self, attrs: list[str]) -> Mapping[str, object]:
+        self.raw_attr_requests.append(attrs)
+        if self.raw_error is not None:
+            raise self.raw_error
+        return dict(self.raw_attrs)
+
+    def set_state(self, value: object) -> None:
+        self.set_calls += 1
+        super().set_state(value)
+
+
+# Match the generated Fluent class identity without importing PyFluent in tests.
+FakePdfValue.__name__ = "probability_density_function"
 
 
 class CallRecorder:
@@ -97,15 +208,18 @@ def test_object_name_discovery_fails_closed_on_incomplete_readback(value: object
         _object_names(IncompleteNames())
 
 
-def make_fake_session() -> tuple[object, CallRecorder, CallRecorder, FakeValue]:
+def make_fake_session() -> tuple[
+    object,
+    CallRecorder,
+    CallRecorder,
+    FakeValue,
+    FakePdfValue,
+]:
     read_mesh = CallRecorder()
     import_chemkin = CallRecorder()
     species_names = ["ch4", "o2", "co", "h2", "h2o", "o", "h", "oh", "co2"]
     species_boundary = FakeNamedObjects(
-        {
-            name: FakeGroup(fuel=FakeValue(0.0), oxidizer=FakeValue(0.0))
-            for name in species_names
-        }
+        {name: FakeGroup(fuel=FakeValue(0.0), oxidizer=FakeValue(0.0)) for name in species_names}
     )
     progress_variable_definition = FakeGroup(
         default_progress_variable=FakeValue(False),
@@ -114,21 +228,15 @@ def make_fake_session() -> tuple[object, CallRecorder, CallRecorder, FakeValue]:
     boundary = FakeGroup(
         fuel_temperature=FakeValue(300.0),
         oxidizer_temperature=FakeValue(300.0),
-        specify_species_in=FakeValue(
-            "mole-fraction", ["mass-fraction", "mole-fraction"]
-        ),
+        specify_species_in=FakeValue("mole-fraction", ["mass-fraction", "mole-fraction"]),
         species_boundary=species_boundary,
         progress_variable_definition=progress_variable_definition,
     )
     chemistry = FakeGroup(
         state_relation=FakeValue("equilibrium", ["equilibrium", "fgm"]),
         energy_treatment=FakeValue("adia", ["adia", "non-adia"]),
-        flamelet_options=FakeValue(
-            "read-flamelet", ["read-flamelet", "create-flamelet"]
-        ),
-        flamelet_type=FakeValue(
-            "premixed-flamelet", ["premixed-flamelet", "diffusion-flamelet"]
-        ),
+        flamelet_options=FakeValue("read-flamelet", ["read-flamelet", "create-flamelet"]),
+        flamelet_type=FakeValue("premixed-flamelet", ["premixed-flamelet", "diffusion-flamelet"]),
         options=FakeGroup(compressibility=FakeValue(False)),
         model_settings=FakeGroup(equilibrium_operating_pressure=FakeValue(101325.0)),
     )
@@ -152,16 +260,11 @@ def make_fake_session() -> tuple[object, CallRecorder, CallRecorder, FakeValue]:
         )
     )
     premix = FakeGroup(
-        turbulence_chemistry_interaction=FakeGroup(
-            option=FakeValue("none", ["none", "fr"])
-        ),
-        variance_settings=FakeGroup(
-            variance_method=FakeValue("algebraic", ["algebraic", "solve"])
-        ),
+        turbulence_chemistry_interaction=FakeGroup(option=FakeValue("none", ["none", "fr"])),
+        variance_settings=FakeGroup(variance_method=FakeValue("algebraic", ["algebraic", "solve"])),
     )
-    combustion_parameters = FakeGroup(
-        probability_density_function=FakeValue("double-delta", ["double-delta", "beta"])
-    )
+    pdf_value = FakePdfValue()
+    combustion_parameters = FakeGroup(probability_density_function=pdf_value)
     ppm = FakeGroup(
         chemistry=chemistry,
         boundary=boundary,
@@ -184,30 +287,24 @@ def make_fake_session() -> tuple[object, CallRecorder, CallRecorder, FakeValue]:
         partially_premixed_combustion_parameters=combustion_parameters,
         import_chemkin=import_chemkin,
     )
-    density_option = FakeValue(
-        "constant", ["constant", "real-gas-soave-redlich-kwong"]
-    )
+    density_option = FakeValue("constant", ["constant", "real-gas-soave-redlich-kwong"])
     mixture = FakeGroup(density=FakeGroup(option=density_option))
     setup = FakeGroup(
         general=FakeGroup(
-            solver=FakeGroup(
-                two_dim_space=FakeValue("planar", ["planar", "axisymmetric"])
-            ),
+            solver=FakeGroup(two_dim_space=FakeValue("planar", ["planar", "axisymmetric"])),
             operating_conditions=FakeGroup(operating_pressure=FakeValue(101325.0)),
         ),
         models=FakeGroup(
             energy=FakeGroup(enabled=FakeValue(False)),
             species=species,
         ),
-        materials=FakeGroup(
-            mixture=FakeNamedObjects({"mascotte-g2-jl9-fgm": mixture})
-        ),
+        materials=FakeGroup(mixture=FakeNamedObjects({"mascotte-g2-jl9-fgm": mixture})),
     )
     session = FakeGroup(
         settings=FakeGroup(file=FakeGroup(read_mesh=read_mesh), setup=setup),
         get_fluent_version=lambda: "2026 R1 (26.1.0)",
     )
-    return session, read_mesh, import_chemkin, density_option
+    return session, read_mesh, import_chemkin, density_option, pdf_value
 
 
 def test_setup_probe_captures_complete_groups_without_calculating(
@@ -228,22 +325,168 @@ def test_setup_probe_captures_complete_groups_without_calculating(
             mesh_asset="g2-medium-mesh",
         ),
     )
-    session, read_mesh, import_chemkin, density_option = make_fake_session()
+    session, read_mesh, import_chemkin, density_option, pdf_value = make_fake_session()
 
     evidence = run_diffusion_fgm_setup_probe(session, case)
 
     assert read_mesh.calls == [((), {"file_name": "/verified/g2-medium.msh"})]
     assert import_chemkin.calls[0][1]["name"] == "mascotte-g2-jl9-fgm"
     assert density_option.get_state() == "real-gas-soave-redlich-kwong"
+    assert pdf_value.get_state() == "beta"
+    assert pdf_value.set_calls == 1
     assert evidence["status"] == "setup_readback_complete"
-    assert set(evidence["readback"]) == set(
-        case.chemistry.model.generation.runtime_defaults.groups
-    )
+    assert set(evidence["readback"]) == set(case.chemistry.model.generation.runtime_defaults.groups)
     assert evidence["readback"]["flamelet"]["maximum_number_grids"] == 64
     assert evidence["readback"]["table"]["parameters"]["minimum_temperature"] == 70.0
     assert evidence["flamelet_calculation_performed"] is False
     assert evidence["pdf_calculation_performed"] is False
     assert evidence["table_generation_eligible"] is False
+    assert evidence["table_generation_permission"] == "prohibited"
+    pdf_evidence = evidence["probability_density_function_evidence"]
+    assert pdf_evidence["allowed_values_helper"] == {"status": "ok", "value": []}
+    assert pdf_evidence["raw_attrs"]["value"]["attrs"]["allowed-values"] == []
+    assert pdf_evidence["decision"] == {
+        "status": "selected",
+        "mode": "single_set_readback",
+        "setter_calls": 1,
+    }
+
+
+def test_pdf_probe_accepts_exact_existing_beta_without_a_setter() -> None:
+    node = FakePdfValue(
+        "beta",
+        raw_attrs={
+            "active?": True,
+            "read-only?": True,
+            "allowed-values": [],
+        },
+        static_error=RuntimeError("static metadata unavailable"),
+    )
+    parent = FakeGroup(probability_density_function=node)
+
+    evidence = _select_probability_density_function(
+        node, parent, "beta", fluent_version="2026 R1 (26.1.0)"
+    )
+
+    assert node.set_calls == 0
+    assert evidence["runtime_static_info"] == {
+        "status": "error",
+        "error": {
+            "type": "RuntimeError",
+            "message": "static metadata unavailable",
+        },
+    }
+    assert evidence["decision"] == {
+        "status": "selected",
+        "mode": "existing_state_noop",
+        "setter_calls": 0,
+    }
+
+
+def test_pdf_probe_records_helper_exception_separately_and_sets_once() -> None:
+    node = FakePdfValue(helper_error=RuntimeError("helper swallowed this in v0.40.2"))
+    parent = FakeGroup(probability_density_function=node)
+
+    evidence = _select_probability_density_function(
+        node, parent, "beta", fluent_version="2026 R1 (26.1.0)"
+    )
+
+    assert node.set_calls == 1
+    assert evidence["allowed_values_helper"]["status"] == "error"
+    assert evidence["raw_attrs"]["status"] == "ok"
+    assert evidence["raw_attrs"]["value"]["attrs"]["allowed-values"] == []
+    assert evidence["preconditions"]["setter_authorized"] is True
+    assert evidence["current_state_after"] == {"status": "ok", "value": "beta"}
+
+
+def test_pdf_probe_fails_before_set_when_raw_metadata_query_errors() -> None:
+    node = FakePdfValue(raw_error=RuntimeError("settings RPC failed"))
+    parent = FakeGroup(probability_density_function=node)
+
+    with pytest.raises(
+        ProbabilityDensityFunctionProbeError,
+        match="raw_attrs_captured",
+    ) as caught:
+        _select_probability_density_function(
+            node, parent, "beta", fluent_version="2026 R1 (26.1.0)"
+        )
+
+    evidence = caught.value.probe_evidence["probability_density_function_evidence"]
+    assert node.set_calls == 0
+    assert evidence["raw_attrs"]["status"] == "error"
+    assert evidence["decision"]["status"] == "blocked"
+
+
+def test_pdf_probe_fails_before_set_when_runtime_static_enum_omits_beta() -> None:
+    node = FakePdfValue(static_info=make_pdf_static_info(["double-delta"]))
+    parent = FakeGroup(probability_density_function=node)
+
+    with pytest.raises(
+        ProbabilityDensityFunctionProbeError,
+        match="runtime_static_info",
+    ):
+        _select_probability_density_function(
+            node, parent, "beta", fluent_version="2026 R1 (26.1.0)"
+        )
+
+    assert node.set_calls == 0
+
+
+def test_pdf_probe_fails_on_nonempty_live_enum_that_excludes_beta() -> None:
+    node = FakePdfValue(
+        raw_attrs={
+            "active?": True,
+            "read-only?": False,
+            "allowed-values": ["double-delta"],
+        }
+    )
+    parent = FakeGroup(probability_density_function=node)
+
+    with pytest.raises(
+        ProbabilityDensityFunctionProbeError,
+        match="explicitly excludes",
+    ):
+        _select_probability_density_function(
+            node, parent, "beta", fluent_version="2026 R1 (26.1.0)"
+        )
+
+    assert node.set_calls == 0
+
+
+def test_pdf_probe_fails_before_set_on_malformed_raw_enum() -> None:
+    node = FakePdfValue(
+        raw_attrs={
+            "active?": True,
+            "read-only?": False,
+            "allowed-values": "beta",
+        }
+    )
+    parent = FakeGroup(probability_density_function=node)
+
+    with pytest.raises(
+        ProbabilityDensityFunctionProbeError,
+        match="raw_allowed_values_valid",
+    ):
+        _select_probability_density_function(
+            node, parent, "beta", fluent_version="2026 R1 (26.1.0)"
+        )
+
+    assert node.set_calls == 0
+
+
+def test_pdf_probe_fails_before_set_on_non_2026_r1_runtime() -> None:
+    node = FakePdfValue()
+    parent = FakeGroup(probability_density_function=node)
+
+    with pytest.raises(
+        ProbabilityDensityFunctionProbeError,
+        match="runtime_2026_r1",
+    ):
+        _select_probability_density_function(
+            node, parent, "beta", fluent_version="2025 R2 (25.2.0)"
+        )
+
+    assert node.set_calls == 0
 
 
 def test_asset_preflight_fails_before_session_access(
@@ -295,13 +538,17 @@ def test_asset_preflight_verifies_every_required_hash(
 def test_probe_and_scaffold_have_no_calculation_or_iteration_calls() -> None:
     paths = [
         ROOT / "src" / "fluent_case_layer" / "driver" / "flamelet.py",
-        ROOT
-        / "examples"
-        / "mascotte-g2-jl-fgm"
-        / "automation"
-        / "setup_readback_smoke.py",
+        ROOT / "examples" / "mascotte-g2-jl-fgm" / "automation" / "setup_readback_smoke.py",
     ]
-    forbidden = {"calc_fla", "calc_pdf", "iterate"}
+    forbidden = {
+        "calc_fla",
+        "calc_pdf",
+        "fmg_initialize",
+        "hybrid_initialize",
+        "initialize",
+        "iterate",
+        "standard_initialize",
+    }
 
     for path in paths:
         tree = ast.parse(path.read_text(encoding="utf-8"))

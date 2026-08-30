@@ -186,6 +186,7 @@ def synthetic_artifacts(tmp_path: Path) -> tuple[Path, Path, str, str, str]:
         "fluent_version": "2026 R1 (26.1.0)",
         "classification": generation.classification,
         "execution_scope": generation.execution_scope,
+        "table_generation_permission": generation.table_generation_permission,
         "status": "setup_readback_complete",
         "assets": probe_assets,
         "requested_generation": generation.model_dump(mode="json"),
@@ -195,10 +196,93 @@ def synthetic_artifacts(tmp_path: Path) -> tuple[Path, Path, str, str, str]:
             "oxidizer": {"o2": 1.0},
             "exposed_species": ["ch4", "o2"],
         },
-        "readback": {
-            name: {"captured": True}
-            for name in generation.runtime_defaults.groups
+        "probability_density_function_evidence": {
+            "schema_version": "1",
+            "requested": "beta",
+            "runtime_version": "2026 R1 (26.1.0)",
+            "allowed_values_helper": {"status": "ok", "value": []},
+            "raw_attrs": {
+                "status": "ok",
+                "value": {
+                    "requested": ["active?", "read-only?", "allowed-values"],
+                    "response": {
+                        "active?": True,
+                        "read-only?": False,
+                        "allowed-values": [],
+                    },
+                    "attrs": {
+                        "active?": True,
+                        "read-only?": False,
+                        "allowed-values": [],
+                    },
+                },
+            },
+            "current_state_before": {"status": "ok", "value": "double-delta"},
+            "parent_state_before": {
+                "status": "ok",
+                "value": {"probability_density_function": "double-delta"},
+            },
+            "generated_v261_schema": {
+                "status": "ok",
+                "value": {
+                    "module": "ansys.fluent.core.generated.solver.settings_261",
+                    "class": "probability_density_function",
+                    "version": "261",
+                    "exposure_level": "stable",
+                    "fluent_name": "probability-density-function",
+                    "python_name": "probability_density_function",
+                    "path": (
+                        "setup/models/species/partially-premixed-combustion-parameters/"
+                        "probability-density-function"
+                    ),
+                    "python_path": (
+                        "<session>.settings.setup.models.species."
+                        "partially_premixed_combustion_parameters."
+                        "probability_density_function"
+                    ),
+                    "beta_constant": "beta",
+                    "allowed_values": ["double-delta", "beta"],
+                },
+            },
+            "runtime_static_info": {
+                "status": "ok",
+                "value": {
+                    "path": (
+                        "setup/models/species/partially-premixed-combustion-parameters/"
+                        "probability-density-function"
+                    ),
+                    "node": {
+                        "type": "string",
+                        "has-allowed-values": True,
+                        "allowed-values": ["double-delta", "beta"],
+                    },
+                },
+            },
+            "preconditions": {
+                "current_state_captured": True,
+                "parent_state_captured": True,
+                "raw_attrs_captured": True,
+                "raw_allowed_values_valid": True,
+                "runtime_2026_r1": True,
+                "active": True,
+                "writable": True,
+                "generated_v261_schema": True,
+                "runtime_static_info": True,
+                "no_live_enum_conflict": True,
+                "setter_authorized": True,
+            },
+            "current_state_after": {"status": "ok", "value": "beta"},
+            "parent_state_after": {
+                "status": "ok",
+                "value": {"probability_density_function": "beta"},
+            },
+            "decision": {
+                "status": "selected",
+                "mode": "single_set_readback",
+                "setter_calls": 1,
+            },
         },
+        "readback": {name: {"captured": True} for name in generation.runtime_defaults.groups},
         "allowed_values": {
             "species_model": ["partially-premixed-combustion"],
             "state_relation": ["fgm"],
@@ -208,7 +292,7 @@ def synthetic_artifacts(tmp_path: Path) -> tuple[Path, Path, str, str, str]:
             "composition_basis": ["mass-fraction"],
             "turbulence_chemistry_interaction": ["fr"],
             "variance_method": ["solve"],
-            "probability_density_function": ["beta"],
+            "probability_density_function": [],
             "density_eos": ["real-gas-soave-redlich-kwong"],
         },
         "flamelet_calculation_performed": False,
@@ -240,7 +324,45 @@ def test_independent_verifier_accepts_complete_synthetic_evidence(tmp_path: Path
 
     assert result["status"] == "verified_setup_readback_complete"
     assert result["success_marker_eligible"] is True
+    assert result["pdf_selection_mode"] == "single_set_readback"
     assert result["calculation_or_iteration_performed"] is False
+
+
+def test_independent_verifier_accepts_exact_existing_beta_noop(tmp_path: Path) -> None:
+    evidence, provenance, commit, snapshot, job_id = synthetic_artifacts(tmp_path)
+    payload = load_json(evidence)
+    pdf = payload["probability_density_function_evidence"]
+    pdf["current_state_before"] = {"status": "ok", "value": "beta"}
+    pdf["parent_state_before"] = {
+        "status": "ok",
+        "value": {"probability_density_function": "beta"},
+    }
+    pdf["runtime_static_info"] = {
+        "status": "error",
+        "error": {"type": "RuntimeError", "message": "not available"},
+    }
+    pdf["preconditions"]["writable"] = False
+    pdf["preconditions"]["runtime_static_info"] = False
+    pdf["preconditions"]["setter_authorized"] = False
+    pdf["decision"] = {
+        "status": "selected",
+        "mode": "existing_state_noop",
+        "setter_calls": 0,
+    }
+    evidence.write_text(json.dumps(payload), encoding="utf-8")
+    verifier = load_verifier()
+
+    result = verifier.verify(
+        case_path=CASE_PATH,
+        evidence_path=evidence,
+        provenance_path=provenance,
+        staging_contract_path=AUTOMATION / "wuzhen-setup-readback-assets.json",
+        expected_commit=commit,
+        expected_snapshot_sha256=snapshot,
+        expected_job_id=job_id,
+    )
+
+    assert result["pdf_selection_mode"] == "existing_state_noop"
 
 
 def test_independent_verifier_rejects_incomplete_settings_readback(tmp_path: Path) -> None:

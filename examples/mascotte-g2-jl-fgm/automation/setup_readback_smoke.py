@@ -79,8 +79,7 @@ def main() -> int:
     readiness = assess_flamelet_table_readiness(case)
     if readiness.ready or readiness.mode != "setup_readback_only":
         raise SystemExit(
-            "refusing a case outside the blocked setup/readback contract: "
-            f"{readiness!r}"
+            f"refusing a case outside the blocked setup/readback contract: {readiness!r}"
         )
 
     try:
@@ -122,6 +121,9 @@ def main() -> int:
             },
             "execution": execution,
         }
+        diagnostics = getattr(exc, "probe_evidence", None)
+        if isinstance(diagnostics, Mapping):
+            failure["diagnostics"] = diagnostics
         atomic_write_json(args.output.resolve(), failure)
         raise
     finally:

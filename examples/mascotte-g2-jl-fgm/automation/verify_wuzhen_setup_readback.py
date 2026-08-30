@@ -35,6 +35,9 @@ PROBE_ASSET_IDS = {
     "jl9-thermodynamics",
     "jl9-transport",
 }
+PDF_SETTINGS_PATH = (
+    "setup/models/species/partially-premixed-combustion-parameters/probability-density-function"
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -66,6 +69,34 @@ def _require_mapping(value: Any, label: str) -> Mapping[str, Any]:
     return value
 
 
+def _require_capture(value: Any, label: str) -> Mapping[str, Any]:
+    capture = _require_mapping(value, label)
+    status = capture.get("status")
+    if status == "ok":
+        if "value" not in capture:
+            raise ValueError(f"{label} has no captured value")
+    elif status == "error":
+        error = _require_mapping(capture.get("error"), f"{label} error")
+        if not isinstance(error.get("type"), str) or not isinstance(error.get("message"), str):
+            raise ValueError(f"{label} error is incomplete")
+    else:
+        raise ValueError(f"{label} has invalid capture status")
+    return capture
+
+
+def _capture_value(capture: Mapping[str, Any]) -> Any:
+    return capture.get("value") if capture.get("status") == "ok" else None
+
+
+def _parent_pdf_value(value: Any) -> Any:
+    if not isinstance(value, Mapping):
+        return None
+    for key in ("probability_density_function", "probability-density-function"):
+        if key in value:
+            return value[key]
+    return None
+
+
 def verify(
     *,
     case_path: Path,
@@ -94,6 +125,8 @@ def verify(
         raise ValueError("evidence classification differs from the typed case")
     if evidence.get("execution_scope") != "setup_readback_only":
         raise ValueError("evidence is outside setup_readback_only scope")
+    if evidence.get("table_generation_permission") != "prohibited":
+        raise ValueError("evidence does not preserve table_generation_permission=prohibited")
     if evidence.get("requested_generation") != generation.model_dump(mode="json"):
         raise ValueError("requested generation differs from the typed case")
     if not re.search(
@@ -126,8 +159,121 @@ def verify(
         raise ValueError("allowed-value evidence is incomplete")
     for name, selected in EXPECTED_ALLOWED_VALUES.items():
         values = allowed_values[name]
-        if not isinstance(values, list) or not values or selected not in values:
+        if not isinstance(values, list):
+            raise TypeError(f"allowed values for {name} are not a list")
+        if name == "probability_density_function":
+            if values and selected not in values:
+                raise ValueError("live PDF allowed values explicitly exclude beta")
+            continue
+        if not values or selected not in values:
             raise ValueError(f"selected {name} value is absent from Fluent allowed values")
+
+    pdf = _require_mapping(
+        evidence.get("probability_density_function_evidence"),
+        "probability_density_function_evidence",
+    )
+    if pdf.get("requested") != "beta":
+        raise ValueError("PDF evidence does not request beta")
+    runtime_version = pdf.get("runtime_version")
+    if runtime_version != evidence.get("fluent_version") or not re.search(
+        r"(?:26\.1|2026\s*R1|v261)", str(runtime_version), re.IGNORECASE
+    ):
+        raise ValueError("PDF evidence is not locked to the reported Fluent 2026 R1 runtime")
+    captures = {
+        name: _require_capture(pdf.get(name), f"PDF {name}")
+        for name in (
+            "allowed_values_helper",
+            "raw_attrs",
+            "current_state_before",
+            "parent_state_before",
+            "generated_v261_schema",
+            "runtime_static_info",
+            "current_state_after",
+            "parent_state_after",
+        )
+    }
+    generated = _capture_value(captures["generated_v261_schema"])
+    if not isinstance(generated, Mapping):
+        raise TypeError("generated v261 PDF schema was not captured")
+    generated_path = generated.get("path")
+    if isinstance(generated_path, str):
+        generated_path = generated_path.removeprefix("fluent/")
+    if not (
+        generated.get("module") == "ansys.fluent.core.generated.solver.settings_261"
+        and generated.get("class") == "probability_density_function"
+        and generated.get("version") == "261"
+        and generated.get("exposure_level") == "stable"
+        and generated.get("fluent_name") == "probability-density-function"
+        and generated.get("python_name") == "probability_density_function"
+        and generated_path == PDF_SETTINGS_PATH
+        and generated.get("beta_constant") == "beta"
+        and generated.get("allowed_values") == ["double-delta", "beta"]
+    ):
+        raise ValueError("generated v261 PDF schema evidence is not exact")
+
+    helper_values = _capture_value(captures["allowed_values_helper"])
+    raw = _capture_value(captures["raw_attrs"])
+    raw_attrs = raw.get("attrs", {}) if isinstance(raw, Mapping) else {}
+    raw_values = raw_attrs.get("allowed-values")
+    for values in (helper_values, raw_values):
+        if isinstance(values, list) and values and "beta" not in values:
+            raise ValueError("captured live PDF metadata explicitly excludes beta")
+
+    current_before = _capture_value(captures["current_state_before"])
+    parent_before = _capture_value(captures["parent_state_before"])
+    current_after = _capture_value(captures["current_state_after"])
+    parent_after = _capture_value(captures["parent_state_after"])
+    if current_after != "beta" or _parent_pdf_value(parent_after) != "beta":
+        raise ValueError("PDF beta leaf and parent readback are not exact")
+
+    decision = _require_mapping(pdf.get("decision"), "PDF decision")
+    preconditions = _require_mapping(pdf.get("preconditions"), "PDF preconditions")
+    mode = decision.get("mode")
+    if decision.get("status") != "selected":
+        raise ValueError("PDF decision is not selected")
+    if mode == "existing_state_noop":
+        if decision.get("setter_calls") != 0:
+            raise ValueError("existing PDF beta no-op must not call the setter")
+        if current_before != "beta" or _parent_pdf_value(parent_before) != "beta":
+            raise ValueError("existing PDF beta no-op lacks exact initial readback")
+    elif mode == "single_set_readback":
+        if decision.get("setter_calls") != 1:
+            raise ValueError("PDF setter path must contain exactly one call")
+        required_preconditions = {
+            "current_state_captured",
+            "parent_state_captured",
+            "raw_attrs_captured",
+            "raw_allowed_values_valid",
+            "runtime_2026_r1",
+            "active",
+            "writable",
+            "generated_v261_schema",
+            "runtime_static_info",
+            "no_live_enum_conflict",
+            "setter_authorized",
+        }
+        if set(preconditions) != required_preconditions or not all(preconditions.values()):
+            raise ValueError("PDF setter was used without every fail-closed precondition")
+        runtime_static = _capture_value(captures["runtime_static_info"])
+        runtime_node = runtime_static.get("node") if isinstance(runtime_static, Mapping) else None
+        runtime_path = runtime_static.get("path") if isinstance(runtime_static, Mapping) else None
+        if isinstance(runtime_path, str):
+            runtime_path = runtime_path.removeprefix("fluent/")
+        runtime_enum = (
+            runtime_node.get("allowed-values", runtime_node.get("allowed_values"))
+            if isinstance(runtime_node, Mapping)
+            else None
+        )
+        if not (
+            runtime_path == PDF_SETTINGS_PATH
+            and isinstance(runtime_node, Mapping)
+            and runtime_node.get("type") == "string"
+            and runtime_node.get("has-allowed-values") is True
+            and runtime_enum == ["double-delta", "beta"]
+        ):
+            raise ValueError("runtime static-info does not authorize the PDF beta setter")
+    else:
+        raise ValueError(f"unsupported PDF selection mode: {mode!r}")
 
     stream = _require_mapping(evidence.get("stream_configuration"), "stream_configuration")
     if set(stream) != {"basis", "fuel", "oxidizer", "exposed_species"}:
@@ -138,9 +284,7 @@ def verify(
         raise ValueError("FGM stream configuration contains an empty component")
 
     case_assets = case.assets.by_id()
-    contract_assets = {
-        entry["id"]: entry for entry in contract.get("simulation_assets", [])
-    }
+    contract_assets = {entry["id"]: entry for entry in contract.get("simulation_assets", [])}
     required_staged_ids = PROBE_ASSET_IDS | {"singla-ohstar-relative"}
     if set(contract_assets) != required_staged_ids:
         raise ValueError("staging contract must contain exactly five approved simulation assets")
@@ -167,9 +311,7 @@ def verify(
     source = _require_mapping(provenance.get("source"), "provenance source")
     scheduler = _require_mapping(provenance.get("scheduler"), "provenance scheduler")
     runtime = _require_mapping(provenance.get("runtime"), "provenance runtime")
-    staged_assets = _require_mapping(
-        provenance.get("staged_assets"), "provenance staged_assets"
-    )
+    staged_assets = _require_mapping(provenance.get("staged_assets"), "provenance staged_assets")
     safety = _require_mapping(provenance.get("safety_contract"), "safety contract")
     if source.get("git_commit") != expected_commit:
         raise ValueError("provenance Git commit differs from submitted commit")
@@ -229,6 +371,7 @@ def verify(
         "execution_provenance_sha256": file_sha256(provenance_path),
         "validated_readback_groups": sorted(expected_groups),
         "validated_simulation_assets": sorted(required_staged_ids),
+        "pdf_selection_mode": mode,
         "calculation_or_iteration_performed": False,
         "success_marker_eligible": True,
     }

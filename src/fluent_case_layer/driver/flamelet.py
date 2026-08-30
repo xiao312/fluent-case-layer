@@ -29,10 +29,27 @@ from .util import file_sha256, stable_hash, to_jsonable
 
 _SPECIES_OPTION = "partially-premixed-combustion"
 _SRK_OPTION = "real-gas-soave-redlich-kwong"
+_PDF_OPTION = "beta"
+_PDF_FLUENT_NAME = "probability-density-function"
+_PDF_SETTINGS_PATH = (
+    "setup/models/species/partially-premixed-combustion-parameters/probability-density-function"
+)
+_PDF_RAW_ATTRS = ("active?", "read-only?", "allowed-values")
+_PDF_STATIC_ENUM = ["double-delta", "beta"]
 
 
 class FlameletSetupError(DriverError):
     """Raised before an incomplete or ambiguous flamelet operation can proceed."""
+
+
+class ProbabilityDensityFunctionProbeError(FlameletSetupError):
+    """Raised with structured evidence when the PDF selection cannot be proven."""
+
+    def __init__(self, message: str, evidence: Mapping[str, Any]) -> None:
+        super().__init__(message)
+        self.probe_evidence = {
+            "probability_density_function_evidence": dict(evidence),
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -202,6 +219,306 @@ def _allowed(node: Any) -> list[Any]:
         raise FlameletSetupError(f"cannot read Fluent allowed values: {exc}") from exc
 
 
+def _capture_evidence(call: Any) -> dict[str, Any]:
+    """Capture a read-only query without collapsing an exception into an empty value."""
+
+    try:
+        return {"status": "ok", "value": to_jsonable(call())}
+    except Exception as exc:  # noqa: BLE001 - preserve arbitrary RPC failures as evidence.
+        return {
+            "status": "error",
+            "error": {
+                "type": type(exc).__name__,
+                "message": str(exc),
+            },
+        }
+
+
+def _query_allowed_values(node: Any) -> list[Any] | None:
+    getter = getattr(node, "allowed_values", None)
+    if not callable(getter):
+        raise TypeError("setting has no allowed_values query")
+    values = getter()
+    if values is None:
+        return None
+    if not isinstance(values, list):
+        raise TypeError(
+            f"Fluent allowed_values() must return a list or None, got {type(values).__name__}"
+        )
+    return values
+
+
+def _query_raw_attrs(node: Any) -> Mapping[str, Any]:
+    getter = getattr(node, "get_attrs", None)
+    if not callable(getter):
+        raise TypeError("setting has no get_attrs query")
+    response = getter(list(_PDF_RAW_ATTRS))
+    if not isinstance(response, Mapping):
+        raise TypeError(f"Fluent get_attrs() must return an object, got {type(response).__name__}")
+    attrs = response.get("attrs", response)
+    if not isinstance(attrs, Mapping):
+        raise TypeError("Fluent get_attrs() did not contain an attribute object")
+    return {
+        "requested": list(_PDF_RAW_ATTRS),
+        "response": response,
+        "attrs": attrs,
+    }
+
+
+def _enum_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    inner = getattr(value, "value", value)
+    return str(inner)
+
+
+def _generated_pdf_schema(node: Any) -> Mapping[str, Any]:
+    cls = type(node)
+    allowed = getattr(cls, "_allowed_values", None)
+    if allowed is not None and not isinstance(allowed, list):
+        raise TypeError("generated _allowed_values is not a list")
+    return {
+        "module": cls.__module__,
+        "class": cls.__name__,
+        "version": str(getattr(cls, "_version", "")),
+        "exposure_level": _enum_text(getattr(cls, "exposure_level", None)),
+        "fluent_name": getattr(cls, "fluent_name", None),
+        "python_name": getattr(cls, "_python_name", None),
+        "path": getattr(node, "path", None),
+        "python_path": getattr(node, "python_path", None),
+        "beta_constant": _enum_text(getattr(cls, "BETA", None)),
+        "allowed_values": list(allowed or []),
+    }
+
+
+def _runtime_static_pdf_schema(node: Any) -> Mapping[str, Any]:
+    proxy = getattr(node, "flproxy", None)
+    getter = getattr(proxy, "get_static_info", None)
+    if not callable(getter):
+        raise TypeError("setting proxy has no get_static_info query")
+    root = getter()
+    if not isinstance(root, Mapping):
+        raise TypeError("Fluent get_static_info() did not return an object")
+    path = getattr(node, "path", None)
+    if not isinstance(path, str) or not path:
+        raise TypeError("setting has no Fluent path")
+    components = [component for component in path.split("/") if component]
+    if components and components[0] == "fluent":
+        components.pop(0)
+    current: Mapping[str, Any] = root
+    for component in components:
+        children = current.get("children")
+        if not isinstance(children, Mapping) or component not in children:
+            raise KeyError(f"runtime static info omits {component!r} in path {path!r}")
+        child = children[component]
+        if not isinstance(child, Mapping):
+            raise TypeError(f"runtime static info node {component!r} is not an object")
+        current = child
+    return {"path": path, "node": current}
+
+
+def _capture_value(capture: Mapping[str, Any]) -> Any:
+    return capture.get("value") if capture.get("status") == "ok" else None
+
+
+def _parent_pdf_value(value: Any) -> Any:
+    if not isinstance(value, Mapping):
+        return None
+    for key in ("probability_density_function", "probability-density-function"):
+        if key in value:
+            return value[key]
+    return None
+
+
+def _is_2026_r1(version: str) -> bool:
+    normalized = re.sub(r"[^a-z0-9.]", "", version.casefold())
+    return any(token in normalized for token in ("26.1", "2026r1", "v261"))
+
+
+def _pdf_probe_failure(message: str, evidence: dict[str, Any]) -> None:
+    evidence["decision"] = {
+        **dict(evidence.get("decision", {})),
+        "status": "blocked",
+        "reason": message,
+    }
+    raise ProbabilityDensityFunctionProbeError(message, evidence)
+
+
+def _select_probability_density_function(
+    node: Any,
+    parent: Any,
+    expected: str,
+    *,
+    fluent_version: str,
+) -> Mapping[str, Any]:
+    """Select beta once using static v261 evidence, or accept an exact no-op.
+
+    ``AllowedValuesMixin.allowed_values()`` in PyFluent 0.40.2 turns every
+    exception into ``[]``.  This probe therefore records the helper result, raw
+    dynamic attributes, generated v261 schema, and server static-info subtree as
+    separate evidence channels before making a decision.
+    """
+
+    evidence: dict[str, Any] = {
+        "schema_version": "1",
+        "requested": expected,
+        "runtime_version": fluent_version,
+        "allowed_values_helper": _capture_evidence(lambda: _query_allowed_values(node)),
+        "raw_attrs": _capture_evidence(lambda: _query_raw_attrs(node)),
+        "current_state_before": _capture_evidence(lambda: _state(node)),
+        "parent_state_before": _capture_evidence(lambda: _state(parent)),
+        "generated_v261_schema": _capture_evidence(lambda: _generated_pdf_schema(node)),
+        "runtime_static_info": _capture_evidence(lambda: _runtime_static_pdf_schema(node)),
+    }
+    if expected != _PDF_OPTION:
+        _pdf_probe_failure(
+            f"PDF metadata probe only permits {_PDF_OPTION!r}, got {expected!r}",
+            evidence,
+        )
+
+    helper_values = _capture_value(evidence["allowed_values_helper"])
+    raw_value = _capture_value(evidence["raw_attrs"])
+    raw_attrs = raw_value.get("attrs", {}) if isinstance(raw_value, Mapping) else {}
+    raw_allowed = raw_attrs.get("allowed-values")
+    live_lists = [
+        values for values in (helper_values, raw_allowed) if isinstance(values, list) and values
+    ]
+    live_enum_conflict = any(expected not in values for values in live_lists)
+
+    generated = _capture_value(evidence["generated_v261_schema"])
+    generated_path = generated.get("path") if isinstance(generated, Mapping) else None
+    if isinstance(generated_path, str):
+        generated_path = generated_path.removeprefix("fluent/")
+    generated_valid = bool(
+        isinstance(generated, Mapping)
+        and generated.get("module") == "ansys.fluent.core.generated.solver.settings_261"
+        and generated.get("class") == "probability_density_function"
+        and generated.get("version") == "261"
+        and generated.get("exposure_level") == "stable"
+        and generated.get("fluent_name") == _PDF_FLUENT_NAME
+        and generated.get("python_name") == "probability_density_function"
+        and generated_path == _PDF_SETTINGS_PATH
+        and generated.get("beta_constant") == expected
+        and generated.get("allowed_values") == _PDF_STATIC_ENUM
+    )
+
+    runtime_static = _capture_value(evidence["runtime_static_info"])
+    runtime_node = runtime_static.get("node") if isinstance(runtime_static, Mapping) else None
+    runtime_path = runtime_static.get("path") if isinstance(runtime_static, Mapping) else None
+    if isinstance(runtime_path, str):
+        runtime_path = runtime_path.removeprefix("fluent/")
+    runtime_allowed = None
+    if isinstance(runtime_node, Mapping):
+        runtime_allowed = runtime_node.get("allowed-values", runtime_node.get("allowed_values"))
+    runtime_static_valid = bool(
+        isinstance(runtime_node, Mapping)
+        and runtime_path == _PDF_SETTINGS_PATH
+        and runtime_node.get("type") == "string"
+        and runtime_node.get("has-allowed-values") is True
+        and runtime_allowed == _PDF_STATIC_ENUM
+    )
+
+    current_before = _capture_value(evidence["current_state_before"])
+    parent_before = _capture_value(evidence["parent_state_before"])
+    preconditions = {
+        "current_state_captured": evidence["current_state_before"]["status"] == "ok",
+        "parent_state_captured": evidence["parent_state_before"]["status"] == "ok",
+        "raw_attrs_captured": evidence["raw_attrs"]["status"] == "ok",
+        "raw_allowed_values_valid": raw_allowed is None or isinstance(raw_allowed, list),
+        "runtime_2026_r1": _is_2026_r1(fluent_version),
+        "active": raw_attrs.get("active?") is True,
+        "writable": raw_attrs.get("read-only?") is False,
+        "generated_v261_schema": generated_valid,
+        "runtime_static_info": runtime_static_valid,
+        "no_live_enum_conflict": not live_enum_conflict,
+    }
+    preconditions["setter_authorized"] = all(preconditions.values())
+    evidence["preconditions"] = preconditions
+
+    if live_enum_conflict:
+        _pdf_probe_failure(
+            "live Fluent metadata explicitly excludes probability density function='beta'",
+            evidence,
+        )
+
+    if current_before == expected:
+        if _parent_pdf_value(parent_before) != expected:
+            _pdf_probe_failure(
+                "PDF leaf is beta but parent-group readback does not confirm beta",
+                evidence,
+            )
+        evidence["current_state_after"] = _capture_evidence(lambda: _state(node))
+        evidence["parent_state_after"] = _capture_evidence(lambda: _state(parent))
+        if (
+            _capture_value(evidence["current_state_after"]) != expected
+            or _parent_pdf_value(_capture_value(evidence["parent_state_after"])) != expected
+        ):
+            _pdf_probe_failure("exact beta no-op did not remain stable on readback", evidence)
+        evidence["decision"] = {
+            "status": "selected",
+            "mode": "existing_state_noop",
+            "setter_calls": 0,
+        }
+        return evidence
+
+    if evidence["current_state_before"]["status"] != "ok":
+        _pdf_probe_failure("cannot read current PDF state before selection", evidence)
+    if not preconditions["setter_authorized"]:
+        failed = sorted(
+            name
+            for name, passed in preconditions.items()
+            if name != "setter_authorized" and not passed
+        )
+        _pdf_probe_failure(
+            "PDF beta setter preconditions failed: " + ", ".join(failed),
+            evidence,
+        )
+
+    setter = getattr(node, "set_state", None)
+    if not callable(setter):
+        _pdf_probe_failure("PDF setting has no set_state method", evidence)
+    evidence["decision"] = {
+        "status": "setting",
+        "mode": "single_set_readback",
+        "setter_calls": 1,
+    }
+    try:
+        setter(expected)
+    except Exception as exc:  # noqa: BLE001 - Fluent setters raise multiple RPC types.
+        evidence["decision"]["setter_error"] = {
+            "type": type(exc).__name__,
+            "message": str(exc),
+        }
+        _pdf_probe_failure("single exact PDF beta setter call failed", evidence)
+
+    evidence["current_state_after"] = _capture_evidence(lambda: _state(node))
+    evidence["parent_state_after"] = _capture_evidence(lambda: _state(parent))
+    if _capture_value(evidence["current_state_after"]) != expected:
+        _pdf_probe_failure("PDF beta leaf readback differs after the setter", evidence)
+    if _parent_pdf_value(_capture_value(evidence["parent_state_after"])) != expected:
+        _pdf_probe_failure("PDF beta parent-group readback differs after the setter", evidence)
+    evidence["decision"] = {
+        "status": "selected",
+        "mode": "single_set_readback",
+        "setter_calls": 1,
+    }
+    return evidence
+
+
+def _pdf_reported_allowed_values(evidence: Mapping[str, Any]) -> list[Any]:
+    raw = _capture_value(evidence.get("raw_attrs", {}))
+    raw_attrs = raw.get("attrs", {}) if isinstance(raw, Mapping) else {}
+    raw_values = raw_attrs.get("allowed-values")
+    helper_values = _capture_value(evidence.get("allowed_values_helper", {}))
+    for values in (raw_values, helper_values):
+        if isinstance(values, list) and values:
+            return list(values)
+    for values in (raw_values, helper_values):
+        if isinstance(values, list):
+            return list(values)
+    return []
+
+
 def _matches(actual: Any, expected: Any) -> bool:
     if isinstance(expected, bool):
         return isinstance(actual, bool) and actual is expected
@@ -241,19 +558,13 @@ def _object_names(container: Any) -> list[str]:
         try:
             values = getter()
         except Exception as exc:
-            raise FlameletSetupError(
-                f"cannot read Fluent named-object names: {exc}"
-            ) from exc
+            raise FlameletSetupError(f"cannot read Fluent named-object names: {exc}") from exc
         if not isinstance(values, list):
-            raise FlameletSetupError(
-                "Fluent get_object_names() did not return the required list"
-            )
+            raise FlameletSetupError("Fluent get_object_names() did not return the required list")
     elif isinstance(container, Mapping):
         values = list(container)
     else:
-        raise FlameletSetupError(
-            "Fluent named-object container does not expose get_object_names()"
-        )
+        raise FlameletSetupError("Fluent named-object container does not expose get_object_names()")
 
     if not values:
         raise FlameletSetupError("Fluent named-object container returned no object names")
@@ -269,8 +580,7 @@ def _require_2026_r1(session: Any) -> str:
     if not callable(getter):
         raise FlameletSetupError("Fluent session does not expose get_fluent_version")
     version = str(getter())
-    normalized = re.sub(r"[^a-z0-9.]", "", version.casefold())
-    if not any(token in normalized for token in ("26.1", "2026r1", "v261")):
+    if not _is_2026_r1(version):
         raise FlameletSetupError(
             f"setup probe is locked to Fluent 2026 R1, but session reports {version!r}"
         )
@@ -310,9 +620,7 @@ def _set_stream_compositions(boundary: Any, case: CaseSpec) -> Mapping[str, Any]
         raise FlameletSetupError(
             "Fluent flamelet boundary omits requested species: " + ", ".join(missing)
         )
-    fuel_fractions = {
-        name.casefold(): value for name, value in fuel.composition.fractions.items()
-    }
+    fuel_fractions = {name.casefold(): value for name, value in fuel.composition.fractions.items()}
     oxidizer_fractions = {
         name.casefold(): value for name, value in oxidizer.composition.fractions.items()
     }
@@ -336,11 +644,12 @@ def _set_stream_compositions(boundary: Any, case: CaseSpec) -> Mapping[str, Any]
     }
 
 
-def run_diffusion_fgm_setup_probe(
+def _run_diffusion_fgm_setup_probe(
     session: Any,
     case: CaseSpec,
     *,
     repository_root: str | Path | None = None,
+    diagnostics: dict[str, Any],
 ) -> Mapping[str, Any]:
     """Configure and serialize an exploratory setup, without generating a table.
 
@@ -354,6 +663,8 @@ def run_diffusion_fgm_setup_probe(
     generation = model.generation
     if generation.execution_scope != "setup_readback_only":  # schema guard plus defense in depth
         raise FlameletSetupError("this runner permits setup_readback_only profiles")
+    if generation.table_generation_permission != "prohibited":
+        raise FlameletSetupError("this runner requires table_generation_permission=prohibited")
     assets = resolve_probe_assets(case, repository_root=repository_root)
     version = _require_2026_r1(session)
 
@@ -464,12 +775,13 @@ def run_diffusion_fgm_setup_probe(
         require_allowed=True,
     )
     combustion_parameters = species.partially_premixed_combustion_parameters
-    _set_exact(
+    pdf_evidence = _select_probability_density_function(
         combustion_parameters.probability_density_function,
+        combustion_parameters,
         generation.probability_density_function,
-        "probability density function",
-        require_allowed=True,
+        fluent_version=version,
     )
+    diagnostics["probability_density_function_evidence"] = pdf_evidence
 
     mixtures = setup.materials.mixture
     mixture_names = _object_names(mixtures)
@@ -505,9 +817,7 @@ def run_diffusion_fgm_setup_probe(
     requested_groups = generation.runtime_defaults.groups
     readback = {name: _state(group_nodes[name]) for name in requested_groups}
     incomplete = sorted(
-        name
-        for name, value in readback.items()
-        if not isinstance(value, Mapping) or not value
+        name for name, value in readback.items() if not isinstance(value, Mapping) or not value
     )
     if incomplete:
         raise FlameletSetupError(
@@ -524,18 +834,17 @@ def run_diffusion_fgm_setup_probe(
             ppm.premix.turbulence_chemistry_interaction.option
         ),
         "variance_method": _allowed(ppm.premix.variance_settings.variance_method),
-        "probability_density_function": _allowed(
-            combustion_parameters.probability_density_function
-        ),
+        "probability_density_function": _pdf_reported_allowed_values(pdf_evidence),
         "density_eos": _allowed(density_option),
     }
     empty_allowed_values = sorted(
-        name for name, values in allowed_values.items() if not values
+        name
+        for name, values in allowed_values.items()
+        if name != "probability_density_function" and not values
     )
     if empty_allowed_values:
         raise FlameletSetupError(
-            "Fluent returned no allowed-value evidence for: "
-            + ", ".join(empty_allowed_values)
+            "Fluent returned no allowed-value evidence for: " + ", ".join(empty_allowed_values)
         )
     return {
         "schema_version": "1",
@@ -544,10 +853,12 @@ def run_diffusion_fgm_setup_probe(
         "fluent_version": version,
         "classification": generation.classification,
         "execution_scope": generation.execution_scope,
+        "table_generation_permission": generation.table_generation_permission,
         "status": "setup_readback_complete",
         "assets": dict(assets.evidence),
         "requested_generation": generation.model_dump(mode="json"),
         "stream_configuration": stream_readback,
+        "probability_density_function_evidence": pdf_evidence,
         "readback": readback,
         "allowed_values": allowed_values,
         "flamelet_calculation_performed": False,
@@ -558,3 +869,29 @@ def run_diffusion_fgm_setup_probe(
             "table-generation revision before enabling calc_fla or calc_pdf."
         ),
     }
+
+
+def run_diffusion_fgm_setup_probe(
+    session: Any,
+    case: CaseSpec,
+    *,
+    repository_root: str | Path | None = None,
+) -> Mapping[str, Any]:
+    """Configure and serialize an exploratory setup without generating a table.
+
+    Structured PDF metadata survives later setup failures so a failed Wuzhen
+    attempt does not lose the evidence needed to diagnose its exact boundary.
+    """
+
+    diagnostics: dict[str, Any] = {}
+    try:
+        return _run_diffusion_fgm_setup_probe(
+            session,
+            case,
+            repository_root=repository_root,
+            diagnostics=diagnostics,
+        )
+    except FlameletSetupError as exc:
+        if diagnostics and not hasattr(exc, "probe_evidence"):
+            exc.probe_evidence = dict(diagnostics)
+        raise
