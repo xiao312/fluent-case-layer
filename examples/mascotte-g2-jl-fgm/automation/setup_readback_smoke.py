@@ -81,6 +81,9 @@ def main() -> int:
         raise SystemExit(
             f"refusing a case outside the blocked setup/readback contract: {readiness!r}"
         )
+    generation = getattr(case.chemistry.model, "generation", None)
+    if generation is None:
+        raise SystemExit("setup/readback case has no typed generation contract")
 
     try:
         pyfluent = importlib.import_module("ansys.fluent.core")
@@ -114,6 +117,10 @@ def main() -> int:
             "schema_version": "1",
             "case_id": case.physics.case.id,
             "status": "setup_readback_failed",
+            "classification": generation.classification,
+            "execution_scope": generation.execution_scope,
+            "table_generation_permission": generation.table_generation_permission,
+            "requested_generation": generation.model_dump(mode="json"),
             "error": {
                 "type": type(exc).__name__,
                 "message": str(exc),

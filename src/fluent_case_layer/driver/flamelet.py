@@ -36,6 +36,10 @@ _PDF_SETTINGS_PATH = (
 )
 _PDF_RAW_ATTRS = ("active?", "read-only?", "allowed-values")
 _PDF_STATIC_ENUM = ["double-delta", "beta"]
+_PDF_GENERATED_MODULES = {
+    "ansys.fluent.core.generated.solver.settings_261",
+    "settings_261",
+}
 
 
 class FlameletSetupError(DriverError):
@@ -336,11 +340,13 @@ def _is_2026_r1(version: str) -> bool:
 
 
 def _pdf_probe_failure(message: str, evidence: dict[str, Any]) -> None:
-    evidence["decision"] = {
+    decision = {
         **dict(evidence.get("decision", {})),
         "status": "blocked",
         "reason": message,
     }
+    decision.setdefault("setter_calls", 0)
+    evidence["decision"] = decision
     raise ProbabilityDensityFunctionProbeError(message, evidence)
 
 
@@ -391,7 +397,7 @@ def _select_probability_density_function(
         generated_path = generated_path.removeprefix("fluent/")
     generated_valid = bool(
         isinstance(generated, Mapping)
-        and generated.get("module") == "ansys.fluent.core.generated.solver.settings_261"
+        and generated.get("module") in _PDF_GENERATED_MODULES
         and generated.get("class") == "probability_density_function"
         and generated.get("version") == "261"
         and generated.get("exposure_level") == "stable"

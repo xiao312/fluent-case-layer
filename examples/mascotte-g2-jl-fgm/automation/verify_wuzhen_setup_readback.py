@@ -199,7 +199,8 @@ def verify(
     if isinstance(generated_path, str):
         generated_path = generated_path.removeprefix("fluent/")
     if not (
-        generated.get("module") == "ansys.fluent.core.generated.solver.settings_261"
+        generated.get("module")
+        in {"ansys.fluent.core.generated.solver.settings_261", "settings_261"}
         and generated.get("class") == "probability_density_function"
         and generated.get("version") == "261"
         and generated.get("exposure_level") == "stable"

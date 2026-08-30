@@ -112,10 +112,75 @@
         "transcript_scan_pattern": "calc[_ -]?fla|calc[_ -]?pdf|initialize|iterate",
         "transcript_scan_matches": []
       }
+    },
+    {
+      "job_id": "43271670",
+      "git_commit": "c7a71e213e316fc12160c2e2df1b51d596cf53d1",
+      "snapshot_sha256": "81a70de04e744a66afe49bc725d5912cc116f8e93fbd5187423a2b842d276d05",
+      "run_path": "/work/home/ac8azwcnf1/xk/260831_fluent_case_layer/runs/g2-jl-fgm-pdf-metadata-c7a71e2-20260831a",
+      "scheduler": {
+        "account": "ac8azwcnf1",
+        "partition": "wzacnormal03",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 85,
+        "start": "2026-08-31T01:17:16+08:00",
+        "end": "2026-08-31T01:18:41+08:00",
+        "node": "b10r4n33",
+        "requested_cpus": 4,
+        "ranks": 1
+      },
+      "failure": {
+        "stage": "probability_density_function_activation_and_state_readback",
+        "message": "api-get-var: the object is not active",
+        "classification": "current_runtime_blocker",
+        "setter_calls": 0,
+        "observations": {
+          "allowed_values_helper": [],
+          "raw_active": false,
+          "parent_state": {},
+          "generated_v261_enum": [
+            "double-delta",
+            "beta"
+          ],
+          "runtime_static_info_enum": [
+            "double-delta",
+            "beta"
+          ]
+        }
+      },
+      "copied_artifacts": [
+        {
+          "path": "job-43271670/execution-provenance.json",
+          "sha256": "61db23f760ad18f74440f78e5508cce507cbf9c8acbc7d56fbdac4194a83ed81",
+          "size_bytes": 4251
+        },
+        {
+          "path": "job-43271670/setup-readback-failure.json",
+          "sha256": "7a2532d5627dd91cf7de05c6f0eecbe4033ba6c1ca75ef2d045327ef3d98e612",
+          "size_bytes": 9105
+        }
+      ],
+      "remote_only_artifact_hashes": {
+        "campaign.log": "d1e5462d2cb38c9e4d7d2a84544893f2fe617f2d2e26ed65c397aeb4fb7528de",
+        "fluent_transcript": "24dfa3a3bf1fbd43e1a58d2d65bbf3eb0270cb3a26d5906fcc1fec8ede9dbc51",
+        "slurm_stdout": "d1e5462d2cb38c9e4d7d2a84544893f2fe617f2d2e26ed65c397aeb4fb7528de",
+        "slurm_stderr": "956c70518ba64f566516d055a51cb9dc8fdc8942ab6340a3660ecd4f57fe8b09"
+      },
+      "terminal_guards": {
+        "success_marker": "absent",
+        "verification_json": "absent",
+        "evidence_sha256": "absent",
+        "transcript_scan_pattern": "calc[_ -]?fla|calc[_ -]?pdf|initialize|iterate",
+        "transcript_scan_matches": [],
+        "table_or_solve_artifacts": []
+      }
     }
   ],
   "claim_boundary": {
     "species_discovery_gap": "resolved_by_get_object_names_and_demonstrated_past_on_retry",
+    "empty_pdf_helper_interpretation": "resolved_as_insufficient_metadata_not_an_unsupported_beta_enum",
+    "current_pdf_activation_gap": "live_leaf_inactive_and_unreadable",
     "complete_settings_readback": false,
     "table_generation_performed": false,
     "pdf_calculation_performed": false,

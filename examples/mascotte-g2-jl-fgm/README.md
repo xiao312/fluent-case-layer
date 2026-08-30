@@ -33,12 +33,15 @@ result.
 
 ## Wuzhen setup/readback probe
 
-Two Wuzhen attempts on 2026-08-31 stopped before complete readback. The first
+Three Wuzhen attempts on 2026-08-31 stopped before complete readback. The first
 identified a `NamedObject.list()` versus `get_object_names()` discovery bug;
 that bug is fixed and the retry progressed past species enumeration. The retry
-then failed closed because Fluent returned no allowed-value evidence for the
-active PDF option. The setup/readback execution is therefore still blocked,
-and no `SUCCESS` artifact exists. See the
+then failed closed because `allowed_values()` returned no evidence for the PDF
+option. A metadata-only follow-up proved that generated v261 and server static
+metadata both contain `beta`, but the live PDF leaf is inactive, its current
+state is unreadable, and its parent state is empty. The fail-closed adapter made
+no setter call. Setup/readback is therefore still blocked, and no `SUCCESS`
+artifact exists. See the
 [auditable attempt note](reference/wuzhen-setup-readback/README.md) and its
 [structured evidence manifest](reference/wuzhen-setup-readback/evidence-manifest.json).
 

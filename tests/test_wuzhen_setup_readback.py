@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / "examples" / "mascotte-g2-jl-fgm"
 AUTOMATION = EXAMPLE / "automation"
 CASE_PATH = EXAMPLE / "case"
+REFERENCE = EXAMPLE / "reference" / "wuzhen-setup-readback"
 
 
 def load_json(path: Path) -> dict[str, object]:
@@ -95,6 +97,42 @@ def test_wuzhen_runtime_wheels_are_exactly_locked() -> None:
         "typing_inspection-0.4.4-py3-none-any.whl",
     }
     assert all(len(digest) == 64 for digest, _ in lines)
+
+
+def test_retained_pdf_metadata_failure_is_hash_locked_and_fail_closed() -> None:
+    manifest = load_json(REFERENCE / "evidence-manifest.json")
+    attempts = {attempt["job_id"]: attempt for attempt in manifest["attempts"]}
+    latest = attempts["43271670"]
+    for artifact in latest["copied_artifacts"]:
+        path = REFERENCE / artifact["path"]
+        assert path.stat().st_size == artifact["size_bytes"]
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == artifact["sha256"]
+
+    provenance = load_json(REFERENCE / "job-43271670" / "execution-provenance.json")
+    assert provenance["source"]["git_commit"] == latest["git_commit"]
+    assert provenance["source"]["snapshot_sha256"] == latest["snapshot_sha256"]
+    assert set(provenance["safety_contract"].values()) == {False}
+
+    failure = load_json(REFERENCE / "job-43271670" / "setup-readback-failure.json")
+    pdf = failure["diagnostics"]["probability_density_function_evidence"]
+    assert failure["status"] == "setup_readback_failed"
+    assert pdf["allowed_values_helper"] == {"status": "ok", "value": []}
+    assert pdf["raw_attrs"]["value"]["attrs"] == {"active?": False}
+    assert pdf["current_state_before"]["status"] == "error"
+    assert pdf["parent_state_before"] == {"status": "ok", "value": {}}
+    assert pdf["generated_v261_schema"]["value"]["allowed_values"] == [
+        "double-delta",
+        "beta",
+    ]
+    assert pdf["runtime_static_info"]["value"]["node"]["allowed-values"] == [
+        "double-delta",
+        "beta",
+    ]
+    assert pdf["preconditions"]["active"] is False
+    assert pdf["preconditions"]["setter_authorized"] is False
+    assert pdf["decision"]["status"] == "blocked"
+    assert latest["failure"]["setter_calls"] == 0
+    assert latest["terminal_guards"]["transcript_scan_matches"] == []
 
 
 def synthetic_artifacts(tmp_path: Path) -> tuple[Path, Path, str, str, str]:
@@ -225,7 +263,7 @@ def synthetic_artifacts(tmp_path: Path) -> tuple[Path, Path, str, str, str]:
             "generated_v261_schema": {
                 "status": "ok",
                 "value": {
-                    "module": "ansys.fluent.core.generated.solver.settings_261",
+                    "module": "settings_261",
                     "class": "probability_density_function",
                     "version": "261",
                     "exposure_level": "stable",

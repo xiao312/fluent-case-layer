@@ -83,7 +83,8 @@ class FakeSettingsProxy:
 
 
 class FakePdfValue(FakeValue):
-    __module__ = "ansys.fluent.core.generated.solver.settings_261"
+    # PyFluent 0.40.2 loads the v261 generated file under this short runtime alias.
+    __module__ = "settings_261"
     _version = "261"
     exposure_level = "stable"
     fluent_name = "probability-density-function"
@@ -415,6 +416,7 @@ def test_pdf_probe_fails_before_set_when_raw_metadata_query_errors() -> None:
     assert node.set_calls == 0
     assert evidence["raw_attrs"]["status"] == "error"
     assert evidence["decision"]["status"] == "blocked"
+    assert evidence["decision"]["setter_calls"] == 0
 
 
 def test_pdf_probe_fails_before_set_when_runtime_static_enum_omits_beta() -> None:
